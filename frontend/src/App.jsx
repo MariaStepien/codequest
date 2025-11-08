@@ -1,12 +1,19 @@
-import './App.css'
+import {Routes, Route } from 'react-router-dom'
 import LoginPage from './pages/LoginPage'
-import './index.css'
+import OptionSelectionPage from './pages/OptionSelectionPage'
 
 function App() {
-
-
   return (
-    <LoginPage/>
+    <Routes>
+      {/* Login screen */}
+      <Route path="/" element={<LoginPage/>} />
+
+      {/* option selection screen */}
+      <Route path="/test" element={<OptionSelectionPage/>} />
+
+      {/* Error screen */}
+      <Route path="*" element={<h1>404 Not Found</h1>} />
+    </Routes>
   )
 }
 
