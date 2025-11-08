@@ -42,6 +42,12 @@ export default function OptionSelectionPage() {
           You have selected: <span className="font-bold text-brown-800">{selectedOption.charAt(0).toUpperCase() + selectedOption.slice(1)}</span>
         </p>
       )}
+
+      <p className="text-center text-sm text-gray-600 mt-2">
+            <a href="/test-level" className= "text-pink-600 font-medium hover:underline">
+            Go further
+            </a>
+        </p>
     </div>
   );
 }
