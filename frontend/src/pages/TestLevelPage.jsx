@@ -3,6 +3,9 @@
 import React from 'react';
 import TextBox from '../components/TextBox'; // Adjust path
 import OrderableList from '../components/OrderableList'; // Adjust path
+import FillInTheBlank from '../components/FillInTheBlank';
+import MatchingPairs from '../components/MatchingPairs';
+import MultipleChoice from '../components/MultipleChoice';
 
 // Define the steps for this specific test level
 const levelSteps = [
@@ -11,6 +14,12 @@ const levelSteps = [
     { id: 'c3', text: "if true:" },
     { id: 'c4', text: "a=4" },
 ];
+
+const vocabularyMatch = [
+    { key: 'A', left: 'Configuration', right: 'The settings that determine system behavior.' },
+    { key: 'B', left: 'Debug', right: 'Identify and remove errors from software.' },
+    { key: 'C', left: 'Ping', right: 'A command to test network connection.' },
+]
 
 export default function TestLevelPage() {
     // Function to handle the final ordered list (e.g., to send to an API for validation)
@@ -37,6 +46,37 @@ export default function TestLevelPage() {
                 <OrderableList 
                     initialItems={levelSteps} 
                     onOrderChange={handleFinalOrder}
+                />
+
+                <TextBox
+                    sentence='Code below is missing the following words: if, else, while, true, false, if'
+                    bgColor='bg-purple-50'
+                    borderColor='border-blue-400'
+                />
+                <FillInTheBlank
+                    sentence="if [BLANK]:"
+                    correctAnswers={['true']}
+                />
+
+                <TextBox
+                    sentence='Connect the following into pairs:'
+                    bgColor='bg-purple-50'
+                    borderColor='border-blue-400'
+                />
+
+                <MatchingPairs
+                    items={vocabularyMatch}
+                />
+
+                <MultipleChoice
+                    question="Which command is primarily used to check if a remote server is reachable?"
+                    options={[
+                        "ipconfig", 
+                        "traceroute", 
+                        "ping", 
+                        "netstat"
+                    ]}
+                    correctAnswer="ping"
                 />
 
                 {/* Optional: Navigation Button */}
