@@ -2,6 +2,9 @@ import {Routes, Route } from 'react-router-dom'
 import LoginPage from './pages/LoginPage'
 import OptionSelectionPage from './pages/OptionSelectionPage'
 import TestLevelPage from './pages/TestLevelPage'
+import LevelSelectionPage from './pages/LevelSelectionPage'
+import DashboardPage from './pages/DashboardPage'
+import UserProfilePage from './pages/UserProfilePage'
 
 function App() {
   return (
@@ -14,6 +17,17 @@ function App() {
 
       {/* option selection screen */}
       <Route path="/test-level" element={<TestLevelPage/>} />
+
+      {/* option selection screen */}
+      <Route path="/levels" element={<LevelSelectionPage/>} />
+
+      
+      {/* option selection screen */}
+      <Route path="/dashboard" element={<DashboardPage/>} />
+
+            
+      {/* option selection screen */}
+      <Route path="/user-info" element={<UserProfilePage/>} />
 
       {/* Error screen */}
       <Route path="*" element={<h1>404 Not Found</h1>} />
