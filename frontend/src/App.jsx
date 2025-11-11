@@ -5,6 +5,7 @@ import TestLevelPage from './pages/TestLevelPage'
 import LevelSelectionPage from './pages/LevelSelectionPage'
 import DashboardPage from './pages/DashboardPage'
 import UserProfilePage from './pages/UserProfilePage'
+import RegisterPage from './pages/RegisterPage'
 
 function App() {
   return (
@@ -28,6 +29,9 @@ function App() {
             
       {/* option selection screen */}
       <Route path="/user-info" element={<UserProfilePage/>} />
+
+      {/* option selection screen */}
+      <Route path="/register" element={<RegisterPage/>} />
 
       {/* Error screen */}
       <Route path="*" element={<h1>404 Not Found</h1>} />
