@@ -97,7 +97,7 @@ export default function RegisterPage() {
               value={userLogin}
               onChange={(e) => setUserLogin(e.target.value)}
               required
-              className="w-full px-5 py-3 text-lg border-2 border-transparent rounded-2xl shadow-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-300 outline-none transition duration-300"
+              className="w-full px-5 py-3 text-lg border-2 border-transparent rounded-2xl shadow-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-300 outline-none transition duration-300 text-gray-900"
               placeholder="Choose a unique login name"
               disabled={isLoading}
             />
@@ -116,7 +116,7 @@ export default function RegisterPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-5 py-3 text-lg border-2 border-transparent rounded-2xl shadow-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-300 outline-none transition duration-300"
+              className="w-full px-5 py-3 text-lg border-2 border-transparent rounded-2xl shadow-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-300 outline-none transition duration-300 text-gray-900"
               placeholder="Enter your password"
               disabled={isLoading}
             />
@@ -135,7 +135,7 @@ export default function RegisterPage() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              className="w-full px-5 py-3 text-lg border-2 border-transparent rounded-2xl shadow-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-300 outline-none transition duration-300"
+              className="w-full px-5 py-3 text-lg border-2 border-transparent rounded-2xl shadow-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-300 outline-none transition duration-300 text-gray-900"
               placeholder="Re-enter your password"
               disabled={isLoading}
             />

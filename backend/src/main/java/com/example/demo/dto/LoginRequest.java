@@ -1,21 +1,18 @@
 package com.example.demo.dto;
 
-// Note: You may need Lombok annotations for getters/setters 
-// but using explicit methods for simplicity here.
-
 public class LoginRequest {
-    private String email;
+    private String userLogin; // Changed from email
     private String password;
 
     // Default constructor is required by Spring
     public LoginRequest() {}
 
-    public String getEmail() {
-        return email;
+    public String getUserLogin() { // Changed from getEmail()
+        return userLogin;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setUserLogin(String userLogin) { // Changed from setEmail()
+        this.userLogin = userLogin;
     }
 
     public String getPassword() {

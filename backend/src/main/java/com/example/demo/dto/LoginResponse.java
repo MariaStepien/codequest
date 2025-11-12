@@ -3,8 +3,9 @@ package com.example.demo.dto;
 public class LoginResponse {
     private String token;
     private String message;
-    private Long userId;
+    private Long userId; // Field is Long
 
+    // FIX: Constructor now takes exactly three arguments (String, String, Long)
     public LoginResponse(String token, String message, Long userId) {
         this.token = token;
         this.message = message;

@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { Loader2 } from 'lucide-react'; // Import for loading spinner
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
+  // FIX: Renamed state from 'email' to 'userLogin' to match DTO
+  const [userLogin, setUserLogin] = useState(""); 
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -14,7 +15,7 @@ export default function LoginPage() {
     setIsLoading(true);
 
     const loginData = {
-      email,
+      userLogin, // Use userLogin state
       password,
     };
 
@@ -38,16 +39,18 @@ export default function LoginPage() {
         
         // 1. Store the JWT Token (e.g., in localStorage or a state manager)
         // Note: In a real app, you would secure this token carefully.
-        // localStorage.setItem('token', responseData.token); 
-
-        // 2. Redirect the user to the dashboard or profile page
-        // window.location.href = '/dashboard'; 
-        // We'll simulate a redirect and show a success message:
-        alertMessage("Login Successful! Welcome.", "success");
+        localStorage.setItem('token', responseData.token); 
+        localStorage.setItem('userId', responseData.userId); 
+        
+        // 2. Redirect the user to the dashboard page (NEW IMPLEMENTATION)
+        window.location.href = '/dashboard'; 
+        
+        // Removed alertMessage since we are now redirecting immediately
+        // alertMessage("Login Successful! Welcome.", "success");
 
       } else {
         // --- FAILURE ---
-        const errorMessage = responseData.message || "Invalid email or password.";
+        const errorMessage = responseData.message || "Invalid login or password.";
         setError(errorMessage);
         alertMessage(errorMessage, "error");
       }
@@ -96,19 +99,21 @@ export default function LoginPage() {
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
             <label
-              htmlFor="email"
+              htmlFor="userLogin"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Email
+              Login / Username
             </label>
+            {/* FIX: Changed htmlFor and id to userLogin to match DTO */}
             <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              id="userLogin"
+              type="text"
+              value={userLogin} // Use userLogin state
+              onChange={(e) => setUserLogin(e.target.value)} // Set userLogin state
               required
-              className="w-full px-5 py-3 text-lg border-2 border-transparent rounded-2xl shadow-sm focus:border-pink-500 focus:ring-2 focus:ring-pink-300 outline-none transition duration-300"
-              placeholder="Enter your email"
+              // ADDED: placeholder-gray-700 for darker text
+              className="w-full px-5 py-3 text-lg border-2 border-transparent rounded-2xl shadow-sm focus:border-pink-500 focus:ring-2 focus:ring-pink-300 outline-none transition duration-300 placeholder-gray-700 text-gray-900"
+              placeholder="Enter your login name"
               disabled={isLoading}
             />
           </div>
@@ -126,7 +131,8 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-5 py-3 text-lg border-2 border-transparent rounded-2xl shadow-sm focus:border-pink-500 focus:ring-2 focus:ring-pink-300 outline-none transition duration-300"
+              // ADDED: placeholder-gray-700 for darker text
+              className="w-full px-5 py-3 text-lg border-2 border-transparent rounded-2xl shadow-sm focus:border-pink-500 focus:ring-2 focus:ring-pink-300 outline-none transition duration-300 placeholder-gray-700 text-gray-900"
               placeholder="Enter your password"
               disabled={isLoading}
             />
@@ -134,7 +140,7 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            className={`w-full py-3 text-lg font-semibold text-white rounded-2xl transition duration-300 shadow-lg flex items-center justify-center space-x-2
+            className={`w-full py-3 text-lg font-semibold text-black rounded-2xl transition duration-300 shadow-lg flex items-center justify-center space-x-2
               ${isLoading 
                 ? 'bg-gray-400 cursor-not-allowed' 
                 : 'bg-gradient-to-r from-yellow-500 to-green-600 hover:from-purple-600 hover:to-pink-500'
@@ -154,7 +160,7 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-gray-600 mt-6">
           Don't have an account?{" "}
-          <a href="/signup" className="text-pink-600 font-medium hover:underline">
+          <a href="/register" className="text-pink-600 font-medium hover:underline">
             Sign up
           </a>
         </p>

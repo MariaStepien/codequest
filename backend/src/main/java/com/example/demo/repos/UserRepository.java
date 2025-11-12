@@ -11,7 +11,7 @@ import com.example.demo.model.Users;
  * Repository for handling database operations for the Users entity.
  */
 @Repository
-public interface UsersRepository extends JpaRepository<Users, Long> {
+public interface UserRepository extends JpaRepository<Users, Long> {
 
     /**
      * Finds a user by their userLogin name. Essential for registration (checking for duplicates)
