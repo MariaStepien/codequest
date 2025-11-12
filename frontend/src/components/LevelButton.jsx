@@ -19,8 +19,26 @@ export default function LevelButton({ levelNumber, isUnlocked = true }) {
         }
     };
 
-    const lockedClasses = 'bg-gray-300 border-gray-500 text-gray-600 cursor-not-allowed';
-    const unlockedClasses = 'bg-indigo-500 border-indigo-700 text-white hover:bg-indigo-600 hover:scale-105';
+    // Pastel Color Palette based on level number
+    const colorMap = {
+        // Red Pastel
+        1: 'bg-red-300 border-red-400 hover:bg-red-400',
+        4: 'bg-red-300 border-red-400 hover:bg-red-400',
+        8: 'bg-red-300 border-red-400 hover:bg-red-400',
+        // Yellow/Orange Pastel
+        2: 'bg-yellow-300 border-yellow-400 hover:bg-yellow-400',
+        5: 'bg-yellow-300 border-yellow-400 hover:bg-yellow-400',
+        // Green Pastel
+        3: 'bg-green-300 border-green-400 hover:bg-green-400',
+        // Blue Pastel
+        7: 'bg-blue-300 border-blue-400 hover:bg-blue-400',
+    };
+
+    const lockedClasses = 'bg-gray-200 border-gray-300 text-gray-500 cursor-not-allowed shadow-inner';
+    
+    // Choose the color based on the level number, defaulting to a pastel blue
+    const unlockedColorClass = colorMap[levelNumber] || 'bg-blue-300 border-blue-400 hover:bg-blue-400';
+    const unlockedClasses = `${unlockedColorClass} text-white hover:scale-105 active:scale-100`;
 
     return (
         <button
@@ -28,10 +46,10 @@ export default function LevelButton({ levelNumber, isUnlocked = true }) {
             disabled={!isUnlocked}
             title={isUnlocked ? `Start Level ${levelNumber}` : 'Level Locked'}
             className={`
-                w-16 h-16 rounded-lg 
+                w-16 h-16 rounded-full 
                 flex items-center justify-center
                 text-xl font-extrabold 
-                shadow-lg border-4 transition-all duration-300
+                shadow-lg border-4 transition-all duration-200
                 ${isUnlocked ? unlockedClasses : lockedClasses}
             `}
         >
