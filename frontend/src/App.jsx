@@ -6,6 +6,7 @@ import LevelSelectionPage from './pages/LevelSelectionPage'
 import DashboardPage from './pages/DashboardPage'
 import UserProfilePage from './pages/UserProfilePage'
 import RegisterPage from './pages/RegisterPage'
+import LevelOneTheAmuletOfCode from './pages/LevelOneTheAmuletOfCode'
 
 function App() {
   return (
@@ -16,22 +17,23 @@ function App() {
       {/* option selection screen */}
       <Route path="/test" element={<OptionSelectionPage/>} />
 
-      {/* option selection screen */}
+      {/* test level screen */}
       <Route path="/test-level" element={<TestLevelPage/>} />
 
-      {/* option selection screen */}
+      {/* level selection screen */}
       <Route path="/levels" element={<LevelSelectionPage/>} />
 
-      
-      {/* option selection screen */}
+      {/* dashboard */}
       <Route path="/dashboard" element={<DashboardPage/>} />
 
-            
-      {/* option selection screen */}
+      {/* user page */}
       <Route path="/user-info" element={<UserProfilePage/>} />
 
-      {/* option selection screen */}
+      {/* register screen */}
       <Route path="/register" element={<RegisterPage/>} />
+
+      {/* first level screen */}
+      <Route path="/level/1" element={<LevelOneTheAmuletOfCode/>} />
 
       {/* Error screen */}
       <Route path="*" element={<h1>404 Not Found</h1>} />

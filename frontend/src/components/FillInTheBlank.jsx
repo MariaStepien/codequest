@@ -6,8 +6,9 @@ import PropTypes from 'prop-types';
  * @param {object} props
  * @param {string} props.sentence The sentence string containing one or more [BLANK] placeholders.
  * @param {string[]} props.correctAnswers An array of expected correct answers, in order.
+ * @param {function} props.onTaskComplete Callback to signal LevelTemplate (true for correct, false for incorrect).
  */
-export default function FillInTheBlank({ sentence, correctAnswers }) {
+export default function FillInTheBlank({ sentence, correctAnswers, onTaskComplete }) {
   // Split the sentence by the placeholder to get text segments
   const textSegments = sentence.split('[BLANK]');
   
@@ -46,7 +47,11 @@ export default function FillInTheBlank({ sentence, correctAnswers }) {
   
   const handleSubmit = () => {
     setIsSubmitted(true);
-    console.log(`Submission complete. All Correct: ${allCorrect}`);
+    // Determine correctness and signal the parent LevelTemplate
+    const isLevelCorrect = userInputs.every((input, index) => 
+        checkAnswer(input, correctAnswers[index])
+    );
+    onTaskComplete(isLevelCorrect);
   };
 
   // --- Rendering Functions ---
@@ -62,7 +67,8 @@ export default function FillInTheBlank({ sentence, correctAnswers }) {
   };
 
   const isAnyInputEmpty = userInputs.some(input => !input.trim());
-  const buttonDisabled = isSubmitted || isAnyInputEmpty;
+  // Disable if already submitted and correct, or if inputs are empty
+  const buttonDisabled = (isSubmitted && allCorrect) || isAnyInputEmpty;
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-2xl mx-auto space-y-4">
@@ -108,13 +114,13 @@ export default function FillInTheBlank({ sentence, correctAnswers }) {
           }
         `}
       >
-        {isSubmitted ? (allCorrect ? 'All Correct!' : 'Check Answers') : 'Check Answers'}
+        {isSubmitted && allCorrect ? 'Correct Runes Sealed!' : 'Check Runes'}
       </button>
 
       {/* Optional: Show feedback after submission */}
       {isSubmitted && !allCorrect && (
-        <p className="text-sm text-red-600 mt-2">
-          Review your answers. Some inputs are incorrect.
+        <p className="text-sm text-red-600 mt-2 text-center">
+          The glyphs are vibrating... Review your answers. Some runes are placed incorrectly.
         </p>
       )}
     </div>
@@ -124,4 +130,5 @@ export default function FillInTheBlank({ sentence, correctAnswers }) {
 FillInTheBlank.propTypes = {
   sentence: PropTypes.string.isRequired,
   correctAnswers: PropTypes.arrayOf(PropTypes.string).isRequired,
+  onTaskComplete: PropTypes.func.isRequired,
 };

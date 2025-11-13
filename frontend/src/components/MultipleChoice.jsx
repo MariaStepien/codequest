@@ -7,20 +7,21 @@ import PropTypes from 'prop-types';
  * @param {string} props.question The question text.
  * @param {string[]} props.options An array of possible answer strings.
  * @param {string} props.correctAnswer The correct answer string (must match one of the options).
+ * @param {function} props.onTaskComplete Callback to signal LevelTemplate (true for correct, false for incorrect).
  */
-export default function MultipleChoice({ question, options, correctAnswer }) {
+export default function MultipleChoice({ question, options, correctAnswer, onTaskComplete }) {
     const [selectedOption, setSelectedOption] = useState(null);
     const [isSubmitted, setIsSubmitted] = useState(false);
 
     // --- Core Logic ---
 
-    const isCorrect = isSubmitted && (selectedOption === correctAnswer);
+    const isCorrect = selectedOption === correctAnswer; // Check correctness based on final selected option
 
     const handleSubmit = () => {
         if (selectedOption) {
             setIsSubmitted(true);
-            console.log(`Submitted answer: ${selectedOption}. Correct: ${isCorrect}`);
-            // You could add logic here to track scores or advance the user
+            // Signal the parent LevelTemplate
+            onTaskComplete(selectedOption === correctAnswer);
         }
     };
 
@@ -52,6 +53,9 @@ export default function MultipleChoice({ question, options, correctAnswer }) {
         }
         return classes;
     };
+    
+    // Disable interaction after a correct submission
+    const disableInteraction = isSubmitted && isCorrect;
 
     return (
         <div className="bg-white p-6 rounded-xl shadow-2xl w-full max-w-lg mx-auto space-y-6">
@@ -63,7 +67,7 @@ export default function MultipleChoice({ question, options, correctAnswer }) {
                 {options.map((option, index) => (
                     <div
                         key={index}
-                        onClick={() => !isSubmitted && setSelectedOption(option)}
+                        onClick={() => !disableInteraction && setSelectedOption(option)}
                         className={getOptionClasses(option)}
                     >
                         {option}
@@ -75,22 +79,23 @@ export default function MultipleChoice({ question, options, correctAnswer }) {
             <div className="pt-4 border-t">
                 {isSubmitted && (
                     <p className={`mb-3 text-center font-medium ${isCorrect ? 'text-green-600' : 'text-red-600'}`}>
-                        {isCorrect ? 'Correct! Well done.' : `Incorrect. The correct answer was: ${correctAnswer}`}
+                        {isCorrect ? 'Correct! Rune power accepted.' : `Incorrect. The correct rune was: ${correctAnswer}`}
                     </p>
                 )}
 
                 <button
                     onClick={handleSubmit}
-                    disabled={!selectedOption || isSubmitted}
+                    // Disable if not selected OR already submitted correctly
+                    disabled={!selectedOption || disableInteraction}
                     className={`
                         w-full py-3 px-4 font-semibold rounded-lg transition duration-200
-                        ${!selectedOption || isSubmitted
+                        ${!selectedOption || disableInteraction
                             ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
                             : 'bg-indigo-600 text-white hover:bg-indigo-700'
                         }
                     `}
                 >
-                    {isSubmitted ? (isCorrect ? 'Completed' : 'Try Another') : 'Submit Answer'}
+                    {disableInteraction ? 'Task Completed' : 'Forge Rune'}
                 </button>
             </div>
         </div>
@@ -101,4 +106,5 @@ MultipleChoice.propTypes = {
     question: PropTypes.string.isRequired,
     options: PropTypes.arrayOf(PropTypes.string).isRequired,
     correctAnswer: PropTypes.string.isRequired,
+    onTaskComplete: PropTypes.func.isRequired,
 };

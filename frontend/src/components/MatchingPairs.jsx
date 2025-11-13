@@ -5,8 +5,9 @@ import PropTypes from 'prop-types';
  * Component for a matching pairs exercise.
  * @param {object} props
  * @param {Array<object>} props.items Array of objects: { key, left, right }
+ * @param {function} props.onTaskComplete Callback to signal LevelTemplate (true only when all pairs matched).
  */
-export default function MatchingPairs({ items }) {
+export default function MatchingPairs({ items, onTaskComplete }) {
     // State stores the 'key' of the currently selected item in each column.
     const [leftSelectionKey, setLeftSelectionKey] = useState(null); 
     const [rightSelectionKey, setRightSelectionKey] = useState(null); 
@@ -20,10 +21,8 @@ export default function MatchingPairs({ items }) {
         if (matchedPairsKeys.includes(key)) return; // Do nothing if already matched
 
         if (type === 'left') {
-            // Only update the left selection state
             setLeftSelectionKey(leftSelectionKey === key ? null : key); 
         } else {
-            // Only update the right selection state
             setRightSelectionKey(rightSelectionKey === key ? null : key); 
         }
         setFeedback(null);
@@ -36,11 +35,17 @@ export default function MatchingPairs({ items }) {
         }
 
         if (leftSelectionKey === rightSelectionKey) {
-            // Correct Match! The keys are identical.
-            setMatchedPairsKeys([...matchedPairsKeys, leftSelectionKey]);
+            // Correct Match!
+            const newMatchedKeys = [...matchedPairsKeys, leftSelectionKey];
+            setMatchedPairsKeys(newMatchedKeys);
             setFeedback({ type: 'success', message: 'Correct match! Pair completed.' });
+            
+            // Check if all pairs are now matched
+            if (newMatchedKeys.length === items.length) {
+                onTaskComplete(true); // Signal completion of this task
+            }
         } else {
-            // Incorrect Match
+            // Incorrect Match - do not signal LevelTemplate false, just give local feedback
             setFeedback({ type: 'error', message: 'Incorrect pairing. Try again!' });
         }
 
@@ -64,19 +69,19 @@ export default function MatchingPairs({ items }) {
             return 'bg-indigo-200 border-4 border-indigo-700 text-indigo-900 shadow-xl transform scale-[1.02]';
         }
         
-        return 'bg-black border-gray-300 hover:bg-gray-100';
+        return 'bg-white border-gray-300 hover:bg-gray-100'; // Changed from black to white/gray for visibility
     };
 
     return (
         <div className="bg-gray-50 p-6 rounded-xl shadow-2xl w-full max-w-2xl mx-auto space-y-6">
             <h3 className="text-2xl font-bold text-gray-800 border-b pb-3">
-                Match the Pairs
+                Match the Ancient Runes
             </h3>
 
             <div className="flex justify-between space-x-6">
                 {/* Left Column (Terms) */}
                 <div className="w-1/2 space-y-3">
-                    <h4 className="text-lg font-semibold text-gray-700 mb-2">Left Column</h4>
+                    <h4 className="text-lg font-semibold text-gray-700 mb-2">Glyphs</h4>
                     {items.map(item => (
                         <div
                             key={item.key} 
@@ -93,7 +98,7 @@ export default function MatchingPairs({ items }) {
 
                 {/* Right Column (Definitions/Properties) - Shuffled for the user */}
                 <div className="w-1/2 space-y-3">
-                    <h4 className="text-lg font-semibold text-gray-700 mb-2">Right Column</h4>
+                    <h4 className="text-lg font-semibold text-gray-700 mb-2">Meanings</h4>
                     {/* Note: You should shuffle the right items in the parent component for a real test! */}
                     {items.map(item => (
                         <div
@@ -132,7 +137,7 @@ export default function MatchingPairs({ items }) {
                         }
                     `}
                 >
-                    {isFinished ? 'All Pairs Matched! 🎉' : 'Check Pairing'}
+                    {isFinished ? 'Sealed All Bonds! 🎉' : 'Forge Pairing'}
                 </button>
             </div>
         </div>
@@ -146,5 +151,6 @@ MatchingPairs.propTypes = {
             left: PropTypes.string.isRequired,
             right: PropTypes.string.isRequired,
         })
-    ).isRequired, // Items are now required
+    ).isRequired,
+    onTaskComplete: PropTypes.func.isRequired,
 };

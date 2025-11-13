@@ -1,43 +1,50 @@
 import React, { useState, useEffect } from 'react';
-
-// Example initial data structure (you will pass this as a prop)
-const initialSentences = [
-    { id: 's1', text: "First, you need to open the application." },
-    { id: 's2', text: "Next, locate the settings menu." },
-    { id: 's3', text: "Finally, save your changes and exit." },
-];
+import PropTypes from 'prop-types';
 
 /**
  * A component allowing users to reorder a list of items using up/down buttons.
+ * @param {Array<object>} props.initialItems The items to be ordered by the user.
+ * @param {Array<object>} props.correctOrder The array of items in the correct order (must have same IDs as initialItems).
+ * @param {function} props.onTaskComplete Callback to signal LevelTemplate (true for correct order, false otherwise).
  */
-export default function OrderableList({ initialItems = initialSentences, onOrderChange }) {
+export default function OrderableList({ initialItems, correctOrder, onTaskComplete }) {
     const [items, setItems] = useState(initialItems);
+    const [isSubmitted, setIsSubmitted] = useState(false);
+    const [isCorrect, setIsCorrect] = useState(false);
 
     // If the initial items prop changes, reset the state
     useEffect(() => {
         setItems(initialItems);
-    }, [initialItems]);
+        setIsSubmitted(false);
+        setIsCorrect(false);
+    }, [initialItems, correctOrder]);
 
-    // Function to move an item up in the list
+    // Function to move an item up or down in the list
     const moveItem = (index, direction) => {
-        // Only proceed if there's a valid move (not already at the top/bottom)
+        if (isSubmitted && isCorrect) return; // Prevent moves after correct submission
+
         if ((direction === 'up' && index > 0) || (direction === 'down' && index < items.length - 1)) {
             const newIndex = direction === 'up' ? index - 1 : index + 1;
-            
-            // 1. Create a copy of the list
             const newItems = [...items];
             
-            // 2. Swap the item with the one in the new position
+            // Swap the item with the one in the new position
             [newItems[index], newItems[newIndex]] = [newItems[newIndex], newItems[index]];
 
-            // 3. Update the state
             setItems(newItems);
-
-            // Optional: Call a function to notify the parent component of the new order
-            if (onOrderChange) {
-                onOrderChange(newItems);
-            }
+            // Reset submission status if user is moving items
+            setIsSubmitted(false); 
         }
+    };
+
+    const handleSubmit = () => {
+        // Check if current items order matches correctOrder
+        const isOrderCorrect = items.every((item, index) => item.id === correctOrder[index].id);
+        
+        setIsSubmitted(true);
+        setIsCorrect(isOrderCorrect);
+        
+        // Signal the parent LevelTemplate
+        onTaskComplete(isOrderCorrect);
     };
 
     return (
@@ -50,10 +57,12 @@ export default function OrderableList({ initialItems = initialSentences, onOrder
                 {items.map((item, index) => (
                     <div 
                         key={item.id} 
-                        className="flex items-center bg-gray-50 border border-gray-200 rounded-md p-3"
+                        className={`flex items-center border rounded-md p-3 transition duration-150
+                            ${isSubmitted && isCorrect ? 'bg-green-100 border-green-500' : 'bg-gray-50 border-gray-200'}
+                        `}
                     >
                         {/* Current Position Marker */}
-                        <span className="text-lg font-bold text-indigo-600 mr-4 w-6 text-center">
+                        <span className={`text-lg font-bold mr-4 w-6 text-center ${isSubmitted && isCorrect ? 'text-green-700' : 'text-indigo-600'}`}>
                             {index + 1}.
                         </span>
 
@@ -64,7 +73,7 @@ export default function OrderableList({ initialItems = initialSentences, onOrder
                         <div className="flex flex-col ml-4 space-y-1">
                             <button
                                 onClick={() => moveItem(index, 'up')}
-                                disabled={index === 0} // Disable 'Up' if it's the first item
+                                disabled={index === 0 || (isSubmitted && isCorrect)}
                                 className={`
                                     p-1 rounded-full text-white bg-indigo-500 hover:bg-indigo-600 
                                     disabled:bg-gray-300 disabled:cursor-not-allowed
@@ -75,7 +84,7 @@ export default function OrderableList({ initialItems = initialSentences, onOrder
                             </button>
                             <button
                                 onClick={() => moveItem(index, 'down')}
-                                disabled={index === items.length - 1} // Disable 'Down' if it's the last item
+                                disabled={index === items.length - 1 || (isSubmitted && isCorrect)}
                                 className={`
                                     p-1 rounded-full text-white bg-indigo-500 hover:bg-indigo-600 
                                     disabled:bg-gray-300 disabled:cursor-not-allowed
@@ -89,15 +98,38 @@ export default function OrderableList({ initialItems = initialSentences, onOrder
                 ))}
             </div>
             
-            {/* Optional Submit Button */}
+            {/* Submit Button */}
             <div className="pt-4 border-t mt-4">
                 <button
-                    className="w-full py-2 px-4 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 transition duration-150"
-                    onClick={() => console.log('Final Order Submitted:', items)}
+                    onClick={handleSubmit}
+                    disabled={isSubmitted && isCorrect}
+                    className={`w-full py-2 px-4 font-semibold rounded-md transition duration-150
+                        ${isSubmitted && isCorrect
+                            ? 'bg-green-600 text-white cursor-default'
+                            : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                        }
+                    `}
                 >
-                    Submit Order
+                    {isSubmitted && isCorrect ? 'Order Sealed!' : 'Submit Sequence'}
                 </button>
             </div>
+            {isSubmitted && !isCorrect && (
+                <p className="text-center text-red-600 font-medium">
+                    The incantation sequence is out of order. Try again!
+                </p>
+            )}
         </div>
     );
 }
+
+OrderableList.propTypes = {
+    initialItems: PropTypes.arrayOf(PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        text: PropTypes.string.isRequired,
+    })).isRequired,
+    correctOrder: PropTypes.arrayOf(PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        text: PropTypes.string.isRequired,
+    })).isRequired,
+    onTaskComplete: PropTypes.func.isRequired,
+};
