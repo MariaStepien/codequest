@@ -2,6 +2,8 @@
 import React, { useState, Children } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
+// 1. IMPORT THE BACKGROUND IMAGE (Assuming you'll place it in the same project directory structure)
+import levelBackground from '../assets/testbackground.png'; // **ADJUST PATH IF NECESSARY**
 
 /**
  * A template for displaying a sequence of interactive task components.
@@ -13,8 +15,9 @@ import { useNavigate } from 'react-router-dom';
  * @param {React.ReactNode} props.children One or more React components, each representing a task.
  * @param {string} props.levelTitle The title for the current level.
  * @param {string} [props.nextLevelPath] Optional path to navigate to when all tasks are complete.
+ * @param {string} [props.backgroundImage] Optional URL or imported image for the background.
  */
-export default function LevelTemplate({ children, levelTitle, nextLevelPath }) {
+export default function LevelTemplate({ children, levelTitle, nextLevelPath, backgroundImage = levelBackground }) {
     const navigate = useNavigate();
     const tasks = Children.toArray(children);
     const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
@@ -55,9 +58,23 @@ export default function LevelTemplate({ children, levelTitle, nextLevelPath }) {
     const currentTaskNumber = currentTaskIndex + 1;
     const totalTasks = tasks.length;
 
+    // 3. Define the background style object with 'contain'
+    const backgroundStyle = {
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: 'contain', // Set to 'contain'
+        backgroundRepeat: 'no-repeat', // Prevent image tiling
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+        minHeight: '100vh',
+    };
+
     return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-            <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-3xl border-t-8 border-indigo-500">
+        <div 
+            className="flex items-center justify-center p-4" 
+            style={backgroundStyle}
+        >
+            {/* Added backdrop-blur-sm and changed background opacity for better readability */}
+            <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-2xl p-8 w-full max-w-3xl border-t-8 border-indigo-500">
                 <header className="mb-6 border-b pb-4">
                     <h2 className="text-3xl font-bold text-gray-800">{levelTitle}</h2>
                     {!isLevelComplete && (
@@ -125,4 +142,5 @@ LevelTemplate.propTypes = {
     children: PropTypes.node.isRequired,
     levelTitle: PropTypes.string.isRequired,
     nextLevelPath: PropTypes.string,
+    backgroundImage: PropTypes.string,
 };
