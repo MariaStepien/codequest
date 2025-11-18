@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.domain.User;
 import com.example.demo.dto.LoginRequest;
 import com.example.demo.dto.LoginResponse;
 import com.example.demo.dto.RegisterRequest;
-import com.example.demo.model.Users;
 import com.example.demo.service.UserService;
 
 @RestController
@@ -35,7 +35,7 @@ public class AuthController {
         try {
             // --- ACTUAL AUTHENTICATION LOGIC ---
             // 1. Call UserService to find the user and verify the password hash.
-            Users authenticatedUser = userService.authenticateUser(login, password);
+            User authenticatedUser = userService.authenticateUser(login, password);
 
             // 2. If authentication succeeds, build the response.
             // NOTE: In a real app, you would generate a JWT token here.

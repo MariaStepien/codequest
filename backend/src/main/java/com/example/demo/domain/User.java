@@ -1,4 +1,4 @@
-package com.example.demo.model;
+package com.example.demo.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Users {
+public class User {
     
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)

@@ -1,11 +1,13 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.RegisterRequest;
-import com.example.demo.model.Users;
-import com.example.demo.repos.UserRepository;
+import java.util.Optional;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import java.util.Optional;
+
+import com.example.demo.domain.User;
+import com.example.demo.dto.RegisterRequest;
+import com.example.demo.repos.UserRepository;
 
 @Service
 public class UserService {
@@ -24,15 +26,15 @@ public class UserService {
      * @param request DTO containing userLogin and password.
      * @return The newly created Users entity.
      */
-    public Users registerNewUser(RegisterRequest request) {
+    public User registerNewUser(RegisterRequest request) {
         // 1. Check if user already exists
-        Optional<Users> existingUser = userRepository.findByUserLogin(request.getUserLogin());
+        Optional<User> existingUser = userRepository.findByUserLogin(request.getUserLogin());
         if (existingUser.isPresent()) {
             throw new RuntimeException("User with login '" + request.getUserLogin() + "' already exists.");
         }
 
         // 2. Create the Users entity
-        Users newUser = new Users();
+        User newUser = new User();
         newUser.setUserLogin(request.getUserLogin());
 
         // 3. Hash the password before saving (CRITICAL SECURITY STEP)
@@ -50,9 +52,9 @@ public class UserService {
      * @return The authenticated Users entity.
      * @throws RuntimeException if the user is not found or the password is incorrect.
      */
-    public Users authenticateUser(String userLogin, String password) {
+    public User authenticateUser(String userLogin, String password) {
         // 1. Find the user by login name
-        Users user = userRepository.findByUserLogin(userLogin)
+        User user = userRepository.findByUserLogin(userLogin)
                 .orElseThrow(() -> new RuntimeException("Invalid login or password."));
 
         // 2. Verify the raw password against the stored hashed password
