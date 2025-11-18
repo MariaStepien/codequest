@@ -5,29 +5,27 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import lombok.AllArgsConstructor;
+import jakarta.persistence.Table;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
+@Table
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Lesson {
+
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name= "course_id", nullable=false)
-    private Course course;
-    
-    @Column
+    @Column(name = "course_id", nullable = false)
+    private Long courseId; 
+
+    @Column(name = "title", nullable = false)
     private String title;
 
-    @Column
-    private int order_index;
+    @Column(name = "order_index", nullable = false)
+    private Integer orderIndex;
 
+    @Column(name = "tasks_json", columnDefinition = "TEXT")
+    private String tasksJson;
 }
