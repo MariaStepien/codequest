@@ -26,7 +26,7 @@ public class LessonController {
      * @param lessonId The ID of the lesson to retrieve.
      * @return The LessonDto with the list of TaskDto objects, or 404 NOT FOUND.
      */
-    @GetMapping("/{lessonId}")
+    @GetMapping("/{id}")
     public ResponseEntity<LessonDto> getLessonDetails(@PathVariable Long lessonId) {
         
         return lessonService.getLessonWithTasks(lessonId)

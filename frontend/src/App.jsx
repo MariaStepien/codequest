@@ -7,6 +7,8 @@ import DashboardPage from './pages/DashboardPage'
 import UserProfilePage from './pages/UserProfilePage'
 import RegisterPage from './pages/RegisterPage'
 import LevelOneTheAmuletOfCode from './pages/LevelOneTheAmuletOfCode'
+import LessonPage from './pages/LessonPage'
+import { useParams } from 'react-router-dom';
 
 function App() {
   return (
@@ -35,10 +37,21 @@ function App() {
       {/* first level screen */}
       <Route path="/level/1" element={<LevelOneTheAmuletOfCode/>} />
 
+      {/*lesson level by id */}
+      <Route path="/lesson/:lessonId" element={<LessonWrapper />} />
+
       {/* Error screen */}
       <Route path="*" element={<h1>404 Not Found</h1>} />
     </Routes>
   )
+}
+
+function LessonWrapper() {
+  // useParams() extracts the 'lessonId' from the URL
+  const { lessonId } = useParams();
+  
+  // LessonPage expects a numeric ID, so we convert the string
+  return <LessonPage lessonId={Number(lessonId)} />; 
 }
 
 export default App

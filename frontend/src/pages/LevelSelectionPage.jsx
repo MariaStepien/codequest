@@ -1,3 +1,4 @@
+// LevelSelectionPage.jsx
 import React, { useMemo, useRef, useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import LevelButton from '../components/LevelButton';
@@ -6,7 +7,7 @@ export default function LevelSelectionPage() {
     // Current status of all levels
     const levelStatus = {
         1: true, 2: true, 3: true, 4: true, 
-        5: true, 7: true, 8: false,
+        5: true, 7: true, 8: false, // Level 8 is locked
     };
 
     // Level positions defined in a normalized 0-100% coordinate system.
@@ -94,6 +95,9 @@ export default function LevelSelectionPage() {
                         
                         {Object.keys(normalizedPositions).map(level => {
                             const pos = normalizedPositions[level];
+                            const levelNumber = Number(level);
+                            const isUnlocked = levelStatus[level]; // Check the status
+
                             return (
                                 <div 
                                     key={level} 
@@ -104,10 +108,21 @@ export default function LevelSelectionPage() {
                                         top: `calc(${pos.y}% - ${levelButtonOffset})`,
                                     }}
                                 >
-                                    <LevelButton 
-                                        levelNumber={Number(level)} 
-                                        isUnlocked={levelStatus[level]} 
-                                    />
+                                    {/* 👇 MODIFIED: Wrap LevelButton in a Link to the lesson page */}
+                                    <Link 
+                                        to={isUnlocked ? `/lesson/${levelNumber}` : '#'}
+                                        onClick={(e) => {
+                                            // Prevent default navigation if the level is locked
+                                            if (!isUnlocked) e.preventDefault();
+                                        }}
+                                        className={!isUnlocked ? 'cursor-not-allowed' : ''}
+                                    >
+                                        <LevelButton 
+                                            levelNumber={levelNumber} 
+                                            isUnlocked={isUnlocked} 
+                                        />
+                                    </Link>
+                                    {/* 👆 END MODIFIED */}
                                 </div>
                             );
                         })}
