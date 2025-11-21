@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 
-// --- TASK COMPONENTS (Reconstructed from provided snippets) ---
-
 /**
  * A component to display a single sentence or piece of explanatory text
  * NOTE: This component automatically signals completion to the parent.
@@ -16,14 +14,12 @@ function TextBox({
   sentence, 
   bgColor = 'bg-indigo-100', 
   borderColor = 'border-indigo-400',
-  onTaskComplete // Add onTaskComplete prop
+  onTaskComplete
 }) {
   
-  // Use useEffect to signal completion immediately upon mounting
   useEffect(() => {
-    // Signal to the LevelTemplate that this non-interactive task is complete
     onTaskComplete(true); 
-  }, [onTaskComplete]); // Dependency array ensures it runs once when the component is created
+  }, [onTaskComplete]);
 
   return (
     <div 
@@ -60,17 +56,14 @@ TextBox.propTypes = {
  * @param {function} props.onTaskComplete Callback to signal LevelTemplate (true only when all pairs matched).
  */
 function MatchingPairs({ items, onTaskComplete }) {
-    // State stores the 'key' of the currently selected item in each column.
     const [leftSelectionKey, setLeftSelectionKey] = useState(null); 
     const [rightSelectionKey, setRightSelectionKey] = useState(null); 
     const [matchedPairsKeys, setMatchedPairsKeys] = useState([]); 
     const [feedback, setFeedback] = useState(null);
     const [isFinished, setIsFinished] = useState(false);
 
-    // --- Core Logic ---
-
     const handleSelect = (key, type) => {
-        if (matchedPairsKeys.includes(key)) return; // Do nothing if already matched
+        if (matchedPairsKeys.includes(key)) return;
 
         if (type === 'left') {
             setLeftSelectionKey(leftSelectionKey === key ? null : key); 
@@ -89,19 +82,14 @@ function MatchingPairs({ items, onTaskComplete }) {
         const leftItem = items.find(i => i.key === leftSelectionKey);
         const rightItem = items.find(i => i.key === rightSelectionKey);
         
-        // This logic assumes the right column items have keys that match the correct left item's key.
-        // A better check is matching by the core 'key' property.
         if (leftSelectionKey === rightSelectionKey) {
-            // Found a match!
             const newMatchedKeys = [...matchedPairsKeys, leftSelectionKey];
             setMatchedPairsKeys(newMatchedKeys);
             setFeedback({ type: 'success', message: 'Pair forged! Excellent work.' });
 
-            // Clear selections
             setLeftSelectionKey(null);
             setRightSelectionKey(null);
             
-            // Check for final completion
             if (newMatchedKeys.length === items.length) {
                 setIsFinished(true);
                 onTaskComplete(true);
@@ -113,7 +101,6 @@ function MatchingPairs({ items, onTaskComplete }) {
         }
     };
 
-    // Shuffle right items once on load for mixing
     const [shuffledRightItems] = useState(() => {
         return [...items].sort(() => Math.random() - 0.5);
     });
@@ -220,7 +207,6 @@ function MultipleChoice({ question, options, correctAnswer, onTaskComplete }) {
     const [selectedOption, setSelectedOption] = useState(null);
     const [isSubmitted, setIsSubmitted] = useState(false);
     
-    // Derived state for convenience
     const isCorrect = selectedOption === correctAnswer; 
     const disableInteraction = isSubmitted && isCorrect;
 
@@ -228,32 +214,25 @@ function MultipleChoice({ question, options, correctAnswer, onTaskComplete }) {
         if (selectedOption) {
             setIsSubmitted(true);
             const isCorrectResult = selectedOption === correctAnswer;
-            // Signal the parent LessonPage
             onTaskComplete(isCorrectResult);
         }
     };
 
-    // --- Styling Helpers ---
     const getOptionClasses = (option) => {
         let classes = 'p-4 border rounded-lg cursor-pointer transition duration-150 text-gray-800';
 
         if (isSubmitted) {
-            // Show correct answer in green
             if (option === correctAnswer) {
                 classes += ' bg-green-100 border-green-600 font-bold';
             }
-            // Show incorrect selected answer in red
             else if (option === selectedOption) {
                 classes += ' bg-red-100 border-red-600 font-bold';
             }
-            // Dim unselected incorrect answers
             else {
                 classes += ' bg-gray-50 border-gray-200 opacity-60';
             }
-            // All options become non-interactive after submission
             classes += ' cursor-default'; 
         } else {
-            // Pre-submission styling
             if (option === selectedOption) {
                 classes += ' bg-indigo-100 border-indigo-600 shadow-md';
             } else {
@@ -293,7 +272,6 @@ function MultipleChoice({ question, options, correctAnswer, onTaskComplete }) {
 
                 <button
                     onClick={handleSubmit}
-                    // Disable if not selected OR already submitted correctly
                     disabled={!selectedOption || disableInteraction}
                     className={`
                         w-full py-3 px-4 font-semibold rounded-lg transition duration-200
@@ -325,17 +303,14 @@ MultipleChoice.propTypes = {
  * @param {function} props.onTaskComplete Callback to signal completion.
  */
 function FillInTheBlank({ sentence, correctAnswers, onTaskComplete }) {
-  // Split the sentence by the placeholder to get text segments
   const textSegments = sentence.split('[BLANK]');
   
-  // Initialize state for user inputs. Needs one input for each blank.
   const [userInputs, setUserInputs] = useState(
     Array(textSegments.length - 1).fill('')
   );
   
   const [isSubmitted, setIsSubmitted] = useState(false);
   
-  // Error handling: Ensure the number of answers matches the number of blanks
   if (textSegments.length - 1 !== correctAnswers.length) {
     return (
       <div className="text-red-600 p-4 border border-red-300 rounded-md">
@@ -353,7 +328,6 @@ function FillInTheBlank({ sentence, correctAnswers, onTaskComplete }) {
     setUserInputs(newInputs);
   };
 
-  // Check if all answers are correct
   const allCorrect = userInputs.every((input, index) => {
     return input.trim().toLowerCase() === correctAnswers[index].toLowerCase();
   });
@@ -369,11 +343,9 @@ function FillInTheBlank({ sentence, correctAnswers, onTaskComplete }) {
 
   const getInputStyles = (index) => {
     if (!isSubmitted) {
-      // Default style before submission
       return 'border-gray-300 focus:border-indigo-500';
     }
     
-    // After submission
     const isThisCorrect = userInputs[index].trim().toLowerCase() === correctAnswers[index].toLowerCase();
     
     if (isThisCorrect) {
@@ -397,7 +369,7 @@ function FillInTheBlank({ sentence, correctAnswers, onTaskComplete }) {
                 type="text"
                 value={userInputs[index]}
                 onChange={(e) => handleInputChange(index, e.target.value)}
-                disabled={isSubmitted && allCorrect} // Disable only if submitted AND all correct
+                disabled={isSubmitted && allCorrect}
                 placeholder={`Answer ${index + 1}`}
                 className={`
                   mx-2 p-2 
@@ -456,7 +428,6 @@ function OrderableList({ initialItems, correctOrder, onTaskComplete }) {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isCorrect, setIsCorrect] = useState(false);
 
-    // If the initial items prop changes, reset the state
     useEffect(() => {
         setItems(initialItems);
         setIsSubmitted(false);
@@ -465,7 +436,7 @@ function OrderableList({ initialItems, correctOrder, onTaskComplete }) {
 
     // Function to move an item up or down in the list
     const moveItem = (index, direction) => {
-        if (isSubmitted && isCorrect) return; // Prevent moves after correct submission
+        if (isSubmitted && isCorrect) return;
 
         if ((direction === 'up' && index > 0) || (direction === 'down' && index < items.length - 1)) {
             const newIndex = direction === 'up' ? index - 1 : index + 1;
@@ -501,7 +472,6 @@ function OrderableList({ initialItems, correctOrder, onTaskComplete }) {
         } else if (isCorrect) {
             classes += 'bg-green-100 border-green-500 text-green-800 cursor-default';
         } else {
-            // Show incorrect order in a neutral/error color
             classes += 'bg-red-50 border-red-300 text-gray-700';
         }
         return classes;
@@ -588,7 +558,6 @@ const TASK_COMPONENTS = {
     FillInTheBlank: FillInTheBlank,
     OrderableList: OrderableList,
     TextBox: TextBox,
-    // Add other components here as you create them
 };
 
 // --- MAIN LESSON PAGE COMPONENT ---
@@ -602,7 +571,7 @@ export default function LessonPage({ lessonId = 1 }) {
     const [lesson, setLesson] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [completedTasks, setCompletedTasks] = useState({}); // Stores { taskId: boolean }
+    const [completedTasks, setCompletedTasks] = useState({});
 
     // --- Data Fetching ---
 
@@ -611,11 +580,23 @@ export default function LessonPage({ lessonId = 1 }) {
             setLoading(true);
             setError(null);
             try {
-                // Fetch from the Spring Boot API endpoint you created
                 const response = await fetch(`/api/lessons/${lessonId}`); 
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    // Check if the response is JSON before trying to parse it
+                    const contentType = response.headers.get("content-type");
+                    let errorText = `HTTP error! status: ${response.status}`;
+
+                    if (contentType && contentType.indexOf("application/json") !== -1) {
+                         const errorData = await response.json();
+                         errorText = errorData.message || errorText;
+                    } else {
+                         const rawError = await response.text();
+                         errorText = `API error for Lesson ID ${lessonId}. Status ${response.status}. Expected JSON, got non-JSON response.`;
+                         console.error("Raw non-JSON response:", rawError);
+                    }
+
+                    throw new Error(errorText);
                 }
                 const data = await response.json();
                 setLesson(data);
@@ -624,7 +605,6 @@ export default function LessonPage({ lessonId = 1 }) {
                 const initialCompletion = {};
                 if (data.tasks) {
                     data.tasks.forEach(task => {
-                        // All tasks start as incomplete
                         initialCompletion[task.id] = false; 
                     });
                 }
@@ -632,9 +612,8 @@ export default function LessonPage({ lessonId = 1 }) {
 
             } catch (err) {
                 console.error("Failed to fetch lesson data:", err);
-                // Fallback to mock data if API fails (useful for local development)
                 setLesson(MOCK_LESSON_DATA); 
-                setError(`Could not fetch lesson ID ${lessonId}. Showing mock data.`);
+                setError(`Could not fetch lesson ID ${lessonId}. Showing mock data. Error: ${err.message}`);
             } finally {
                 setLoading(false);
             }
@@ -645,7 +624,6 @@ export default function LessonPage({ lessonId = 1 }) {
 
     // --- Task Completion Handler ---
     
-    // Using useCallback to ensure handleTaskCompletion has a stable reference
     const handleTaskCompletion = useCallback((taskId, isSuccessful) => {
         if (isSuccessful) {
             setCompletedTasks(prev => {
@@ -655,7 +633,6 @@ export default function LessonPage({ lessonId = 1 }) {
                 const allTasksCompleted = lesson.tasks.every(task => newState[task.id]);
                 if (allTasksCompleted) {
                     console.log("Lesson Complete! Congratulations!");
-                    // Here you would typically trigger an API call to save progress
                 }
                 
                 return newState;
@@ -688,7 +665,6 @@ export default function LessonPage({ lessonId = 1 }) {
     const completedCount = Object.values(completedTasks).filter(isDone => isDone).length;
     const progressPercent = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0;
     
-    // Function to dynamically render the correct component
     const renderTask = (task) => {
         const TaskComponent = TASK_COMPONENTS[task.type];
         
@@ -701,11 +677,9 @@ export default function LessonPage({ lessonId = 1 }) {
             );
         }
 
-        // Filter out the 'id' and 'type' to pass the rest as props
         const { id, type, ...taskProps } = task;
         const isCompleted = completedTasks[id];
-        
-        // Pass the task-specific props and the completion callback
+
         return (
             <div 
                 key={id} 
@@ -718,10 +692,11 @@ export default function LessonPage({ lessonId = 1 }) {
                         </span>
                     )}
                     <TaskComponent 
-                        // Spread the rest of the DTO fields as props (e.g., question, items, sentence)
                         {...taskProps} 
-                        // Inject the callback with the specific task ID
-                        onTaskComplete={(isSuccessful) => handleTaskCompletion(id, isSuccessful)}
+                        onTaskComplete={isCompleted 
+                            ? () => {} 
+                            : (isSuccessful) => handleTaskCompletion(id, isSuccessful)
+                        }
                     />
                 </div>
             </div>

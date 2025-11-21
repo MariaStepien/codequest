@@ -10,6 +10,7 @@ import com.example.demo.dto.LessonDto;
 import com.example.demo.dto.TaskDto;
 import com.example.demo.repos.LessonRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -45,15 +46,23 @@ public class LessonService {
         lessonDto.setOrderIndex(lesson.getOrderIndex()); 
         
         try {
-            TypeReference<List<TaskDto>> typeRef = new TypeReference<>() {};
+            JsonNode rootNode = objectMapper.readTree(lesson.getTasksJson());
+            JsonNode tasksNode = rootNode.get("tasks");
             
-            List<TaskDto> tasks = objectMapper.readValue(lesson.getTasksJson(), typeRef);
-            
-            lessonDto.setTasks(tasks);
+            if (tasksNode != null && tasksNode.isArray()) {
+                TypeReference<List<TaskDto>> typeRef = new TypeReference<>() {};
+                List<TaskDto> tasks = objectMapper.readValue(tasksNode.traverse(), typeRef);
+                
+                lessonDto.setTasks(tasks);
+            } else {
+                System.err.println("Error parsing tasks JSON for lesson ID " + lessonId + ": 'tasks' array field is missing or invalid in JSON structure.");
+                lessonDto.setTasks(List.of()); 
+            }
+            // 🌟🌟🌟 FIX END 🌟🌟🌟
             
         } catch (Exception e) {
             System.err.println("Error parsing tasks JSON for lesson ID " + lessonId + ": " + e.getMessage());
-            lessonDto.setTasks(List.of()); 
+            lessonDto.setTasks(List.of());
         }
 
         return Optional.of(lessonDto);

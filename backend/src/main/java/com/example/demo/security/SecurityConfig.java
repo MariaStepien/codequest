@@ -26,11 +26,13 @@ public class SecurityConfig {
                 // FIX: Explicitly permit OPTIONS requests for all paths (CORS preflight)
                 registry.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
                 
+                registry.requestMatchers("/api/lessons/**").permitAll();
+
                 // Allow the login endpoint
                 registry.requestMatchers("/api/auth/login").permitAll();
                 
                 // Allow the registration path
-                registry.requestMatchers("api/auth/register").permitAll();
+                registry.requestMatchers("/api/auth/register").permitAll();
 
                 // All other requests still require authentication
                 registry.anyRequest().authenticated();
