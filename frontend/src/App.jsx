@@ -44,6 +44,8 @@ function App() {
       {/* available courses list */}
       <Route path="/courses" element={<CoursesPage />} />
 
+      <Route path="/course/:courseId/level/:levelNumber" element={<LevelTemplate />} />
+
       {/* Error screen */}
       <Route path="*" element={<h1>404 Not Found</h1>} />
     </Routes>

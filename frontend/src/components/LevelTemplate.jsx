@@ -20,8 +20,8 @@ import levelBackground from '../assets/testbackground.png';
 
 export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBackground }) {
     // Get lessonId from the URL path
-    const { lessonId: routeLessonId } = useParams();
-    const lessonId = routeLessonId ? parseInt(routeLessonId, 10) : null;
+    const { courseId, levelNumber: routeLevelNumber } = useParams();
+    const orderIndex = routeLevelNumber ? parseInt(routeLevelNumber, 10) : null;
     
     // State for lesson data and loading
     const [lessonData, setLessonData] = useState(null);
@@ -35,8 +35,8 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
     const [feedbackMessage, setFeedbackMessage] = useState('');
 
     useEffect(() => {
-        if (!lessonId) {
-            setError("Lesson ID is missing from the route.");
+        if (!courseId || !orderIndex) {
+            setError("Course ID or Level Number (Order Index) is missing from the route.");
             setIsLoading(false);
             return;
         }
@@ -45,11 +45,12 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
             setIsLoading(true);
             setError(null);
             try {
-                const response = await fetch(`/api/lessons/${lessonId}`); 
+                const url = `/api/lessons/course/${courseId}/order/${orderIndex}`;
+                const response = await fetch(url); 
                 
                 if (!response.ok) {
                     if (response.status === 404) {
-                        throw new Error("Lesson not found. (Status 404)");
+                        throw new Error(`Lesson not found for Course ID ${courseId} and Order Index ${orderIndex}. (Status 404)`);
                     }
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -66,7 +67,7 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
         };
 
         fetchLessonData();
-    }, [lessonId]);
+    }, [courseId, orderIndex]);
 
     const tasks = lessonData?.tasks || [];
     const isLevelComplete = currentTaskIndex >= tasks.length;
@@ -103,8 +104,7 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
 
     const currentTaskNumber = currentTaskIndex + 1;
     const totalTasks = tasks.length;
-    const levelTitle = lessonData?.title || `Level ${lessonId || '?'}`;
-
+    const levelTitle = lessonData?.title || `Level ${orderIndex || '?'}`;
     const backgroundStyle = {
         backgroundImage: `url(${backgroundImage})`,
         backgroundSize: 'contain', 

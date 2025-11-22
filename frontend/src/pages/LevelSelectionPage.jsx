@@ -160,7 +160,7 @@ export default function LevelSelectionPage() {
                                     }}
                                 >
                                     <Link 
-                                        to={isUnlocked ? `/level/${levelNumber}` : '#'}
+                                        to={isUnlocked ? `/course/${courseId}/level/${levelNumber}` : '#'}
                                         onClick={(e) => {
                                             if (!isUnlocked) e.preventDefault();
                                         }}

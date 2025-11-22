@@ -21,15 +21,21 @@ public class LessonController {
 
     private final LessonService lessonService;
 
-    /**
-     * GET endpoint to retrieve a single lesson by ID, including its parsed tasks.
-     * @param lessonId The ID of the lesson to retrieve.
-     * @return The LessonDto with the list of TaskDto objects, or 404 NOT FOUND.
-     */
     @GetMapping("/{lessonId}")
     public ResponseEntity<LessonDto> getLessonDetails(@PathVariable Long lessonId) {
         
         return lessonService.getLessonWithTasks(lessonId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+    
+    //gives back Lesson with specific courseId and orderIndex
+    @GetMapping("/course/{courseId}/order/{orderIndex}")
+    public ResponseEntity<LessonDto> getLessonDetailsByCourseAndOrder(
+            @PathVariable Long courseId,
+            @PathVariable Integer orderIndex) {
+        
+        return lessonService.getLessonWithTasksByCourseIdAndOrderIndex(courseId, orderIndex)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

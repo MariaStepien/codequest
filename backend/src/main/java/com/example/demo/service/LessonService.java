@@ -38,8 +38,28 @@ public class LessonService {
             return Optional.empty();
         }
 
-        Lesson lesson = lessonOptional.get();
+        return lessonOptional.map(this::mapToDtoWithTasks);
+    }
+    
+    /**
+     * Retrieves a lesson by Course ID and Order Index, including the parsed list of tasks.
+     * This is the new method to support level map clicks.
+     * @param courseId The ID of the course.
+     * @param orderIndex The sequential order of the lesson.
+     * @return An Optional containing the fully processed LessonDto, or empty if not found.
+     */
+    public Optional<LessonDto> getLessonWithTasksByCourseIdAndOrderIndex(Long courseId, Integer orderIndex) {
         
+        Optional<Lesson> lessonOptional = lessonRepository.findByCourseIdAndOrderIndex(courseId, orderIndex);
+
+        if (lessonOptional.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return lessonOptional.map(this::mapToDtoWithTasks);
+    }
+    
+    private LessonDto mapToDtoWithTasks(Lesson lesson) {
         LessonDto lessonDto = new LessonDto();
         lessonDto.setId(lesson.getId());
         lessonDto.setTitle(lesson.getTitle());
@@ -55,16 +75,15 @@ public class LessonService {
                 
                 lessonDto.setTasks(tasks);
             } else {
-                System.err.println("Error parsing tasks JSON for lesson ID " + lessonId + ": 'tasks' array field is missing or invalid in JSON structure.");
+                System.err.println("Error parsing tasks JSON for lesson ID " + lesson.getId() + ": 'tasks' array field is missing or invalid in JSON structure.");
                 lessonDto.setTasks(List.of()); 
             }
-            // 🌟🌟🌟 FIX END 🌟🌟🌟
             
         } catch (Exception e) {
-            System.err.println("Error parsing tasks JSON for lesson ID " + lessonId + ": " + e.getMessage());
+            System.err.println("Error parsing tasks JSON for lesson ID " + lesson.getId() + ": " + e.getMessage());
             lessonDto.setTasks(List.of());
         }
 
-        return Optional.of(lessonDto);
+        return lessonDto;
     }
 }
