@@ -35,7 +35,6 @@ export default function MatchingPairs({ items, onTaskComplete }) {
             setMatchedPairsKeys(newMatchedKeys);
             setFeedback({ type: 'success', message: 'Correct match! Pair completed.' });
             
-            // Check if all pairs are now matched
             if (newMatchedKeys.length === items.length) {
                 onTaskComplete(true);
             }
