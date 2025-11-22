@@ -30,6 +30,8 @@ public class SecurityConfig {
                 // Allow the registration path
                 registry.requestMatchers("/api/auth/register").permitAll();
 
+                registry.requestMatchers("/api/courses").permitAll();
+
                 // All other requests still require authentication
                 registry.anyRequest().authenticated();
             })

@@ -9,6 +9,7 @@ import RegisterPage from './pages/RegisterPage'
 import LevelOneTheAmuletOfCode from './pages/LevelOneTheAmuletOfCode'
 import { useParams } from 'react-router-dom';
 import LevelTemplate from './components/LevelTemplate'
+import CoursesPage from './pages/CoursesPage'
 
 function App() {
   return (
@@ -39,6 +40,9 @@ function App() {
 
       {/*lesson level by id */}
       <Route path="/level/:lessonId" element={<LevelWrapper />} />
+
+      {/* available courses list */}
+      <Route path="/courses" element={<CoursesPage />} />
 
       {/* Error screen */}
       <Route path="*" element={<h1>404 Not Found</h1>} />
