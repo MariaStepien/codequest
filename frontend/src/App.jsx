@@ -24,7 +24,7 @@ function App() {
       <Route path="/test-level" element={<TestLevelPage/>} />
 
       {/* level selection screen */}
-      <Route path="/levels" element={<LevelSelectionPage/>} />
+      <Route path="/course/:courseId" element={<LevelSelectionPage/>} />
 
       {/* dashboard */}
       <Route path="/dashboard" element={<DashboardPage/>} />

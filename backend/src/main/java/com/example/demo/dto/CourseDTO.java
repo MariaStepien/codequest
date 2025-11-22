@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CourseDTO {
+    private Long id;
     private String title;
     private int totalLessons;
     private int estimatedHours;

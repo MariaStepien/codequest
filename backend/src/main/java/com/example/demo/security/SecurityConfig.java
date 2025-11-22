@@ -32,6 +32,8 @@ public class SecurityConfig {
 
                 registry.requestMatchers("/api/courses").permitAll();
 
+                registry.requestMatchers("/api/courses/**").permitAll();
+
                 // All other requests still require authentication
                 registry.anyRequest().authenticated();
             })

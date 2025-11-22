@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,5 +24,12 @@ public class CourseController {
     public ResponseEntity<List<CourseDTO>> getAllCourses() {
         List<CourseDTO> courses = courseService.findAllCourses();
         return ResponseEntity.ok(courses);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CourseDTO> getCourseDetails(@PathVariable Long id) {
+        return courseService.findCourseDetailsById(id)
+            .map(ResponseEntity::ok)
+            .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

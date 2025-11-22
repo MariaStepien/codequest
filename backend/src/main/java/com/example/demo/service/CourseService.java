@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -25,9 +26,14 @@ public class CourseService {
             .collect(Collectors.toList());
     }
 
-    private CourseDTO mapToDTO(Course course) {
+    public Optional<CourseDTO> findCourseDetailsById(Long id) {
+        return courseRepository.findById(id)
+            .map(this::mapToDTO);
+    }
 
+    private CourseDTO mapToDTO(Course course) {
         return new CourseDTO(
+            course.getId(),
             course.getTitle(),
             course.getTotal_lessons(),
             course.getEstimated_hours()

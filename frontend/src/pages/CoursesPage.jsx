@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const CoursesPage = () => {
@@ -10,7 +10,7 @@ const CoursesPage = () => {
     useEffect(() => {
         const fetchCourses = async () => {
             try {
-                const response = await fetch('/api/courses');
+                const response = await fetch('/api/courses'); 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -26,8 +26,8 @@ const CoursesPage = () => {
         fetchCourses();
     }, []);
 
-    const handleButtonClick = () => {
-        navigate(`/levels`); 
+    const handleButtonClick = (courseId) => {
+        navigate(`/course/${courseId}`); 
     };
 
     if (loading) {
@@ -42,8 +42,8 @@ const CoursesPage = () => {
         <div style={styles.container}>
             <h1 style={styles.pageTitle}>Available Courses</h1>
             <div style={styles.coursesGrid}>
-                {courses.map((course, index) => (
-                    <div key={index} style={styles.courseCard}>
+                {courses.map((course) => (
+                    <div key={course.id} style={styles.courseCard}>
                         <h2 style={styles.courseTitle}>{course.title}</h2>
                         <div style={styles.courseInfo}>
                             <p style={styles.infoText}>
@@ -54,19 +54,20 @@ const CoursesPage = () => {
                             </p>
                         </div>
                         <div style={styles.progressBarContainer}>
-                            <div style={{...styles.progressBarFill, width: `${(index % 3) * 30 + 10}%`, backgroundColor: ['#5E56E7', '#F5A623', '#9B51E0'][index % 3]}}></div>
+                            {/* Example dynamic progress using a hash of the ID for consistency */}
+                            <div style={{...styles.progressBarFill, width: `${(course.id % 5) * 20 + 10}%`, backgroundColor: ['#5E56E7', '#F5A623', '#9B51E0'][course.id % 3]}}></div>
                         </div>
                         <p style={styles.overallProgress}>
-                             Overall Progress: {(index % 3) * 30 + 10}%
+                             Overall Progress: {(course.id % 5) * 20 + 10}% 
                         </p>
                         <button 
-                            onClick={() => handleButtonClick(course.id)}
+                            onClick={() => handleButtonClick(course.id)} 
                             style={{
                                 ...styles.button,
-                                backgroundColor: ['#5E56E7', '#F5A623', '#9B51E0'][index % 3]
+                                backgroundColor: ['#5E56E7', '#F5A623', '#9B51E0'][course.id % 3]
                             }}
                         >
-                            {index === 3 ? 'Review Course' : 'Continue Learning →'} 
+                            Continue Learning →
                         </button>
                     </div>
                 ))}
@@ -145,7 +146,7 @@ const styles = {
         cursor: 'pointer',
         transition: 'background-color 0.3s ease',
         textAlign: 'center',
-        textDecoration: 'none',
+        textDecoration: 'none', 
     },
 };
 
