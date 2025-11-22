@@ -8,17 +8,13 @@ import PropTypes from 'prop-types';
  * @param {function} props.onTaskComplete Callback to signal LevelTemplate (true only when all pairs matched).
  */
 export default function MatchingPairs({ items, onTaskComplete }) {
-    // State stores the 'key' of the currently selected item in each column.
     const [leftSelectionKey, setLeftSelectionKey] = useState(null); 
     const [rightSelectionKey, setRightSelectionKey] = useState(null); 
     const [matchedPairsKeys, setMatchedPairsKeys] = useState([]); 
     const [feedback, setFeedback] = useState(null);
 
-    // --- Core Logic ---
-
-    // Handles selection from either column
     const handleSelect = (key, type) => {
-        if (matchedPairsKeys.includes(key)) return; // Do nothing if already matched
+        if (matchedPairsKeys.includes(key)) return;
 
         if (type === 'left') {
             setLeftSelectionKey(leftSelectionKey === key ? null : key); 
@@ -35,28 +31,22 @@ export default function MatchingPairs({ items, onTaskComplete }) {
         }
 
         if (leftSelectionKey === rightSelectionKey) {
-            // Correct Match!
             const newMatchedKeys = [...matchedPairsKeys, leftSelectionKey];
             setMatchedPairsKeys(newMatchedKeys);
             setFeedback({ type: 'success', message: 'Correct match! Pair completed.' });
             
             // Check if all pairs are now matched
             if (newMatchedKeys.length === items.length) {
-                onTaskComplete(true); // Signal completion of this task
+                onTaskComplete(true);
             }
         } else {
-            // Incorrect Match - do not signal LevelTemplate false, just give local feedback
             setFeedback({ type: 'error', message: 'Incorrect pairing. Try again!' });
         }
-
-        // Clear selections regardless of result, so the user can choose the next pair
         setLeftSelectionKey(null);
         setRightSelectionKey(null);
     };
 
     const isFinished = matchedPairsKeys.length === items.length;
-
-    // --- Styling Helpers ---
 
     const getItemStyles = (key, type) => {
         const isMatched = matchedPairsKeys.includes(key);
@@ -65,11 +55,10 @@ export default function MatchingPairs({ items, onTaskComplete }) {
         if (isMatched) return 'bg-green-100 border-green-500 text-green-800 pointer-events-none opacity-80';
         
         if (isSelected) {
-            // Enhanced visual feedback for selection
             return 'bg-indigo-200 border-4 border-indigo-700 text-indigo-900 shadow-xl transform scale-[1.02]';
         }
         
-        return 'bg-white border-gray-300 hover:bg-gray-100'; // Changed from black to white/gray for visibility
+        return 'bg-white text-black border-gray-300 hover:bg-gray-100';
     };
 
     return (
@@ -85,7 +74,7 @@ export default function MatchingPairs({ items, onTaskComplete }) {
                     {items.map(item => (
                         <div
                             key={item.key} 
-                            onClick={() => handleSelect(item.key, 'left')} // Pass item.key
+                            onClick={() => handleSelect(item.key, 'left')}
                             className={`
                                 p-4 border-2 rounded-lg cursor-pointer transition duration-150
                                 ${getItemStyles(item.key, 'left')} 
@@ -96,14 +85,12 @@ export default function MatchingPairs({ items, onTaskComplete }) {
                     ))}
                 </div>
 
-                {/* Right Column (Definitions/Properties) - Shuffled for the user */}
                 <div className="w-1/2 space-y-3">
-                    <h4 className="text-lg font-semibold text-gray-700 mb-2">Meanings</h4>
-                    {/* Note: You should shuffle the right items in the parent component for a real test! */}
+                    <h4 className="text-lg text-black font-semibold text-gray-700 mb-2">Meanings</h4>
                     {items.map(item => (
                         <div
                             key={item.key} 
-                            onClick={() => handleSelect(item.key, 'right')} // Pass item.key
+                            onClick={() => handleSelect(item.key, 'right')}
                             className={`
                                 p-4 border-2 rounded-lg cursor-pointer transition duration-150
                                 ${getItemStyles(item.key, 'right')} 

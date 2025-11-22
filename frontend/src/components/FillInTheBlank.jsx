@@ -1,26 +1,24 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
-/**
- * Component for a fill-in-the-blank exercise supporting multiple blanks.
- * @param {object} props
- * @param {string} props.sentence The sentence string containing one or more [BLANK] placeholders.
- * @param {string[]} props.correctAnswers An array of expected correct answers, in order.
- * @param {function} props.onTaskComplete Callback to signal LevelTemplate (true for correct, false for incorrect).
- */
 export default function FillInTheBlank({ sentence, correctAnswers, onTaskComplete }) {
-  // Split the sentence by the placeholder to get text segments
-  const textSegments = sentence.split('[BLANK]');
+  const safeSentence = sentence || ""; 
+  const textSegments = safeSentence.split('[BLANK]');
   
-  // Initialize state for user inputs. Needs one input for each blank.
   const [userInputs, setUserInputs] = useState(
     Array(textSegments.length - 1).fill('')
   );
   
   const [isSubmitted, setIsSubmitted] = useState(false);
   
-  // Error handling: Ensure the number of answers matches the number of blanks
   if (textSegments.length - 1 !== correctAnswers.length) {
+    if (safeSentence === "") {
+        return (
+             <div className="text-red-600 p-4 border border-red-300 rounded-md">
+                Data Error: FillInTheBlank received no sentence.
+             </div>
+        );
+    }
     return (
       <div className="text-red-600 p-4 border border-red-300 rounded-md">
         Configuration Error: Must provide {textSegments.length - 1} correct answers, but {correctAnswers.length} were given.
@@ -28,65 +26,53 @@ export default function FillInTheBlank({ sentence, correctAnswers, onTaskComplet
     );
   }
 
-  // --- Logic Functions ---
-
   const handleInputChange = (index, value) => {
+    if (isSubmitted) return; 
     const newInputs = [...userInputs];
     newInputs[index] = value;
     setUserInputs(newInputs);
-    setIsSubmitted(false); // Reset submission status if user is typing
-  };
-  
-  const checkAnswer = (input, correct) => {
-    return input.trim().toLowerCase() === correct.trim().toLowerCase();
   };
 
-  const allCorrect = userInputs.every((input, index) => 
-    checkAnswer(input, correctAnswers[index])
-  );
+  const allCorrect = userInputs.every((input, index) => {
+    return input.trim().toLowerCase() === correctAnswers[index].toLowerCase();
+  });
   
   const handleSubmit = () => {
     setIsSubmitted(true);
-    // Determine correctness and signal the parent LevelTemplate
-    const isLevelCorrect = userInputs.every((input, index) => 
-        checkAnswer(input, correctAnswers[index])
-    );
-    onTaskComplete(isLevelCorrect);
+    onTaskComplete(allCorrect);
   };
 
-  // --- Rendering Functions ---
-
+  const buttonDisabled = isSubmitted && allCorrect;
+  
   const getInputStyles = (index) => {
     if (!isSubmitted) {
-      return 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500';
+      return 'border-gray-300 focus:border-indigo-500';
     }
-    const isThisCorrect = checkAnswer(userInputs[index], correctAnswers[index]);
-    return isThisCorrect
-      ? 'border-green-500 bg-green-50 focus:ring-green-500' 
-      : 'border-red-500 bg-red-50 focus:ring-red-500';
+    
+    const isThisCorrect = userInputs[index].trim().toLowerCase() === correctAnswers[index].toLowerCase();
+    
+    if (isThisCorrect) {
+      return 'border-green-500 bg-green-50 text-green-700 cursor-default';
+    } else {
+      return 'border-red-500 bg-red-50 text-red-700';
+    }
   };
 
-  const isAnyInputEmpty = userInputs.some(input => !input.trim());
-  // Disable if already submitted and correct, or if inputs are empty
-  const buttonDisabled = (isSubmitted && allCorrect) || isAnyInputEmpty;
-
   return (
-    <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-2xl mx-auto space-y-4">
-      <h3 className="text-xl font-semibold text-gray-700">Fill in the Missing Words</h3>
+    <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+      <h3 className="text-xl font-bold mb-4 text-gray-700">Fill In The Blank</h3>
+      <p className="mb-4 text-gray-600">Complete the ritual sentence by filling in the missing runes.</p>
       
-      <div className="flex flex-wrap items-center text-lg text-gray-800 leading-relaxed">
+      <div className="text-xl text-black mb-8 flex flex-wrap items-center leading-relaxed">
         {textSegments.map((segment, index) => (
           <React.Fragment key={index}>
-            {/* Display the text segment */}
-            <span>{segment}</span>
-            
-            {/* If there's another segment, we need an input field here */}
-            {index < textSegments.length - 1 && (
+            <span className="p-1 mx-1">{segment}</span> 
+            {index < correctAnswers.length && (
               <input
                 type="text"
                 value={userInputs[index]}
                 onChange={(e) => handleInputChange(index, e.target.value)}
-                disabled={isSubmitted && allCorrect} // Disable only if submitted AND all correct
+                disabled={isSubmitted && allCorrect}
                 placeholder={`Answer ${index + 1}`}
                 className={`
                   mx-2 p-2 
@@ -114,10 +100,9 @@ export default function FillInTheBlank({ sentence, correctAnswers, onTaskComplet
           }
         `}
       >
-        {isSubmitted && allCorrect ? 'Correct Runes Sealed!' : 'Check Runes'}
+        {isSubmitted && allCorrect ? 'Correct Runes Sealed! 🎉' : 'Check Runes'}
       </button>
 
-      {/* Optional: Show feedback after submission */}
       {isSubmitted && !allCorrect && (
         <p className="text-sm text-red-600 mt-2 text-center">
           The glyphs are vibrating... Review your answers. Some runes are placed incorrectly.
@@ -128,7 +113,7 @@ export default function FillInTheBlank({ sentence, correctAnswers, onTaskComplet
 }
 
 FillInTheBlank.propTypes = {
-  sentence: PropTypes.string.isRequired,
-  correctAnswers: PropTypes.arrayOf(PropTypes.string).isRequired,
-  onTaskComplete: PropTypes.func.isRequired,
+    sentence: PropTypes.string.isRequired,
+    correctAnswers: PropTypes.arrayOf(PropTypes.string).isRequired,
+    onTaskComplete: PropTypes.func.isRequired,
 };

@@ -110,7 +110,7 @@ export default function LevelSelectionPage() {
                                 >
                                     {/* 👇 MODIFIED: Wrap LevelButton in a Link to the lesson page */}
                                     <Link 
-                                        to={isUnlocked ? `/lesson/${levelNumber}` : '#'}
+                                        to={isUnlocked ? `/level/${levelNumber}` : '#'}
                                         onClick={(e) => {
                                             // Prevent default navigation if the level is locked
                                             if (!isUnlocked) e.preventDefault();
