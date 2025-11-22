@@ -12,38 +12,32 @@ export default function OrderableList({ initialItems, correctOrder, onTaskComple
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isCorrect, setIsCorrect] = useState(false);
 
-    // If the initial items prop changes, reset the state
     useEffect(() => {
         setItems(initialItems);
         setIsSubmitted(false);
         setIsCorrect(false);
     }, [initialItems, correctOrder]);
 
-    // Function to move an item up or down in the list
     const moveItem = (index, direction) => {
-        if (isSubmitted && isCorrect) return; // Prevent moves after correct submission
+        if (isSubmitted && isCorrect) return;
 
         if ((direction === 'up' && index > 0) || (direction === 'down' && index < items.length - 1)) {
             const newIndex = direction === 'up' ? index - 1 : index + 1;
             const newItems = [...items];
             
-            // Swap the item with the one in the new position
             [newItems[index], newItems[newIndex]] = [newItems[newIndex], newItems[index]];
 
             setItems(newItems);
-            // Reset submission status if user is moving items
             setIsSubmitted(false); 
         }
     };
 
     const handleSubmit = () => {
-        // Check if current items order matches correctOrder
         const isOrderCorrect = items.every((item, index) => item.id === correctOrder[index].id);
         
         setIsSubmitted(true);
         setIsCorrect(isOrderCorrect);
         
-        // Signal the parent LevelTemplate
         onTaskComplete(isOrderCorrect);
     };
 

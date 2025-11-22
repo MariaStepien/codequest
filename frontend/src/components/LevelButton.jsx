@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 
@@ -13,30 +12,23 @@ export default function LevelButton({ levelNumber, isUnlocked = true }) {
 
     const handleClick = () => {
         if (isUnlocked) {
-            // Navigate to the dynamic route for this level, e.g., /level/1, /level/2
             navigate(`/level/${levelNumber}`); 
             console.log(`Navigating to Level ${levelNumber}`);
         }
     };
 
-    // Pastel Color Palette based on level number
     const colorMap = {
-        // Red Pastel
         1: 'bg-red-300 border-red-400 hover:bg-red-400',
         4: 'bg-red-300 border-red-400 hover:bg-red-400',
         8: 'bg-red-300 border-red-400 hover:bg-red-400',
-        // Yellow/Orange Pastel
         2: 'bg-yellow-300 border-yellow-400 hover:bg-yellow-400',
         5: 'bg-yellow-300 border-yellow-400 hover:bg-yellow-400',
-        // Green Pastel
         3: 'bg-green-300 border-green-400 hover:bg-green-400',
-        // Blue Pastel
         7: 'bg-blue-300 border-blue-400 hover:bg-blue-400',
     };
 
     const lockedClasses = 'bg-gray-200 border-gray-300 text-gray-500 cursor-not-allowed shadow-inner';
     
-    // Choose the color based on the level number, defaulting to a pastel blue
     const unlockedColorClass = colorMap[levelNumber] || 'bg-blue-300 border-blue-400 hover:bg-blue-400';
     const unlockedClasses = `${unlockedColorClass} text-white hover:scale-105 active:scale-100`;
 

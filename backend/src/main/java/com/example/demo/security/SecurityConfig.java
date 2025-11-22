@@ -6,7 +6,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.SecurityFilterChain; // Import HttpMethod
+import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
@@ -15,15 +15,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-            // 1. Disable CSRF (essential for stateless REST APIs)
             .csrf(csrf -> csrf.disable())
 
-            // 2. Configure Session Management to be Stateless (standard for token-based auth)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             
-            // 3. Configure authorization rules
             .authorizeHttpRequests(registry -> {
-                // FIX: Explicitly permit OPTIONS requests for all paths (CORS preflight)
                 registry.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
                 
                 registry.requestMatchers("/api/lessons/**").permitAll();
@@ -38,7 +34,6 @@ public class SecurityConfig {
                 registry.anyRequest().authenticated();
             })
             
-            // Disable default form login configuration
             .formLogin(form -> form.disable())
             
             .build();

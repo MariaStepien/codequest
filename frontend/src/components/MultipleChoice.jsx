@@ -13,38 +13,28 @@ export default function MultipleChoice({ question, options, correctAnswer, onTas
     const [selectedOption, setSelectedOption] = useState(null);
     const [isSubmitted, setIsSubmitted] = useState(false);
 
-    // --- Core Logic ---
-
-    const isCorrect = selectedOption === correctAnswer; // Check correctness based on final selected option
-
+    const isCorrect = selectedOption === correctAnswer;
     const handleSubmit = () => {
         if (selectedOption) {
             setIsSubmitted(true);
-            // Signal the parent LevelTemplate
             onTaskComplete(selectedOption === correctAnswer);
         }
     };
-
-    // --- Styling Helpers ---
 
     const getOptionClasses = (option) => {
         let classes = 'p-4 border rounded-lg cursor-pointer transition duration-150 text-gray-800';
 
         if (isSubmitted) {
-            // Show correct answer in green
             if (option === correctAnswer) {
                 classes += ' bg-green-100 border-green-600 font-bold';
             }
-            // Show incorrect selected answer in red
             else if (option === selectedOption && option !== correctAnswer) {
                 classes += ' bg-red-100 border-red-600 font-bold';
             }
-            // Unselected, incorrect options fade slightly
             else {
                 classes += ' bg-gray-50 border-gray-200 opacity-70';
             }
         } else {
-            // Pre-submission styles
             if (option === selectedOption) {
                 classes += ' bg-indigo-100 border-indigo-600 ring-2 ring-indigo-300 shadow-md';
             } else {
@@ -54,7 +44,6 @@ export default function MultipleChoice({ question, options, correctAnswer, onTas
         return classes;
     };
     
-    // Disable interaction after a correct submission
     const disableInteraction = isSubmitted && isCorrect;
 
     return (
@@ -85,7 +74,6 @@ export default function MultipleChoice({ question, options, correctAnswer, onTas
 
                 <button
                     onClick={handleSubmit}
-                    // Disable if not selected OR already submitted correctly
                     disabled={!selectedOption || disableInteraction}
                     className={`
                         w-full py-3 px-4 font-semibold rounded-lg transition duration-200

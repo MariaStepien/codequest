@@ -11,7 +11,6 @@ public class OrderableListTaskDto implements TaskDto {
     private String type = "OrderableList"; // Must match the name in @JsonSubTypes
     private String prompt;
     
-    // Inner class for the items structure (used for both initial and correct order)
     @Data
     public static class ListItem {
         private String id;

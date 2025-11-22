@@ -9,7 +9,7 @@ import OrderableList from './OrderableList';
 import TextBox from './TextBox';
 
 const TaskComponentMap = {
-    'TextBox': TextBox,          // Matches TextBoxTaskDto.java type
+    'TextBox': TextBox,                // Matches TextBoxTaskDto.java type
     'MultipleChoice': MultipleChoice,  // Matches MultipleChoiceTaskDto.java type
     'FillInTheBlank': FillInTheBlank,  // Matches FillInTheBlankTaskDto.java type
     'MatchingPairs': MatchingPairs,    // Matches MatchingPairsTaskDto.java type
@@ -97,7 +97,7 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
         }
     };
 
-    const currentTaskObject = tasks[currentTaskIndex]; // The TaskDto object
+    const currentTaskObject = tasks[currentTaskIndex];
     const taskProps = currentTaskObject || {}; 
     const CurrentTaskComponent = currentTaskObject ? TaskComponentMap[currentTaskObject.type] : null;
 

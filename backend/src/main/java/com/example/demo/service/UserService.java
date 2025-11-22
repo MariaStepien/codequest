@@ -15,7 +15,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    // Dependency Injection for Repository and Encoder
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -27,21 +26,17 @@ public class UserService {
      * @return The newly created Users entity.
      */
     public User registerNewUser(RegisterRequest request) {
-        // 1. Check if user already exists
         Optional<User> existingUser = userRepository.findByUserLogin(request.getUserLogin());
         if (existingUser.isPresent()) {
             throw new RuntimeException("User with login '" + request.getUserLogin() + "' already exists.");
         }
 
-        // 2. Create the Users entity
         User newUser = new User();
         newUser.setUserLogin(request.getUserLogin());
 
-        // 3. Hash the password before saving (CRITICAL SECURITY STEP)
         String hashedPassword = passwordEncoder.encode(request.getPassword());
         newUser.setPassword(hashedPassword);
 
-        // 4. Save to the database
         return userRepository.save(newUser);
     }
     
@@ -53,13 +48,11 @@ public class UserService {
      * @throws RuntimeException if the user is not found or the password is incorrect.
      */
     public User authenticateUser(String userLogin, String password) {
-        // 1. Find the user by login name
         User user = userRepository.findByUserLogin(userLogin)
                 .orElseThrow(() -> new RuntimeException("Invalid login or password."));
 
-        // 2. Verify the raw password against the stored hashed password
         if (passwordEncoder.matches(password, user.getPassword())) {
-            return user; // Authentication successful
+            return user;
         } else {
             throw new RuntimeException("Invalid login or password.");
         }

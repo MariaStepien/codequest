@@ -6,8 +6,6 @@ export default function OptionSelectionPage() {
   const handleOptionClick = (option) => {
     setSelectedOption(option);
     console.log(`User selected: ${option}`);
-    // You can add logic here to navigate or perform an action based on the selection
-    // For example, if using React Router: navigate(`/${option.toLowerCase()}`);
   };
 
   return (
@@ -19,20 +17,19 @@ export default function OptionSelectionPage() {
           <button
             key={option}
             onClick={() => handleOptionClick(option)}
-            // Apply conditional styling based on whether this option is selected
             className={`
               w-full py-6 px-4
               text-xl font-semibold text-brown-700
               border-4 rounded-lg
               transition duration-200 ease-in-out
               ${selectedOption === option
-                ? 'bg-brown-200 border-brown-700 shadow-md transform scale-105' // Styles for selected
-                : 'bg-yellow-200 border-brown-500 hover:bg-yellow-300 hover:border-brown-700' // Styles for unselected/hover
+                ? 'bg-brown-200 border-brown-700 shadow-md transform scale-105'
+                : 'bg-yellow-200 border-brown-500 hover:bg-yellow-300 hover:border-brown-700'
               }
               flex items-center justify-center
             `}
           >
-            {option.charAt(0).toUpperCase() + option.slice(1)} {/* Capitalize first letter */}
+            {option.charAt(0).toUpperCase() + option.slice(1)}
           </button>
         ))}
       </div>

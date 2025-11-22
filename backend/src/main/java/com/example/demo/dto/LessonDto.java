@@ -12,6 +12,5 @@ public class LessonDto {
     private String title;
     private Integer orderIndex;
     
-    // The list of parsed, strongly-typed TaskDto objects
     private List<TaskDto> tasks;
 }

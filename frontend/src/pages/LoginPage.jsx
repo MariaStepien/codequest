@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { Loader2 } from 'lucide-react'; // Import for loading spinner
+import { Loader2 } from 'lucide-react';
 
 export default function LoginPage() {
-  // FIX: Renamed state from 'email' to 'userLogin' to match DTO
   const [userLogin, setUserLogin] = useState(""); 
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
@@ -15,11 +14,10 @@ export default function LoginPage() {
     setIsLoading(true);
 
     const loginData = {
-      userLogin, // Use userLogin state
+      userLogin,
       password,
     };
 
-    // Replace this URL with your actual Spring Boot backend address
     const API_URL = "http://localhost:8080/api/auth/login"; 
 
     try {
@@ -34,28 +32,17 @@ export default function LoginPage() {
       const responseData = await response.json();
 
       if (response.ok) {
-        // --- SUCCESS ---
         console.log("Login successful!", responseData);
-        
-        // 1. Store the JWT Token (e.g., in localStorage or a state manager)
-        // Note: In a real app, you would secure this token carefully.
         localStorage.setItem('token', responseData.token); 
         localStorage.setItem('userId', responseData.userId); 
-        
-        // 2. Redirect the user to the dashboard page (NEW IMPLEMENTATION)
-        window.location.href = '/dashboard'; 
-        
-        // Removed alertMessage since we are now redirecting immediately
-        // alertMessage("Login Successful! Welcome.", "success");
 
+        window.location.href = '/dashboard';
       } else {
-        // --- FAILURE ---
         const errorMessage = responseData.message || "Invalid login or password.";
         setError(errorMessage);
         alertMessage(errorMessage, "error");
       }
     } catch (err) {
-      // --- NETWORK ERROR ---
       console.error("Network or Fetch Error:", err);
       setError("Could not reach the server. Please check your connection.");
       alertMessage("Could not reach the server. Try again later.", "error");
@@ -64,7 +51,6 @@ export default function LoginPage() {
     }
   };
   
-  // Custom alert/message box function to replace window.alert()
   const alertMessage = (message, type) => {
     const alertBox = document.getElementById('custom-alert');
     if (alertBox) {
@@ -72,7 +58,6 @@ export default function LoginPage() {
         alertBox.className = `p-4 rounded-lg text-black font-semibold mb-4 transition-opacity duration-300 ${
             type === 'success' ? 'bg-green-500' : 'bg-red-500'
         } opacity-100`;
-        // Hide after 3 seconds
         setTimeout(() => {
             alertBox.className = alertBox.className.replace('opacity-100', 'opacity-0');
         }, 3000);
@@ -104,14 +89,12 @@ export default function LoginPage() {
             >
               Login / Username
             </label>
-            {/* FIX: Changed htmlFor and id to userLogin to match DTO */}
             <input
               id="userLogin"
               type="text"
-              value={userLogin} // Use userLogin state
-              onChange={(e) => setUserLogin(e.target.value)} // Set userLogin state
+              value={userLogin}
+              onChange={(e) => setUserLogin(e.target.value)}
               required
-              // ADDED: placeholder-gray-700 for darker text
               className="w-full px-5 py-3 text-lg border-2 border-transparent rounded-2xl shadow-sm focus:border-pink-500 focus:ring-2 focus:ring-pink-300 outline-none transition duration-300 placeholder-gray-700 text-gray-900"
               placeholder="Enter your login name"
               disabled={isLoading}
@@ -131,7 +114,6 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              // ADDED: placeholder-gray-700 for darker text
               className="w-full px-5 py-3 text-lg border-2 border-transparent rounded-2xl shadow-sm focus:border-pink-500 focus:ring-2 focus:ring-pink-300 outline-none transition duration-300 placeholder-gray-700 text-gray-900"
               placeholder="Enter your password"
               disabled={isLoading}

@@ -4,7 +4,6 @@ public class RegisterRequest {
     private String userLogin;
     private String password;
 
-    // Default constructor is required by Spring
     public RegisterRequest() {}
 
     public String getUserLogin() {

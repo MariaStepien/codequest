@@ -1,13 +1,9 @@
-// src/pages/TestLevelPage.jsx (or similar)
-
-import React from 'react';
-import TextBox from '../components/TextBox'; // Adjust path
-import OrderableList from '../components/OrderableList'; // Adjust path
+import TextBox from '../components/TextBox';
+import OrderableList from '../components/OrderableList';
 import FillInTheBlank from '../components/FillInTheBlank';
 import MatchingPairs from '../components/MatchingPairs';
 import MultipleChoice from '../components/MultipleChoice';
 
-// Define the steps for this specific test level
 const levelSteps = [
     { id: 'c1', text: "a=5" },
     { id: 'c2', text: "else:" },
@@ -22,10 +18,8 @@ const vocabularyMatch = [
 ]
 
 export default function TestLevelPage() {
-    // Function to handle the final ordered list (e.g., to send to an API for validation)
     const handleFinalOrder = (orderedItems) => {
         console.log("The user's final ordering is:", orderedItems);
-        // Add your logic here (e.g., comparing to the correct sequence)
     };
 
     return (
@@ -35,14 +29,12 @@ export default function TestLevelPage() {
                     Level 1: System Startup Sequence
                 </h1>
 
-                {/* 1. Instruction Box Component */}
                 <TextBox
                     sentence="The steps below are mixed up. Use the Up (▲) and Down (▼) buttons to arrange them in the correct operational sequence."
                     bgColor="bg-blue-50"
                     borderColor="border-blue-400"
                 />
 
-                {/* 2. Orderable Task Component */}
                 <OrderableList 
                     initialItems={levelSteps} 
                     onOrderChange={handleFinalOrder}
@@ -78,9 +70,6 @@ export default function TestLevelPage() {
                     ]}
                     correctAnswer="ping"
                 />
-
-                {/* Optional: Navigation Button */}
-                {/* <button className="mt-8 text-indigo-600">Go back to options</button> */}
             </div>
         </div>
     );

@@ -16,14 +16,12 @@ export default function TextBox({
   sentence, 
   bgColor = 'bg-indigo-100', 
   borderColor = 'border-indigo-400',
-  onTaskComplete // Add onTaskComplete prop
+  onTaskComplete
 }) {
   
-  // Use useEffect to signal completion immediately upon mounting
   useEffect(() => {
-    // Signal to the LevelTemplate that this non-interactive task is complete
     onTaskComplete(true); 
-  }, [onTaskComplete]); // Dependency array ensures it runs once when the component is created
+  }, [onTaskComplete]);
 
   return (
     <div 
@@ -45,10 +43,9 @@ export default function TextBox({
   );
 }
 
-// Optional: Add PropTypes for robust development
 TextBox.propTypes = {
   sentence: PropTypes.string.isRequired,
   bgColor: PropTypes.string,
   borderColor: PropTypes.string,
-  onTaskComplete: PropTypes.func.isRequired, // onTaskComplete is now required
+  onTaskComplete: PropTypes.func.isRequired,
 };

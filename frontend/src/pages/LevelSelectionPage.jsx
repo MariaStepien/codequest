@@ -1,16 +1,13 @@
-// LevelSelectionPage.jsx
-import React, { useMemo, useRef, useState, useEffect, useCallback } from 'react';
+import { useMemo} from 'react';
 import { Link } from 'react-router-dom';
 import LevelButton from '../components/LevelButton';
 
 export default function LevelSelectionPage() {
-    // Current status of all levels
     const levelStatus = {
         1: true, 2: true, 3: true, 4: true, 
-        5: true, 7: true, 8: false, // Level 8 is locked
+        5: true, 7: true, 8: false,
     };
 
-    // Level positions defined in a normalized 0-100% coordinate system.
     const normalizedPositions = useMemo(() => ({
         1: { x: 10, y: 50 }, 
         2: { x: 30, y: 10 }, 
@@ -21,7 +18,6 @@ export default function LevelSelectionPage() {
         8: { x: 90, y: 50 } 
     }), []);
 
-    // Define the connections between levels
     const paths = useMemo(() => [
         [1, 2], [1, 3],
         [2, 4], [3, 4],
@@ -29,11 +25,8 @@ export default function LevelSelectionPage() {
         [5, 8], [7, 8],
     ], []);
 
-    // Button size information (64px)
-    // We need to offset the position by half the button size (32px) to center the button.
     const levelButtonOffset = '32px'; 
 
-    // --- SVG Drawing Logic ---
     const drawPaths = useMemo(() => {
         return paths.map(([startLevel, endLevel]) => {
             const start = normalizedPositions[startLevel];
@@ -41,8 +34,6 @@ export default function LevelSelectionPage() {
             
             if (!start || !end) return null;
 
-            // SVG coordinates are based on the container size, so we use 
-            // the percentage values directly as the SVG viewbox (0-100) will scale with the container.
             return (
                 <line 
                     key={`${startLevel}-${endLevel}`}
@@ -50,8 +41,8 @@ export default function LevelSelectionPage() {
                     y1={`${start.y}%`} 
                     x2={`${end.x}%`} 
                     y2={`${end.y}%`} 
-                    stroke="#8DD3F8" // Light pastel blue
-                    strokeWidth="0.8" // Responsive stroke width (0.8% of viewbox)
+                    stroke="#8DD3F8"
+                    strokeWidth="0.8"
                     strokeLinecap="round"
                 />
             );
@@ -60,7 +51,6 @@ export default function LevelSelectionPage() {
 
 
     return (
-        // Light background for the pastel theme
         <div className="min-h-screen bg-gray-50 p-4 sm:p-8 text-gray-800">
             <div className="mx-auto w-full max-w-7xl"> 
                 
@@ -81,38 +71,31 @@ export default function LevelSelectionPage() {
                     
                     {/* Responsive Map Area (50% height of its width) */}
                     <div className="relative w-full h-0 pt-[50%] overflow-hidden bg-gray-100 rounded-lg">
-                        
-                        {/* --- 1. SVG Path Layer (Drawn first) --- */}
                         <svg 
                             className="absolute inset-0 w-full h-full z-0" 
-                            viewBox="0 0 100 100" // 0-100 viewbox matches our percentage positions
-                            preserveAspectRatio="none" // Stretch to fit the container's 50% aspect ratio
+                            viewBox="0 0 100 100"
+                            preserveAspectRatio="none"
                         >
                             {drawPaths}
                         </svg>
-
-                        {/* --- 2. Level Buttons Layer (Positioned over the SVG) --- */}
                         
                         {Object.keys(normalizedPositions).map(level => {
                             const pos = normalizedPositions[level];
                             const levelNumber = Number(level);
-                            const isUnlocked = levelStatus[level]; // Check the status
+                            const isUnlocked = levelStatus[level];
 
                             return (
                                 <div 
                                     key={level} 
                                     className="absolute z-10"
                                     style={{
-                                        // Center the 64px button on the percentage point
                                         left: `calc(${pos.x}% - ${levelButtonOffset})`,
                                         top: `calc(${pos.y}% - ${levelButtonOffset})`,
                                     }}
                                 >
-                                    {/* 👇 MODIFIED: Wrap LevelButton in a Link to the lesson page */}
                                     <Link 
                                         to={isUnlocked ? `/level/${levelNumber}` : '#'}
                                         onClick={(e) => {
-                                            // Prevent default navigation if the level is locked
                                             if (!isUnlocked) e.preventDefault();
                                         }}
                                         className={!isUnlocked ? 'cursor-not-allowed' : ''}
@@ -122,7 +105,6 @@ export default function LevelSelectionPage() {
                                             isUnlocked={isUnlocked} 
                                         />
                                     </Link>
-                                    {/* 👆 END MODIFIED */}
                                 </div>
                             );
                         })}

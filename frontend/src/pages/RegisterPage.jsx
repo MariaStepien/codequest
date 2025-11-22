@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Loader2 } from 'lucide-react';
 
 export default function RegisterPage() {
-  // We use userLogin state to match the backend DTO property
   const [userLogin, setUserLogin] = useState(""); 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -10,7 +9,6 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(null);
 
-  // Function to handle the registration attempt
   const handleRegister = async (e) => {
     e.preventDefault();
     setError(null);
@@ -24,11 +22,10 @@ export default function RegisterPage() {
     }
 
     const registerData = {
-      userLogin, // Corresponds to the user's login/email
+      userLogin,
       password,
     };
 
-    // Replace this URL with your actual Spring Boot backend address
     const API_URL = "http://localhost:8080/api/auth/register"; 
 
     try {
@@ -43,20 +40,16 @@ export default function RegisterPage() {
       const responseData = await response.json();
 
       if (response.ok) {
-        // --- SUCCESS ---
         setSuccess(responseData.message || "Registration successful! You can now log in.");
-        // Clear form after success
         setUserLogin("");
         setPassword("");
         setConfirmPassword("");
 
       } else {
-        // --- FAILURE ---
         const errorMessage = responseData.message || "Registration failed. Please try a different login name.";
         setError(errorMessage);
       }
     } catch (err) {
-      // --- NETWORK ERROR ---
       console.error("Network or Fetch Error:", err);
       setError("Could not reach the server. Please check your connection.");
     } finally {
