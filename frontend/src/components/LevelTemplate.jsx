@@ -19,7 +19,7 @@ const TaskComponentMap = {
 import levelBackground from '../assets/testbackground.png';
 
 export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBackground }) {
-    // Get lessonId from the URL path
+    // Get levelId from the URL path
     const { courseId, levelNumber: routeLevelNumber } = useParams();
     const orderIndex = routeLevelNumber ? parseInt(routeLevelNumber, 10) : null;
     
@@ -33,6 +33,37 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
     const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
     const [isCurrentTaskComplete, setIsCurrentTaskComplete] = useState(false);
     const [feedbackMessage, setFeedbackMessage] = useState('');
+
+    const updateUserProgress = async (courseId, completedLevelOrderIndex) => {
+        const jwtToken = localStorage.getItem('token');
+        
+        if (!jwtToken) {
+            console.error("Authentication token missing. Cannot save progress.");
+            return;
+        }
+
+        try {
+            const response = await fetch('http://localhost:8080/api/progress/update', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${jwtToken}`,
+                },
+                body: JSON.stringify({
+                    courseId: courseId,
+                    completedLevelOrderIndex: completedLevelOrderIndex
+                }),
+            });
+
+            if (!response.ok) {
+                console.error("Failed to save progress.", await response.json());
+            } else {
+                console.log("Progress saved successfully!", await response.json());
+            }
+        } catch (e) {
+            console.error("Network error while saving progress:", e);
+        }
+    };
 
     useEffect(() => {
         if (!courseId || !orderIndex) {
@@ -70,7 +101,7 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
     }, [courseId, orderIndex]);
 
     const tasks = lessonData?.tasks || [];
-    const isLevelComplete = currentTaskIndex >= tasks.length;
+    const isLevelComplete = currentTaskIndex >= tasks.length; 
 
     const handleTaskCompletion = (isCorrect) => {
         if (isCorrect) {
@@ -82,11 +113,24 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
         }
     };
 
-    const handleNextTask = () => {
+    const handleNextTask = async () => {
         if (isCurrentTaskComplete) {
-            setCurrentTaskIndex(prevIndex => prevIndex + 1);
-            setIsCurrentTaskComplete(false);
-            setFeedbackMessage('');
+            if (currentTaskIndex < tasks.length - 1) {
+                setCurrentTaskIndex(prevIndex => prevIndex + 1);
+                setIsCurrentTaskComplete(false);
+                setFeedbackMessage('');
+            } else {
+                const courseIdNum = parseInt(courseId, 10);
+                
+                if (courseIdNum && orderIndex) {
+                    await updateUserProgress(courseIdNum, orderIndex);
+                }
+                
+                setCurrentTaskIndex(tasks.length);
+                
+                setIsCurrentTaskComplete(false);
+                setFeedbackMessage('Progress saved!');
+            }
         }
     };
 
@@ -94,7 +138,7 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
         if (nextLevelPath) {
             navigate(nextLevelPath);
         } else {
-            navigate('/levels');
+            navigate('/dashboard');
         }
     };
 
@@ -122,7 +166,7 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
         return <div className="text-center py-20 text-xl font-bold text-red-600">Error: {error}</div>;
     }
     
-    if (tasks.length === 0) {
+    if (tasks.length === 0 && !isLoading) {
         return <div className="text-center py-20 text-xl font-bold text-orange-600">No tasks found for this lesson.</div>;
     }
 

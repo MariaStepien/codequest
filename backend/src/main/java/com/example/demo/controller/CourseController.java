@@ -3,12 +3,15 @@ package com.example.demo.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.CourseDTO;
+import com.example.demo.dto.CourseWithProgressDto;
 import com.example.demo.service.CourseService;
 
 import lombok.RequiredArgsConstructor;
@@ -31,5 +34,21 @@ public class CourseController {
         return courseService.findCourseDetailsById(id)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    /**
+     * Fetches all courses with the authenticated user's current progress.
+     * Maps to the /api/courses/with-progress endpoint.
+     */
+    @GetMapping("/with-progress")
+    public ResponseEntity<List<CourseWithProgressDto>> getAllCoursesWithProgress(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        
+        Long userId = Long.parseLong(userDetails.getUsername());
+        
+        List<CourseWithProgressDto> coursesWithProgress = 
+            courseService.getAllCoursesWithProgressForUser(userId);
+        
+        return ResponseEntity.ok(coursesWithProgress);
     }
 }

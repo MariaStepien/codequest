@@ -27,14 +27,15 @@ public class Course {
     private String title;
 
     @Column
-    private int total_lessons;
+    private int totalLessons;
 
     @Column
-    private int estimated_hours;
+    private int estimatedHours;
 
     @CreatedDate
     private OffsetDateTime dateCreated;
 
     @LastModifiedDate
     private OffsetDateTime lastUpdated;
+
 }

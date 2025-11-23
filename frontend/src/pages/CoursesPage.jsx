@@ -9,13 +9,30 @@ const CoursesPage = () => {
 
     useEffect(() => {
         const fetchCourses = async () => {
+            setLoading(true);
+            setError(null);
+            
+            const jwtToken = localStorage.getItem('token'); 
+            
+            if (!jwtToken) {
+                setError("Authentication token missing. Please log in.");
+                setLoading(false);
+                return;
+            }
+
             try {
-                const response = await fetch('/api/courses'); 
+                const response = await fetch('/api/courses/with-progress', { 
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${jwtToken}`, 
+                    },
+                }); 
+                
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
-                setCourses(data);
+                setCourses(data); 
             } catch (error) {
                 setError(error);
             } finally {
@@ -30,6 +47,11 @@ const CoursesPage = () => {
         navigate(`/course/${courseId}`); 
     };
 
+    const calculateProgressPercentage = (completed, total) => {
+        if (total === 0) return 0;
+        return Math.min(100, Math.round((completed / total) * 100));
+    };
+
     if (loading) {
         return <div style={styles.container}>Loading courses...</div>;
     }
@@ -42,35 +64,42 @@ const CoursesPage = () => {
         <div style={styles.container}>
             <h1 style={styles.pageTitle}>Available Courses</h1>
             <div style={styles.coursesGrid}>
-                {courses.map((course) => (
-                    <div key={course.id} style={styles.courseCard}>
-                        <h2 style={styles.courseTitle}>{course.title}</h2>
-                        <div style={styles.courseInfo}>
-                            <p style={styles.infoText}>
-                                <span role="img" aria-label="lessons">📖</span> {course.totalLessons} Lessons
+                {courses.map((course) => {
+                    const completed = course.completedLevels || 0; 
+                    const total = course.totalLessons || 1;
+                    const progressPercentage = calculateProgressPercentage(completed, total);
+                    const accentColor = ['#5E56E7', '#F5A623', '#9B51E0'][course.id % 3];
+
+                    return (
+                        <div key={course.id} style={styles.courseCard}>
+                            <h2 style={styles.courseTitle}>{course.title}</h2>
+                            <div style={styles.courseInfo}>
+                                <p style={styles.infoText}>
+                                    <span role="img" aria-label="lessons">📖</span> {course.totalLessons} Lessons
+                                </p>
+                                <p style={styles.infoText}>
+                                    <span role="img" aria-label="time">🕒</span> ~{course.estimatedHours} Hours
+                                </p>
+                            </div>
+                            <div style={styles.progressBarContainer}>
+                                <div style={{...styles.progressBarFill, width: `${progressPercentage}%`, backgroundColor: accentColor}}></div>
+                            </div>
+                            <p style={styles.overallProgress}>
+                                 Overall Progress: {progressPercentage}% ({completed} / {course.totalLessons})
                             </p>
-                            <p style={styles.infoText}>
-                                <span role="img" aria-label="time">🕒</span> ~{course.estimatedHours} Hours
-                            </p>
+                            <button 
+                                onClick={() => handleButtonClick(course.id)} 
+                                style={{
+                                    ...styles.button,
+                                    backgroundColor: accentColor
+                                }}
+                            >
+                                {/* Change button text based on progress */}
+                                {progressPercentage === 0 ? 'Start Course →' : 'Continue Learning →'}
+                            </button>
                         </div>
-                        <div style={styles.progressBarContainer}>
-                            {/* Example dynamic progress using a hash of the ID for consistency */}
-                            <div style={{...styles.progressBarFill, width: `${(course.id % 5) * 20 + 10}%`, backgroundColor: ['#5E56E7', '#F5A623', '#9B51E0'][course.id % 3]}}></div>
-                        </div>
-                        <p style={styles.overallProgress}>
-                             Overall Progress: {(course.id % 5) * 20 + 10}% 
-                        </p>
-                        <button 
-                            onClick={() => handleButtonClick(course.id)} 
-                            style={{
-                                ...styles.button,
-                                backgroundColor: ['#5E56E7', '#F5A623', '#9B51E0'][course.id % 3]
-                            }}
-                        >
-                            Continue Learning →
-                        </button>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         </div>
     );

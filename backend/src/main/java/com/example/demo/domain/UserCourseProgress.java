@@ -1,5 +1,6 @@
 package com.example.demo.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,4 +27,7 @@ public class UserCourseProgress {
     @ManyToOne
     @JoinColumn(name= "user_id", nullable=false)
     private User user;
+
+    @Column
+    private int completedLessons;
 }
