@@ -11,7 +11,8 @@ const initialUserData = {
   courses: [],
   streak: 0,
   xp: 0,
-  badges: 0
+  badges: 0,
+  latestActivity: null
 };
 
 const ProgressBar = ({ progress, color, title }) => (
@@ -38,95 +39,105 @@ const StatCard = ({ value, label, icon: Icon, color }) => (
 );
 
 
-const DashboardContent = ({ userData, handleNavigation }) => (
-    <div className="space-y-8">
-        <div className="p-6 bg-white rounded-xl shadow-lg border-l-4 border-indigo-500">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                Welcome back, {userData.userLogin}
-            </h2 >
-            <p className="text-xl text-gray-600 font-medium">
-                You're <span className="text-indigo-600 font-extrabold">{userData.progress}%</span> through <span className="text-gray-800">{userData.currentCourse}</span>!
-            </p>
-        </div>
+const DashboardContent = ({ userData, handleNavigation }) => {
+  const latestActivity = userData.latestActivity;
+  
+  // Helper to format the time
+  const formatTimeAgo = (isoString) => {
+      if (!isoString) return "No recent activity";
+      const date = new Date(isoString);
+      return date.toLocaleString();
+  };
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            <div className="lg:col-span-2 space-y-8">
-                
-                <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-8 rounded-xl shadow-xl text-white">
-                    <p className="text-sm font-semibold mb-2 opacity-80">
-                        LATEST ACTIVITY
-                    </p>
-                    <h3 className="text-2xl font-bold mb-4">
-                        {userData.currentCourse}: {userData.currentLesson}
-                    </h3>
-                    <a 
-                      href={`/levels/${userData.currentCourse}`} 
-                      className="flex items-center space-x-2 bg-white text-indigo-600 px-6 py-2 rounded-full font-semibold shadow-lg hover:bg-indigo-50 transition duration-150"
-                    >
-                        <span>Resume Learning</span>
-                        <ArrowRight className="w-5 h-5" />
-                    </a>
-                </div>
+  return (
+      <div className="space-y-8">
+          <div className="p-6 bg-white rounded-xl shadow-lg border-l-4 border-indigo-500">
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                  Welcome back, {userData.userLogin}
+              </h2>
+          </div>
 
-                <div className="bg-white p-6 rounded-xl shadow-lg">
-                    <div className="flex justify-between items-center mb-4 border-b pb-2">
-                      <h3 className="text-xl font-bold text-gray-900">
-                        Your Course Progress
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              
+              <div className="lg:col-span-2 space-y-8">
+                  <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-8 rounded-xl shadow-xl text-white">
+                      <p className="text-sm font-semibold mb-2 opacity-80">
+                          LATEST ACTIVITY: {latestActivity ? formatTimeAgo(latestActivity.lastUpdated) : "Never"}
+                      </p>
+                      <h3 className="text-2xl font-bold mb-4">
+                          {latestActivity ? 
+                              `${latestActivity.courseTitle}: Level ${latestActivity.completedLevelOrderIndex} completed` : 
+                              "Start your first course!"
+                          }
                       </h3>
-                      <button 
-                        onClick={() => handleNavigation('courses')}
-                        className="bg-blue text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition"
+                      <a 
+                        href={latestActivity ? `/course/${latestActivity.courseId}` : '/courses'} 
+                        className="flex items-center space-x-2 bg-white text-indigo-600 px-6 py-2 rounded-full font-semibold shadow-lg hover:bg-indigo-50 transition duration-150"
                       >
-                        View All Courses &rarr;
-                      </button>
-                    </div>
+                          <span>{latestActivity ? 'Go to Next Level' : 'Start a Course'}</span>
+                          <ArrowRight className="w-5 h-5" />
+                      </a>
+                  </div>
 
-                    <div className="space-y-4">
-                        {userData.courses.filter(c => c.progress > 0 && c.progress < 100).slice(0, 3).map(course => (
-                            <ProgressBar 
-                                key={course.id}
-                                title={course.title} 
-                                progress={course.progress} 
-                                color={course.color} 
-                            />
-                        ))}
-                    </div>
-                </div>
-                
-            </div>
-            
-            <div className="lg:col-span-1 space-y-8">
-                
-                <div className="bg-white p-6 rounded-xl shadow-lg">
-                    <h3 className="text-xl font-bold text-gray-900 mb-4 border-b pb-2">
-                        Gamification Stats
-                    </h3 >
-                    <div className="grid grid-cols-3 gap-4 text-center">
-                        <StatCard 
-                            value={userData.streak} 
-                            label="Day Streak" 
-                            icon={Sun} 
-                            color="orange"
-                        />
-                        <StatCard 
-                            value={userData.xp} 
-                            label="Total XP" 
-                            icon={Zap} 
-                            color="teal"
-                        />
-                        <StatCard 
-                            value={userData.badges} 
-                            label="Badges Earned" 
-                            icon={Award} 
-                            color="pink"
-                        />
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-);
+                  <div className="bg-white p-6 rounded-xl shadow-lg">
+                      <div className="flex justify-between items-center mb-4 border-b pb-2">
+                        <h3 className="text-xl font-bold text-gray-900">
+                          Your Course Progress
+                        </h3>
+                        <button 
+                          onClick={() => handleNavigation('courses')}
+                          className="bg-blue text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition"
+                        >
+                          View All Courses &rarr;
+                        </button>
+                      </div>
+
+                      <div className="space-y-4">
+                          {userData.courses.filter(c => c.progress > 0 && c.progress < 100).slice(0, 3).map(course => (
+                              <ProgressBar 
+                                  key={course.id}
+                                  title={course.title} 
+                                  progress={course.progress} 
+                                  color={course.color} 
+                              />
+                          ))}
+                      </div>
+                  </div>
+                  
+              </div>
+              
+              <div className="lg:col-span-1 space-y-8">
+                  
+                  <div className="bg-white p-6 rounded-xl shadow-lg">
+                      <h3 className="text-xl font-bold text-gray-900 mb-4 border-b pb-2">
+                          Gamification Stats
+                      </h3>
+                      <div className="grid grid-cols-3 gap-4 text-center">
+                          <StatCard 
+                              value={userData.streak} 
+                              label="Day Streak" 
+                              icon={Sun} 
+                              color="orange"
+                          />
+                          <StatCard 
+                              value={userData.xp} 
+                              label="Total XP" 
+                              icon={Zap} 
+                              color="teal"
+                          />
+                          <StatCard 
+                              value={userData.badges} 
+                              label="Badges Earned" 
+                              icon={Award} 
+                              color="pink"
+                          />
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  );
+};
 
 
 const navLinks = [
@@ -153,6 +164,32 @@ export default function DashboardPage() {
         }, 1500); 
         return;
     }
+
+    const fetchLatestActivity = async () => {
+        try {
+            const response = await fetch('http://localhost:8080/api/progress/latest-activity', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${jwtToken}`, 
+                },
+            });
+            
+            if (response.ok) {
+                const activityData = await response.json();
+                
+                if (activityData) {
+                    setUserData(prevData => ({
+                        ...prevData,
+                        latestActivity: activityData,
+                    }));
+                }
+            } else {
+                console.error("Failed to fetch latest activity. Status:", response.status);
+            }
+        } catch (err) {
+            console.error("Error fetching latest activity:", err);
+        }
+    };
 
     const fetchUserData = async () => {
       try {
@@ -186,6 +223,8 @@ export default function DashboardPage() {
             xp: 1250,
             badges: 3
         }));
+
+        await fetchLatestActivity();
         
       } catch (err) {
         console.error("Error fetching user data:", err);

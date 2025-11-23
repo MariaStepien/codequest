@@ -1,5 +1,10 @@
 package com.example.demo.domain;
 
+import java.time.OffsetDateTime;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,4 +35,11 @@ public class UserCourseProgress {
 
     @Column
     private int completedLessons;
+    
+    @CreatedDate
+    private OffsetDateTime dateCreated;
+
+    @LastModifiedDate
+    private OffsetDateTime lastUpdated;
+
 }

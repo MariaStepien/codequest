@@ -1,8 +1,11 @@
 package com.example.demo.controller;
 
+import java.util.Optional;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,5 +52,27 @@ public class UserCourseProgressController {
         );
         
         return ResponseEntity.ok(updatedProgress);
+    }
+
+    /**
+     * Protected endpoint to fetch the user's single latest progress activity.
+     */
+    @GetMapping("/latest-activity")
+    public ResponseEntity<Optional<UserCourseProgressService.LatestActivityDto>> getLatestActivity(
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        // Add a null check here to avoid the NPE you experienced previously
+        if (userDetails == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        Long userId = Long.parseLong(userDetails.getUsername());
+
+        // Delegate to the service to get the latest activity DTO
+        Optional<UserCourseProgressService.LatestActivityDto> latestActivity = 
+            progressService.getLatestActivity(userId);
+
+        // Return 200 OK with the DTO (or empty if no progress exists)
+        return ResponseEntity.ok(latestActivity);
     }
 }

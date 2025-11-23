@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import java.time.OffsetDateTime;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import com.example.demo.repos.CourseRepository;
 import com.example.demo.repos.UserCourseProgressRepository;
 import com.example.demo.repos.UserRepository;
 
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -20,6 +22,24 @@ public class UserCourseProgressService {
     private final UserCourseProgressRepository userCourseProgressRepository;
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
+
+    @Data
+    public static class LatestActivityDto {
+        private String courseTitle;
+        private int completedLevelOrderIndex;
+        private OffsetDateTime lastUpdated;
+    }
+
+    public Optional<LatestActivityDto> getLatestActivity(Long userId) {
+        return userCourseProgressRepository.findLatestProgressByUserId(userId)
+            .map(progress -> {
+                LatestActivityDto dto = new LatestActivityDto();
+                dto.setCourseTitle(progress.getCourse().getTitle());
+                dto.setCompletedLevelOrderIndex(progress.getCompletedLessons());
+                dto.setLastUpdated(progress.getLastUpdated());
+                return dto;
+            });
+    }
 
     public UserCourseProgress updateProgress(Long userId, Long courseId, int newCompletedLessons) {
         

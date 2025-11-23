@@ -47,6 +47,8 @@ public class SecurityConfig {
 
                 registry.requestMatchers("/api/courses/with-progress").permitAll();
 
+                registry.requestMatchers("/api/progress/latest-activity").permitAll();
+
                 // All other requests still require authentication
                 registry.anyRequest().authenticated();
             })
