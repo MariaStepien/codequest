@@ -1,20 +1,17 @@
-import { useState } from 'react';
-import { LogOut, Settings, BarChart3, BookOpenText, Code, Wrench, User, Users, Sun, Zap, Award, ArrowRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { LogOut, Settings, BarChart3, BookOpenText, User, Sun, Zap, Award, ArrowRight } from 'lucide-react';
 import CoursesPage from './CoursesPage';
 
-const userData = {
-  name: "Alex",
-  progress: 70,
-  currentCourse: "Python for Beginners",
-  currentLesson: "Lesson 5: Loops and Iteration",
-  courses: [
-    { id: 1, title: "Python for Beginners", progress: 70, color: "blue", lessons: 20, hours: 15, status: 'In Progress' },
-    { id: 2, title: "Modern JavaScript", progress: 45, color: "yellow", lessons: 30, hours: 25, status: 'In Progress' },
-    { id: 4, title: "Introduction to HTML & CSS", progress: 100, color: "green", lessons: 10, hours: 5, status: 'Completed' },
-  ],
-  streak: 15,
-  xp: 1250,
-  badges: 3
+// Initial state for user data before successful fetch
+const initialUserData = {
+  userLogin: "Guest",
+  progress: 0,
+  currentCourse: "N/A",
+  currentLesson: "N/A",
+  courses: [],
+  streak: 0,
+  xp: 0,
+  badges: 0
 };
 
 const ProgressBar = ({ progress, color, title }) => (
@@ -45,7 +42,7 @@ const DashboardContent = ({ userData, handleNavigation }) => (
     <div className="space-y-8">
         <div className="p-6 bg-white rounded-xl shadow-lg border-l-4 border-indigo-500">
             <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                Welcome back, {userData.name} 👋
+                Welcome back, {userData.userLogin}
             </h2 >
             <p className="text-xl text-gray-600 font-medium">
                 You're <span className="text-indigo-600 font-extrabold">{userData.progress}%</span> through <span className="text-gray-800">{userData.currentCourse}</span>!
@@ -137,15 +134,84 @@ const navLinks = [
   { id: 'courses', name: 'Courses', icon: BookOpenText }
 ];
 
-export default function App() {
+export default function DashboardPage() { 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState('dashboard'); 
+  const [userData, setUserData] = useState(initialUserData); 
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const jwtToken = localStorage.getItem('token');
+    
+    if (!jwtToken) {
+        setIsLoading(false);
+        setError("Not logged in. Cannot fetch user data. Redirecting to login...");
+        
+        setTimeout(() => {
+            window.location.replace('/'); 
+        }, 1500); 
+        return;
+    }
+
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/api/user/me', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${jwtToken}`, 
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          localStorage.removeItem('token');
+          throw new Error('Session expired or invalid. Please log in again.');
+        }
+
+        const userDetails = await response.json();
+        
+        setUserData(prevData => ({
+            ...prevData,
+            userLogin: userDetails.userLogin,
+            progress: 70, 
+            currentCourse: "Python for Beginners",
+            currentLesson: "Lesson 5: Loops and Iteration",
+            courses: [
+              { id: 1, title: "Python for Beginners", progress: 70, color: "blue", lessons: 20, hours: 15, status: 'In Progress' },
+              { id: 2, title: "Modern JavaScript", progress: 45, color: "yellow", lessons: 30, hours: 25, status: 'In Progress' },
+              { id: 4, title: "Introduction to HTML & CSS", progress: 100, color: "green", lessons: 10, hours: 5, status: 'Completed' },
+            ],
+            streak: 15,
+            xp: 1250,
+            badges: 3
+        }));
+        
+      } catch (err) {
+        console.error("Error fetching user data:", err);
+        setError(err.message);
+        
+        if (err.message.includes('Session expired')) {
+            setTimeout(() => {
+                window.location.replace('/'); 
+            }, 3000); 
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const handleNavigation = (pageId) => {
     setCurrentPage(pageId);
   };
 
   const renderPage = () => {
+    if (isLoading) return <div className="text-center py-10 text-xl font-medium">Loading user dashboard...</div>;
+    if (error) return <div className="text-center py-10 text-xl font-medium text-red-600">Error: {error}</div>;
+
     switch (currentPage) {
       case 'dashboard':
         return <DashboardContent userData={userData} handleNavigation={handleNavigation} />;
@@ -159,6 +225,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
+      {/* Hidden spans for Tailwind JIT compilation to ensure colors are included */}
       <div className="hidden">
         <span className="text-blue-600 bg-blue-500 border-blue-200 bg-blue-50 border-blue-300 bg-blue-100"></span>
         <span className="text-yellow-600 bg-yellow-500 border-yellow-200 bg-yellow-50 border-yellow-300 bg-yellow-100"></span>
@@ -221,7 +288,15 @@ export default function App() {
                   <Settings className="w-4 h-4" />
                   <span>Settings</span>
                 </a>
-                <a href="#logout" className="flex items-center space-x-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                <a 
+                  href="#logout" 
+                  onClick={() => {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('userId');
+                    window.location.replace('/');
+                  }}
+                  className="flex items-center space-x-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                >
                   <LogOut className="w-4 h-4" />
                   <span>Logout</span>
                 </a>

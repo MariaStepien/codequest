@@ -11,6 +11,7 @@ import com.example.demo.domain.User;
 import com.example.demo.dto.LoginRequest;
 import com.example.demo.dto.LoginResponse;
 import com.example.demo.dto.RegisterRequest;
+import com.example.demo.service.JwtService;
 import com.example.demo.service.UserService;
 
 @RestController
@@ -18,9 +19,11 @@ import com.example.demo.service.UserService;
 public class AuthController {
     
     private final UserService userService;
+    private final JwtService jwtService;
 
-    public AuthController(UserService userService) {
+    public AuthController(UserService userService, JwtService jwtService) {
         this.userService = userService;
+        this.jwtService = jwtService;
     }
 
     @PostMapping("/login")
@@ -31,9 +34,11 @@ public class AuthController {
 
         try {
             User authenticatedUser = userService.authenticateUser(login, password);
+            
+            String token = jwtService.generateToken(authenticatedUser.getId());
 
             LoginResponse response = new LoginResponse(
-                "mock-jwt-token-for-user-" + authenticatedUser.getId(), 
+                token, 
                 "Authentication successful!", 
                 authenticatedUser.getId()
             );

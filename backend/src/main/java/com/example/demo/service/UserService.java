@@ -57,4 +57,15 @@ public class UserService {
             throw new RuntimeException("Invalid login or password.");
         }
     }
+
+    /**
+     * Finds a user by their unique ID.
+     * @param userId The ID of the user.
+     * @return The User entity.
+     * @throws RuntimeException if the user is not found.
+     */
+    public User findUserById(Long userId) { // <--- NEW METHOD
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+    }
 }
