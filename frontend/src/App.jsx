@@ -1,12 +1,9 @@
 import {Routes, Route } from 'react-router-dom'
 import LoginPage from './pages/LoginPage'
 import OptionSelectionPage from './pages/OptionSelectionPage'
-import TestLevelPage from './pages/TestLevelPage'
 import LevelSelectionPage from './pages/LevelSelectionPage'
 import DashboardPage from './pages/DashboardPage'
-import UserProfilePage from './pages/UserProfilePage'
 import RegisterPage from './pages/RegisterPage'
-import LevelOneTheAmuletOfCode from './pages/LevelOneTheAmuletOfCode'
 import { useParams } from 'react-router-dom';
 import LevelTemplate from './components/LevelTemplate'
 import CoursesPage from './pages/CoursesPage'
@@ -18,10 +15,7 @@ function App() {
       <Route path="/" element={<LoginPage/>} />
 
       {/* option selection screen */}
-      <Route path="/test" element={<OptionSelectionPage/>} />
-
-      {/* test level screen */}
-      <Route path="/test-level" element={<TestLevelPage/>} />
+      <Route path="/option-select" element={<OptionSelectionPage/>} />
 
       {/* level selection screen */}
       <Route path="/course/:courseId" element={<LevelSelectionPage/>} />
@@ -29,14 +23,8 @@ function App() {
       {/* dashboard */}
       <Route path="/dashboard" element={<DashboardPage/>} />
 
-      {/* user page */}
-      <Route path="/user-info" element={<UserProfilePage/>} />
-
       {/* register screen */}
       <Route path="/register" element={<RegisterPage/>} />
-
-      {/* first level screen */}
-      <Route path="/level/1" element={<LevelOneTheAmuletOfCode/>} />
 
       {/*lesson level by id */}
       <Route path="/level/:lessonId" element={<LevelWrapper />} />
