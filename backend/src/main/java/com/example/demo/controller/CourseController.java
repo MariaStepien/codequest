@@ -51,4 +51,16 @@ public class CourseController {
         
         return ResponseEntity.ok(coursesWithProgress);
     }
+
+    @GetMapping("/completed-levels/{id}")
+    public ResponseEntity<Integer> getCompletedLevelsForCourse(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        
+        Long userId = Long.parseLong(userDetails.getUsername());
+        
+        int completedLevels = courseService.getCompletedLevelsForCourse(userId, id);
+        
+        return ResponseEntity.ok(completedLevels);
+    }
 }

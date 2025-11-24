@@ -55,4 +55,8 @@ public class CourseService {
             return dto;
         }).collect(Collectors.toList());
     }
+
+    public int getCompletedLevelsForCourse(Long userId, Long courseId) {
+        return progressService.getCompletedLevelsForCourse(userId, courseId);
+    }
 }

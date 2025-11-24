@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { LogOut, Settings, BarChart3, BookOpenText, User, Sun, Zap, Award, ArrowRight } from 'lucide-react';
+import { LogOut, Settings, BarChart3, BookOpenText, User, Sun, Zap, Award, ArrowRight, Star } from 'lucide-react';
 import CoursesPage from './CoursesPage';
 
 // Initial state for user data before successful fetch
@@ -9,9 +9,8 @@ const initialUserData = {
   currentCourse: "N/A",
   currentLesson: "N/A",
   courses: [],
-  streak: 0,
   xp: 0,
-  badges: 0,
+  level: 15,
   latestActivity: null
 };
 
@@ -78,32 +77,6 @@ const DashboardContent = ({ userData, handleNavigation }) => {
                           <ArrowRight className="w-5 h-5" />
                       </a>
                   </div>
-
-                  <div className="bg-white p-6 rounded-xl shadow-lg">
-                      <div className="flex justify-between items-center mb-4 border-b pb-2">
-                        <h3 className="text-xl font-bold text-gray-900">
-                          Your Course Progress
-                        </h3>
-                        <button 
-                          onClick={() => handleNavigation('courses')}
-                          className="bg-blue text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition"
-                        >
-                          View All Courses &rarr;
-                        </button>
-                      </div>
-
-                      <div className="space-y-4">
-                          {userData.courses.filter(c => c.progress > 0 && c.progress < 100).slice(0, 3).map(course => (
-                              <ProgressBar 
-                                  key={course.id}
-                                  title={course.title} 
-                                  progress={course.progress} 
-                                  color={course.color} 
-                              />
-                          ))}
-                      </div>
-                  </div>
-                  
               </div>
               
               <div className="lg:col-span-1 space-y-8">
@@ -114,22 +87,16 @@ const DashboardContent = ({ userData, handleNavigation }) => {
                       </h3>
                       <div className="grid grid-cols-3 gap-4 text-center">
                           <StatCard 
-                              value={userData.streak} 
-                              label="Day Streak" 
-                              icon={Sun} 
-                              color="orange"
-                          />
-                          <StatCard 
                               value={userData.xp} 
                               label="Total XP" 
                               icon={Zap} 
                               color="teal"
                           />
                           <StatCard 
-                              value={userData.badges} 
-                              label="Badges Earned" 
-                              icon={Award} 
-                              color="pink"
+                              value={userData.level}
+                              label="Player level"
+                              icon={Star}
+                              color='yellow'
                           />
                       </div>
                   </div>
@@ -219,9 +186,8 @@ export default function DashboardPage() {
               { id: 2, title: "Modern JavaScript", progress: 45, color: "yellow", lessons: 30, hours: 25, status: 'In Progress' },
               { id: 4, title: "Introduction to HTML & CSS", progress: 100, color: "green", lessons: 10, hours: 5, status: 'Completed' },
             ],
-            streak: 15,
             xp: 1250,
-            badges: 3
+            level: 15,
         }));
 
         await fetchLatestActivity();
@@ -311,22 +277,14 @@ export default function DashboardPage() {
               className="flex items-center space-x-2 p-1.5 rounded-full hover:bg-gray-100 transition duration-150"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
-              <div className="w-8 h-8 rounded-full bg-pink-500 flex items-center justify-center text-white font-semibold text-sm">
-                A
+              <div className="w-8 h-8 flex items-center justify-center text-white font-semibold text-sm">
+                {userData.userLogin}
               </div>
               <User className="w-4 h-4 text-gray-500 hidden sm:block" />
             </button>
 
             {isMenuOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-1 z-20">
-                <a href="#profile" className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                  <User className="w-4 h-4" />
-                  <span>Profile</span>
-                </a>
-                <a href="#settings" className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                  <Settings className="w-4 h-4" />
-                  <span>Settings</span>
-                </a>
                 <a 
                   href="#logout" 
                   onClick={() => {

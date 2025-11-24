@@ -2,26 +2,28 @@ import { useMemo, useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import LevelButton from '../components/LevelButton';
 
-const MOCK_USER_PROGRESS = {
-    '1': 5,
-    '2': 3,
-    '3': 10,
-};
+const SPACING_Y = 120; 
+const INITIAL_OFFSET_Y = 60; 
 
-
-{/*Generates positions for levels in a straight horizontal line.*/}
+{/*Generates positions for levels in a straight vertical line.*/}
 const generateHorizontalPositions = (totalLevels) => {
     const positions = {};
+    
+    let finalY = INITIAL_OFFSET_Y;
+
     for (let i = 1; i <= totalLevels; i++) {
-        let x;
-        if (totalLevels === 1) {
-            x = 50; 
-        } else {
-            x = 10 + (i - 1) * (80 / (totalLevels - 1));
+        const y = INITIAL_OFFSET_Y + (i - 1) * SPACING_Y;
+
+        positions[i] = { y: y, x: 50};
+
+        if (i === totalLevels) {
+            finalY = y;
         }
-        positions[i] = { x: x, y: 50 };
     }
-    return positions;
+    return {
+        positions,
+        mapHeight: finalY + INITIAL_OFFSET_Y 
+    }
 };
 
 
@@ -37,10 +39,23 @@ const generateSequentialPaths = (totalLevels) => {
 export default function LevelSelectionPage() {
     const { courseId } = useParams();
     const [courseDetails, setCourseDetails] = useState(null);
+    const [lastCompletedLevel, setLastCompletedLevel] = useState(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
+        const jwtToken = localStorage.getItem('token');
+    
+        if (!jwtToken) {
+            setIsLoading(false);
+            setError("Not logged in. Cannot fetch user data. Redirecting to login...");
+            
+            setTimeout(() => {
+                window.location.replace('/'); 
+            }, 1500); 
+            return;
+        }
+
         const fetchDetails = async () => {
             try {
                 const response = await fetch(`/api/courses/${courseId}`); 
@@ -49,6 +64,21 @@ export default function LevelSelectionPage() {
                 }
                 const data = await response.json();
                 setCourseDetails(data);
+
+                const progressResponse = await fetch(`/api/courses/completed-levels/${courseId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${jwtToken}`, 
+                        'Content-Type': 'application/json',
+                    },
+                });
+                if (!progressResponse.ok) {
+                    console.error(`Failed to fetch progress for course ${courseId}. Status: ${progressResponse.status}`);
+                    setLastCompletedLevel(0);
+                } else {
+                    const completedLevels = await progressResponse.json();
+                    setLastCompletedLevel(completedLevels);
+                }
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -61,11 +91,10 @@ export default function LevelSelectionPage() {
 
     const courseTitle = courseDetails?.title || 'Loading Course...';
     const totalLessons = courseDetails?.totalLessons || 1;
-    const lastCompletedLevel = MOCK_USER_PROGRESS[courseId] || 0; 
 
-    const normalizedPositions = useMemo(() => 
-        generateHorizontalPositions(totalLessons), 
-        [totalLessons]
+    const { positions: normalizedPositions, mapHeight } = useMemo(() => 
+        generateHorizontalPositions(totalLessons),
+        [totalLessons]    
     );
 
     const paths = useMemo(() => 
@@ -96,11 +125,11 @@ export default function LevelSelectionPage() {
                 <line 
                     key={`${startLevel}-${endLevel}`}
                     x1={`${start.x}%`} 
-                    y1={`${start.y}%`} 
+                    y1={start.y}
                     x2={`${end.x}%`} 
-                    y2={`${end.y}%`} 
-                    stroke={isPathUnlocked ? "#7DD3FC" : "#D1D5DB"}
-                    strokeWidth="4" 
+                    y2={end.y}
+                    stroke={isPathUnlocked ? "#7DD3FC" : "#D1D5AA"}
+                    strokeWidth="3"
                     strokeLinecap="round"
                 />
             );
@@ -121,10 +150,9 @@ export default function LevelSelectionPage() {
                 
                 <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 space-y-4 sm:space-y-0">
                     <h1 className="text-4xl font-extrabold text-blue-400">
-                        {/* Display dynamic Course Title */}
                         {courseTitle}
                     </h1>
-                    <Link to="/courses" className="text-blue-400 hover:text-blue-500 transition duration-150 flex items-center space-x-2 font-medium">
+                    <Link to="/dashboard" className="text-blue-400 hover:text-blue-500 transition duration-150 flex items-center space-x-2 font-medium">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
@@ -135,47 +163,55 @@ export default function LevelSelectionPage() {
                 {/* Level Map Container */}
                 <div className="border-4 border-blue-200 rounded-xl shadow-xl bg-white p-4 sm:p-6 md:p-8"> 
 
-                    <div className="relative w-full h-0 pt-[25%] overflow-hidden bg-gray-100 rounded-lg"> 
-                        <svg 
-                            className="absolute inset-0 w-full h-full z-0" 
-                            viewBox="0 0 100 100"
-                            preserveAspectRatio="none"
+                    <div 
+                        className="relative w-full overflow-y-scroll overflow-x-hidden" 
+                        style={{ height: '70vh' }}
+                    >
+                        {/* CONTENT CONTAINER: Height is set to match the total path length */}
+                        <div 
+                            className="relative w-full"
+                            style={{ height: `${mapHeight}px` }} 
                         >
-                            {drawPaths}
-                        </svg>
-                        
-                        {/* Render Level Buttons */}
-                        {Object.keys(normalizedPositions).map(level => {
-                            const pos = normalizedPositions[level];
-                            const levelNumber = Number(level);
-                            const isUnlocked = levelStatus[levelNumber];
+                            <svg 
+                                className="absolute inset-0 w-full h-full z-0" 
+                                viewBox={`0 0 100 ${mapHeight}`} 
+                                preserveAspectRatio="xMidYMin slice"
+                            >
+                                {drawPaths}
+                            </svg>
+                            
+                            {/* Render Level Buttons */}
+                            {Object.keys(normalizedPositions).map(level => {
+                                const pos = normalizedPositions[level];
+                                const levelNumber = Number(level);
+                                const isUnlocked = levelStatus[levelNumber];
 
-                            return (
-                                <div 
-                                    key={level} 
-                                    className="absolute z-10"
-                                    style={{
-                                        left: `calc(${pos.x}% - ${levelButtonOffset})`,
-                                        top: `calc(${pos.y}% - ${levelButtonOffset})`,
-                                    }}
-                                >
-                                    <Link 
-                                        to={isUnlocked ? `/course/${courseId}/level/${levelNumber}` : '#'}
-                                        onClick={(e) => {
-                                            if (!isUnlocked) e.preventDefault();
+                                return (
+                                    <div 
+                                        key={level} 
+                                        className="absolute z-10"
+                                        style={{
+                                            left: `calc(${pos.x}% - ${levelButtonOffset})`,
+                                            top: `calc(${pos.y}px - ${levelButtonOffset})`, 
                                         }}
-                                        className={!isUnlocked ? 'cursor-not-allowed' : ''}
                                     >
-                                        <LevelButton 
-                                            levelNumber={levelNumber} 
-                                            isUnlocked={isUnlocked} 
-                                            courseId={courseId}
-                                        />
-                                    </Link>
-                                </div>
-                            );
-                        })}
-                        
+                                        <Link 
+                                            to={isUnlocked ? `/course/${courseId}/level/${levelNumber}` : '#'}
+                                            onClick={(e) => {
+                                                if (!isUnlocked) e.preventDefault();
+                                            }}
+                                            className={!isUnlocked ? 'cursor-not-allowed' : ''}
+                                        >
+                                            <LevelButton 
+                                                levelNumber={levelNumber} 
+                                                isUnlocked={isUnlocked} 
+                                                courseId={courseId}
+                                            />
+                                        </Link>
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </div>
                 </div>
             </div>

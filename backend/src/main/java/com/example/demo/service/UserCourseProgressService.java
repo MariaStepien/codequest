@@ -25,6 +25,7 @@ public class UserCourseProgressService {
 
     @Data
     public static class LatestActivityDto {
+        private Long courseId;
         private String courseTitle;
         private int completedLevelOrderIndex;
         private OffsetDateTime lastUpdated;
@@ -34,6 +35,7 @@ public class UserCourseProgressService {
         return userCourseProgressRepository.findLatestProgressByUserId(userId)
             .map(progress -> {
                 LatestActivityDto dto = new LatestActivityDto();
+                dto.setCourseId(progress.getCourse().getId());
                 dto.setCourseTitle(progress.getCourse().getTitle());
                 dto.setCompletedLevelOrderIndex(progress.getCompletedLessons());
                 dto.setLastUpdated(progress.getLastUpdated());
@@ -59,6 +61,7 @@ public class UserCourseProgressService {
             
             if (newCompletedLessons > progress.getCompletedLessons()) {
                 progress.setCompletedLessons(newCompletedLessons);
+                progress.setLastUpdated(OffsetDateTime.now());
             }
             
         } else {
@@ -66,6 +69,8 @@ public class UserCourseProgressService {
             progress.setUser(user); 
             progress.setCourse(course); 
             progress.setCompletedLessons(newCompletedLessons);
+            progress.setDateCreated(OffsetDateTime.now());
+            progress.setLastUpdated(OffsetDateTime.now());
         }
         
         return userCourseProgressRepository.save(progress);
