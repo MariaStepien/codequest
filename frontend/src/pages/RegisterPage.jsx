@@ -59,7 +59,7 @@ export default function RegisterPage() {
 
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-500 via-pink-400 to-red-500 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-400 via-pink-300 to-red-500 p-4">
       <div className="bg-white/90 backdrop-blur-md p-10 rounded-3xl shadow-2xl w-full max-w-md">
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">
           Create Your CodeQuest Account
@@ -139,7 +139,7 @@ export default function RegisterPage() {
             className={`w-full py-3 text-lg font-semibold text-white rounded-2xl transition duration-300 shadow-lg flex items-center justify-center space-x-2
               ${isLoading 
                 ? 'bg-gray-400 cursor-not-allowed' 
-                : 'bg-gradient-to-r from-purple-500 to-pink-600 hover:from-red-600 hover:to-yellow-500'
+                : 'bg-gradient-to-r from-red-500 to-purple-500 hover:from-purple-700 hover:to-red-700'
               }`}
             disabled={isLoading}
           >

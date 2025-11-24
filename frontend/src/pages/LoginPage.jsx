@@ -66,7 +66,7 @@ export default function LoginPage() {
 
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-yellow-500 via-green-400 to-yellow-500 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-cyan-500 to-blue-1000 p-4">
       <div className="bg-white/90 backdrop-blur-md p-10 rounded-3xl shadow-2xl w-full max-w-md">
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">
           Welcome to CodeQuest
@@ -95,7 +95,7 @@ export default function LoginPage() {
               value={userLogin}
               onChange={(e) => setUserLogin(e.target.value)}
               required
-              className="w-full px-5 py-3 text-lg border-2 border-transparent rounded-2xl shadow-sm focus:border-pink-500 focus:ring-2 focus:ring-pink-300 outline-none transition duration-300 placeholder-gray-700 text-gray-900"
+              className="w-full px-5 py-3 text-lg border-2 border-transparent rounded-2xl shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-cyan-300 outline-none transition duration-300 placeholder-gray-700 text-gray-900"
               placeholder="Enter your login name"
               disabled={isLoading}
             />
@@ -114,7 +114,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-5 py-3 text-lg border-2 border-transparent rounded-2xl shadow-sm focus:border-pink-500 focus:ring-2 focus:ring-pink-300 outline-none transition duration-300 placeholder-gray-700 text-gray-900"
+              className="w-full px-5 py-3 text-lg border-2 border-transparent rounded-2xl shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-cyan-300 outline-none transition duration-300 placeholder-gray-700 text-gray-900"
               placeholder="Enter your password"
               disabled={isLoading}
             />
@@ -125,7 +125,7 @@ export default function LoginPage() {
             className={`w-full py-3 text-lg font-semibold text-black rounded-2xl transition duration-300 shadow-lg flex items-center justify-center space-x-2
               ${isLoading 
                 ? 'bg-gray-400 cursor-not-allowed' 
-                : 'bg-gradient-to-r from-yellow-500 to-green-600 hover:from-purple-600 hover:to-pink-500'
+                : 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-blue-700 hover:to-cyan-800'
               }`}
             disabled={isLoading}
           >
@@ -148,7 +148,7 @@ export default function LoginPage() {
         </p>
         <p className="text-center text-sm text-gray-600 mt-2">
             Or {" "}
-            <a href="/test" className= "text-pink-600 font-medium hover:underline">
+            <a href="/course/1/level/1" className= "text-pink-600 font-medium hover:underline">
             try the app without loginning in
             </a>
         </p>

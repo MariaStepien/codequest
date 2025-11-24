@@ -41,7 +41,7 @@ export default function OptionSelectionPage() {
       )}
 
       <p className="text-center text-sm text-gray-600 mt-2">
-            <a href="/test-level" className= "text-pink-600 font-medium hover:underline">
+            <a href="/" className= "text-pink-600 font-medium hover:underline">
             Go further
             </a>
         </p>
