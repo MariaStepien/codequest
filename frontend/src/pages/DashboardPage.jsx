@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { LogOut, Settings, BarChart3, BookOpenText, User, Sun, Zap, Award, ArrowRight, Star } from 'lucide-react';
+import { LogOut, BarChart3, BookOpenText, User, Zap, ArrowRight, Star } from 'lucide-react';
 import CoursesPage from './CoursesPage';
 
 // Initial state for user data before successful fetch
@@ -14,21 +14,6 @@ const initialUserData = {
   latestActivity: null
 };
 
-const ProgressBar = ({ progress, color, title }) => (
-  <div className="mb-2">
-    <div className="flex justify-between text-sm font-medium mb-1">
-      <span className="text-gray-700">{title}</span>
-      <span className={`text-${color}-600`}>{progress}%</span>
-    </div>
-    <div className="w-full bg-gray-200 rounded-full h-2.5">
-      <div 
-        className={`h-2.5 rounded-full bg-${color}-500 transition-all duration-700`} 
-        style={{ width: `${progress}%` }}
-      />
-    </div>
-  </div>
-);
-
 const StatCard = ({ value, label, icon: Icon, color }) => (
   <div className={`p-4 rounded-xl border border-${color}-200 bg-${color}-50`}>
     <Icon className={`w-6 h-6 mx-auto mb-1 text-${color}-600`} />
@@ -38,7 +23,7 @@ const StatCard = ({ value, label, icon: Icon, color }) => (
 );
 
 
-const DashboardContent = ({ userData, handleNavigation }) => {
+const DashboardContent = ({ userData }) => {
   const latestActivity = userData.latestActivity;
   
   // Helper to format the time
@@ -83,7 +68,7 @@ const DashboardContent = ({ userData, handleNavigation }) => {
                   
                   <div className="bg-white p-6 rounded-xl shadow-lg">
                       <h3 className="text-xl font-bold text-gray-900 mb-4 border-b pb-2">
-                          Gamification Stats
+                          User's Stats
                       </h3>
                       <div className="grid grid-cols-3 gap-4 text-center">
                           <StatCard 
@@ -248,7 +233,6 @@ export default function DashboardPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
           
           <div className="flex items-center space-x-2 cursor-pointer" onClick={() => handleNavigation('dashboard')}>
-            <Zap className="text-indigo-600 w-7 h-7" />
             <span className="text-xl font-extrabold text-gray-900">
               CodeQuest
             </span>
