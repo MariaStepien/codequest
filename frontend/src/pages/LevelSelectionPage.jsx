@@ -115,15 +115,15 @@ export default function LevelSelectionPage() {
             <div className="mx-auto w-full max-w-7xl"> 
                 
                 <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 space-y-4 sm:space-y-0">
-                    <h1 className="text-4xl font-extrabold text-blue-400">
-                        {courseTitle}
-                    </h1>
                     <Link to="/dashboard" className="text-blue-400 hover:text-blue-500 transition duration-150 flex items-center space-x-2 font-medium">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
                         <span>Go back to Courses</span>
                     </Link>
+                    <h1 className="text-4xl font-extrabold text-blue-400">
+                        {courseTitle}
+                    </h1>
                 </header>
 
                 {/* Level Map Container */}
