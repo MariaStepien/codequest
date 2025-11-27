@@ -1,5 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+
+// Helper function to shuffle an array (Fisher-Yates)
+const shuffleArray = (array) => {
+    if (!Array.isArray(array)) {
+        return [];
+    }
+    const shuffled = [...array]; 
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+};
 
 /**
  * A component allowing users to reorder a list of items using up/down buttons.
@@ -8,12 +21,12 @@ import PropTypes from 'prop-types';
  * @param {function} props.onTaskComplete Callback to signal LevelTemplate (true for correct order, false otherwise).
  */
 export default function OrderableList({ initialItems, correctOrder, onTaskComplete }) {
-    const [items, setItems] = useState(initialItems);
+    const [items, setItems] = useState(() => shuffleArray(initialItems));
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isCorrect, setIsCorrect] = useState(false);
 
     useEffect(() => {
-        setItems(initialItems);
+        setItems(shuffleArray(initialItems));
         setIsSubmitted(false);
         setIsCorrect(false);
     }, [initialItems, correctOrder]);

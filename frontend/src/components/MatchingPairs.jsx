@@ -1,17 +1,25 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
-/**
- * Component for a matching pairs exercise.
- * @param {object} props
- * @param {Array<object>} props.items Array of objects: { key, left, right }
- * @param {function} props.onTaskComplete Callback to signal LevelTemplate (true only when all pairs matched).
- */
+const shuffleArray = (array) => {
+    if (!Array.isArray(array)) {
+        return [];
+    }
+    const shuffled = [...array]; 
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+};
+
 export default function MatchingPairs({ items, onTaskComplete }) {
     const [leftSelectionKey, setLeftSelectionKey] = useState(null); 
     const [rightSelectionKey, setRightSelectionKey] = useState(null); 
     const [matchedPairsKeys, setMatchedPairsKeys] = useState([]); 
     const [feedback, setFeedback] = useState(null);
+    
+    const [shuffledRightItems] = useState(() => shuffleArray(items)); 
 
     const handleSelect = (key, type) => {
         if (matchedPairsKeys.includes(key)) return;
@@ -30,7 +38,7 @@ export default function MatchingPairs({ items, onTaskComplete }) {
             return;
         }
 
-        if (leftSelectionKey === rightSelectionKey) {
+        if (leftSelectionKey === rightSelectionKey) { 
             const newMatchedKeys = [...matchedPairsKeys, leftSelectionKey];
             setMatchedPairsKeys(newMatchedKeys);
             setFeedback({ type: 'success', message: 'Correct match! Pair completed.' });
@@ -67,7 +75,6 @@ export default function MatchingPairs({ items, onTaskComplete }) {
             </h3>
 
             <div className="flex justify-between space-x-6">
-                {/* Left Column (Terms) */}
                 <div className="w-1/2 space-y-3">
                     <h4 className="text-lg font-semibold text-gray-700 mb-2">Glyphs</h4>
                     {items.map(item => (
@@ -86,7 +93,7 @@ export default function MatchingPairs({ items, onTaskComplete }) {
 
                 <div className="w-1/2 space-y-3">
                     <h4 className="text-lg text-black font-semibold text-gray-700 mb-2">Meanings</h4>
-                    {items.map(item => (
+                    {shuffledRightItems.map(item => (
                         <div
                             key={item.key} 
                             onClick={() => handleSelect(item.key, 'right')}
@@ -101,7 +108,6 @@ export default function MatchingPairs({ items, onTaskComplete }) {
                 </div>
             </div>
 
-            {/* Submission and Feedback Area */}
             <div className="pt-4 border-t">
                 {feedback && (
                     <p className={`mb-3 text-center font-medium ${feedback.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>

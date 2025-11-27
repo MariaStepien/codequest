@@ -12,24 +12,40 @@ import PropTypes from 'prop-types';
 export default function MultipleChoice({ question, options, correctAnswer, onTaskComplete }) {
     const [selectedOption, setSelectedOption] = useState(null);
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [attempts, setAttempts] = useState(0);
 
     const isCorrect = selectedOption === correctAnswer;
+    const hasFailed = isSubmitted && !isCorrect;
+    const hasSucceeded = isSubmitted && isCorrect;
+
     const handleSubmit = () => {
         if (selectedOption) {
             setIsSubmitted(true);
-            onTaskComplete(selectedOption === correctAnswer);
+            setAttempts(prev => prev + 1);
+
+            if (selectedOption === correctAnswer) {
+                onTaskComplete(true);
+            }
         }
+    };
+
+    const handleTryAgain = () => {
+        setSelectedOption(null);
+        setIsSubmitted(false);
     };
 
     const getOptionClasses = (option) => {
         let classes = 'p-4 border rounded-lg cursor-pointer transition duration-150 text-gray-800';
 
         if (isSubmitted) {
-            if (option === correctAnswer) {
+            if (option === correctAnswer && hasSucceeded) {
                 classes += ' bg-green-100 border-green-600 font-bold';
             }
-            else if (option === selectedOption && option !== correctAnswer) {
+            else if (option === selectedOption && hasFailed) {
                 classes += ' bg-red-100 border-red-600 font-bold';
+            }
+            else if (option === selectedOption && hasSucceeded) {
+                classes += ' bg-green-100 border-green-600 font-bold';
             }
             else {
                 classes += ' bg-gray-50 border-gray-200 opacity-70';
@@ -44,7 +60,7 @@ export default function MultipleChoice({ question, options, correctAnswer, onTas
         return classes;
     };
     
-    const disableInteraction = isSubmitted && isCorrect;
+    const disableInteraction = hasSucceeded; 
 
     return (
         <div className="bg-white p-6 rounded-xl shadow-2xl w-full max-w-lg mx-auto space-y-6">
@@ -64,27 +80,39 @@ export default function MultipleChoice({ question, options, correctAnswer, onTas
                 ))}
             </div>
 
-            {/* Submission and Feedback Area */}
-            <div className="pt-4 border-t">
+            <div className="pt-4 border-t space-y-3">
                 {isSubmitted && (
                     <p className={`mb-3 text-center font-medium ${isCorrect ? 'text-green-600' : 'text-red-600'}`}>
-                        {isCorrect ? 'Correct! Rune power accepted.' : `Incorrect. The correct rune was: ${correctAnswer}`}
+                        {isCorrect 
+                            ? `Correct! Rune power accepted (Attempt ${attempts}).` 
+                            : `Incorrect. Try again, apprentice. (Attempt ${attempts})`}
                     </p>
                 )}
 
-                <button
-                    onClick={handleSubmit}
-                    disabled={!selectedOption || disableInteraction}
-                    className={`
-                        w-full py-3 px-4 font-semibold rounded-lg transition duration-200
-                        ${!selectedOption || disableInteraction
-                            ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                            : 'bg-indigo-600 text-white hover:bg-indigo-700'
-                        }
-                    `}
-                >
-                    {disableInteraction ? 'Task Completed' : 'Forge Rune'}
-                </button>
+                {!hasFailed && (
+                    <button
+                        onClick={handleSubmit}
+                        disabled={!selectedOption || disableInteraction}
+                        className={`
+                            w-full py-3 px-4 font-semibold rounded-lg transition duration-200
+                            ${!selectedOption || disableInteraction
+                                ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                                : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                            }
+                        `}
+                    >
+                        {disableInteraction ? 'Task Completed' : 'Forge Rune'}
+                    </button>
+                )}
+                
+                {hasFailed && (
+                    <button
+                        onClick={handleTryAgain}
+                        className="w-full py-3 px-4 font-semibold rounded-lg transition duration-200 bg-yellow-500 text-white hover:bg-yellow-600"
+                    >
+                        Try Again
+                    </button>
+                )}
             </div>
         </div>
     );

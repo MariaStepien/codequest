@@ -5,11 +5,11 @@ export default function FillInTheBlank({ sentence, correctAnswers, onTaskComplet
   const safeSentence = sentence || ""; 
   const textSegments = safeSentence.split('[BLANK]');
   
-  const [userInputs, setUserInputs] = useState(
-    Array(textSegments.length - 1).fill('')
-  );
+  const initialInputs = Array(textSegments.length - 1).fill('');
+  const [userInputs, setUserInputs] = useState(initialInputs);
   
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [attempts, setAttempts] = useState(0); 
   
   if (textSegments.length - 1 !== correctAnswers.length) {
     if (safeSentence === "") {
@@ -26,24 +26,41 @@ export default function FillInTheBlank({ sentence, correctAnswers, onTaskComplet
     );
   }
 
-  const handleInputChange = (index, value) => {
-    if (isSubmitted) return; 
-    const newInputs = [...userInputs];
-    newInputs[index] = value;
-    setUserInputs(newInputs);
-  };
-
+  const allFilled = userInputs.every(input => input.trim() !== '');
   const allCorrect = userInputs.every((input, index) => {
     return input.trim().toLowerCase() === correctAnswers[index].toLowerCase();
   });
-  
-  const handleSubmit = () => {
-    setIsSubmitted(true);
-    onTaskComplete(allCorrect);
+  const hasSucceeded = isSubmitted && allCorrect;
+  const hasFailed = isSubmitted && !allCorrect;
+
+  const handleInputChange = (index, value) => {
+    if (hasSucceeded) return; 
+
+    const newInputs = [...userInputs];
+    newInputs[index] = value;
+    setUserInputs(newInputs);
+
+    if (isSubmitted) {
+        setIsSubmitted(false);
+    }
   };
 
-  const buttonDisabled = isSubmitted && allCorrect;
-  
+  const handleSubmit = () => {
+    if (!allFilled) return;
+    
+    setIsSubmitted(true);
+    setAttempts(prev => prev + 1);
+
+    if (allCorrect) {
+        onTaskComplete(true);
+    }
+  };
+
+  const handleTryAgain = () => {
+    setUserInputs(initialInputs);
+    setIsSubmitted(false);
+  };
+
   const getInputStyles = (index) => {
     if (!isSubmitted) {
       return 'border-gray-300 focus:border-indigo-500';
@@ -51,10 +68,15 @@ export default function FillInTheBlank({ sentence, correctAnswers, onTaskComplet
     
     const isThisCorrect = userInputs[index].trim().toLowerCase() === correctAnswers[index].toLowerCase();
     
-    if (isThisCorrect) {
+    if (isThisCorrect && hasSucceeded) {
       return 'border-green-500 bg-green-50 text-green-700 cursor-default';
-    } else {
+    } else if (!isThisCorrect && hasFailed) {
       return 'border-red-500 bg-red-50 text-red-700';
+    } else if (isThisCorrect && hasFailed) {
+      return 'border-yellow-500 bg-yellow-50 text-yellow-700';
+    } 
+    else {
+      return 'border-green-500 bg-green-50 text-green-700 cursor-default';
     }
   };
 
@@ -72,7 +94,7 @@ export default function FillInTheBlank({ sentence, correctAnswers, onTaskComplet
                 type="text"
                 value={userInputs[index]}
                 onChange={(e) => handleInputChange(index, e.target.value)}
-                disabled={isSubmitted && allCorrect}
+                disabled={hasSucceeded}
                 placeholder={`Answer ${index + 1}`}
                 className={`
                   mx-2 p-2 
@@ -89,25 +111,42 @@ export default function FillInTheBlank({ sentence, correctAnswers, onTaskComplet
         ))}
       </div>
 
-      <button
-        onClick={handleSubmit}
-        disabled={buttonDisabled}
-        className={`
-          w-full py-2 px-4 font-semibold rounded-md transition duration-150
-          ${buttonDisabled
-            ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
-            : 'bg-indigo-600 text-white hover:bg-indigo-700'
-          }
-        `}
-      >
-        {isSubmitted && allCorrect ? 'Correct Runes Sealed! 🎉' : 'Check Runes'}
-      </button>
-
-      {isSubmitted && !allCorrect && (
-        <p className="text-sm text-red-600 mt-2 text-center">
-          The glyphs are vibrating... Review your answers. Some runes are placed incorrectly.
-        </p>
-      )}
+      <div className="space-y-3">
+        {hasSucceeded && (
+          <p className="text-sm text-green-600 font-bold mt-2 text-center">
+            Correct Runes Sealed! 🎉 (Attempt {attempts})
+          </p>
+        )}
+        
+        {hasFailed ? (
+          <button
+            onClick={handleTryAgain}
+            className="w-full py-2 px-4 font-semibold rounded-md transition duration-150 bg-yellow-500 text-white hover:bg-yellow-600"
+          >
+            Try Again (Attempt {attempts} Failed)
+          </button>
+        ) : (
+          <button
+            onClick={handleSubmit}
+            disabled={!allFilled || hasSucceeded}
+            className={`
+              w-full py-2 px-4 font-semibold rounded-md transition duration-150
+              ${!allFilled || hasSucceeded
+                ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                : 'bg-indigo-600 text-white hover:bg-indigo-700'
+              }
+            `}
+          >
+            {hasSucceeded ? 'Task Completed' : 'Check Runes'}
+          </button>
+        )}
+        
+        {isSubmitted && !allCorrect && (
+          <p className="text-sm text-red-600 text-center">
+            The glyphs are vibrating... Review your answers. Some runes are placed incorrectly.
+          </p>
+        )}
+      </div>
     </div>
   );
 }

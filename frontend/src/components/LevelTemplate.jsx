@@ -28,11 +28,12 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // State for task progression
+    // State for task progression and exit confirmation
     const navigate = useNavigate();
     const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
     const [isCurrentTaskComplete, setIsCurrentTaskComplete] = useState(false);
     const [feedbackMessage, setFeedbackMessage] = useState('');
+    const [showExitConfirmation, setShowExitConfirmation] = useState(false); 
 
     const updateUserProgress = async (courseId, completedLevelOrderIndex) => {
         const jwtToken = localStorage.getItem('token');
@@ -100,6 +101,18 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
         fetchLessonData();
     }, [courseId, orderIndex]);
 
+    const handleExitLevel = () => {
+        setShowExitConfirmation(true);
+    };
+
+    const handleConfirmExit = () => {
+        navigate('/dashboard');
+    };
+
+    const handleCancelExit = () => {
+        setShowExitConfirmation(false);
+    };
+
     const tasks = lessonData?.tasks || [];
     const isLevelComplete = currentTaskIndex >= tasks.length; 
 
@@ -151,7 +164,7 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
     const levelTitle = lessonData?.title || `Level ${orderIndex || '?'}`;
     const backgroundStyle = {
         backgroundImage: `url(${backgroundImage})`,
-        backgroundSize: 'contain', 
+        backgroundSize: 'cover', 
         backgroundRepeat: 'no-repeat', 
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed',
@@ -175,21 +188,33 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
             className="flex items-center justify-center p-4" 
             style={backgroundStyle}
         >
-            {/* The main container remains visually unchanged */}
+            {/* NEW: Top-left fixed Exit Button */}
+            {!isLevelComplete && (
+                <button
+                    onClick={handleExitLevel}
+                    className="fixed top-4 left-4 p-3 rounded-full bg-red-500 text-white text-xl hover:bg-red-600 transition duration-200 shadow-lg z-50"
+                    title="Exit Level (Return to Dashboard)"
+                >
+                    <span className="sr-only">Exit Level</span>
+                    &times;
+                </button>
+            )}
+
             <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-2xl p-8 w-full max-w-3xl border-t-8 border-indigo-500">
                 <header className="mb-6 border-b pb-4">
-                    <h2 className="text-3xl font-bold text-gray-800">{levelTitle}</h2>
-                    {!isLevelComplete && (
-                        <p className="text-sm text-indigo-500 font-semibold mt-2">
-                            Step {currentTaskNumber} of {totalTasks}
-                        </p>
-                    )}
+                    <div>
+                        <h2 className="text-3xl font-bold text-gray-800">{levelTitle}</h2>
+                        {!isLevelComplete && (
+                            <p className="text-sm text-indigo-500 font-semibold mt-2">
+                                Step {currentTaskNumber} of {totalTasks}
+                            </p>
+                        )}
+                    </div>
                 </header>
 
                 <div className="min-h-[250px] flex flex-col justify-center">
                     {!isLevelComplete ? (
                         <>
-                            {/* Dynamic Task Rendering */}
                             {CurrentTaskComponent ? (
                                 <CurrentTaskComponent 
                                     {...taskProps} 
@@ -215,7 +240,7 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
                     )}
                 </div>
 
-                {/* Task Progression Button Area (Unchanged Look) */}
+                {/* Task Progression Button Area */}
                 {!isLevelComplete && (
                     <div className="mt-8 pt-4 border-t flex justify-end">
                         {feedbackMessage && (
@@ -239,6 +264,31 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
                     </div>
                 )}
             </div>
+            
+            {showExitConfirmation && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-20 backdrop-blur-sm">
+                    <div className="bg-white p-8 rounded-xl shadow-2xl max-w-sm w-full text-center">
+                        <h3 className="text-xl font-bold text-gray-800 mb-4">Are you sure you want to exit the level?</h3>
+                        <p className="text-red-500 mb-6 font-medium">
+                            Progress won't be saved!
+                        </p>
+                        <div className="flex justify-center space-x-4">
+                            <button
+                                onClick={handleConfirmExit}
+                                className="px-6 py-2 rounded-md bg-red-600 text-white font-semibold hover:bg-red-700 transition duration-150"
+                            >
+                                Yes (Exit)
+                            </button>
+                            <button
+                                onClick={handleCancelExit}
+                                className="px-6 py-2 rounded-md bg-gray-200 text-white-800 font-semibold hover:bg-gray-300 transition duration-150"
+                            >
+                                No (Stay)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
