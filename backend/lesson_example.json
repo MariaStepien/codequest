@@ -90,6 +90,13 @@
           "text": "The JVM executes the bytecode, running the application."
         }
       ]
+    },
+    {
+      "id": "cft-001",
+      "type": "CodeFix",
+      "instructions": "The loop below is intended to print numbers from 0 to 4. Fix the condition so it works correctly.",
+      "incorrectCode": "for (int i = 0; i <= 5; i++) {\n\tSystem.out.println(i);\n}",
+      "fixedCode": "for (int i = 0; i < 5; i++) {\n\tSystem.out.println(i);\n}"
     }
   ]
 }

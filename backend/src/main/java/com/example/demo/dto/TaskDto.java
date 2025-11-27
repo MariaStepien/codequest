@@ -20,7 +20,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
     @JsonSubTypes.Type(value = MultipleChoiceTaskDto.class, name = "MultipleChoice"),
     @JsonSubTypes.Type(value = FillInTheBlankTaskDto.class, name = "FillInTheBlank"),
     @JsonSubTypes.Type(value = OrderableListTaskDto.class, name = "OrderableList"),
-    @JsonSubTypes.Type(value = TextBoxTaskDto.class, name = "TextBox")
+    @JsonSubTypes.Type(value = TextBoxTaskDto.class, name = "TextBox"),
+    @JsonSubTypes.Type(value = CodeFixTaskDto.class, name = "CodeFix")
 })
 public interface TaskDto {
     String getId();

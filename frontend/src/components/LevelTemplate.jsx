@@ -7,6 +7,9 @@ import MatchingPairs from './MatchingPairs';
 import MultipleChoice from './MultipleChoice';
 import OrderableList from './OrderableList';
 import TextBox from './TextBox';
+import CodeFix from './CodeFix';
+
+import levelBackground from '../assets/testbackground.png';
 
 const TaskComponentMap = {
     'TextBox': TextBox,                // Matches TextBoxTaskDto.java type
@@ -14,9 +17,8 @@ const TaskComponentMap = {
     'FillInTheBlank': FillInTheBlank,  // Matches FillInTheBlankTaskDto.java type
     'MatchingPairs': MatchingPairs,    // Matches MatchingPairsTaskDto.java type
     'OrderableList': OrderableList,    // Matches OrderableListTaskDto.java type
+    'CodeFix' : CodeFix                // Matches CodeFixTaskDto.java type
 };
-
-import levelBackground from '../assets/testbackground.png';
 
 export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBackground }) {
     // Get levelId from the URL path
