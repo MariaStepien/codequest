@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { LogOut, BarChart3, BookOpenText, User, Zap, ArrowRight, Star } from 'lucide-react';
+import { Zap, ArrowRight, Star } from 'lucide-react';
+import Header from '../components/Header';
 import CoursesPage from './CoursesPage';
 
-// Initial state for user data before successful fetch
 const initialUserData = {
   userLogin: "Guest",
   progress: 0,
@@ -14,7 +14,7 @@ const initialUserData = {
   latestActivity: null
 };
 
-const StatCard = ({ value, label, icon: Icon, color }) => (
+const DashboardStatCard = ({ value, label, icon: Icon, color }) => (
   <div className={`p-4 rounded-xl border border-${color}-200 bg-${color}-50`}>
     <Icon className={`w-6 h-6 mx-auto mb-1 text-${color}-600`} />
     <div className="text-2xl font-extrabold text-gray-900">{value}</div>
@@ -22,11 +22,9 @@ const StatCard = ({ value, label, icon: Icon, color }) => (
   </div>
 );
 
-
-const DashboardContent = ({ userData }) => {
+const DashboardContentArea = ({ userData }) => {
   const latestActivity = userData.latestActivity;
   
-  // Helper to format the time
   const formatTimeAgo = (isoString) => {
       if (!isoString) return "No recent activity";
       const date = new Date(isoString);
@@ -71,13 +69,13 @@ const DashboardContent = ({ userData }) => {
                           User's Stats
                       </h3>
                       <div className="grid grid-cols-3 gap-4 text-center">
-                          <StatCard 
+                          <DashboardStatCard 
                               value={userData.xp} 
                               label="Total XP" 
                               icon={Zap} 
                               color="teal"
                           />
-                          <StatCard 
+                          <DashboardStatCard 
                               value={userData.level}
                               label="Player level"
                               icon={Star}
@@ -92,14 +90,8 @@ const DashboardContent = ({ userData }) => {
 };
 
 
-const navLinks = [
-  { id: 'dashboard', name: 'Dashboard', icon: BarChart3 },
-  { id: 'courses', name: 'Courses', icon: BookOpenText }
-];
-
 export default function DashboardPage() { 
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState('dashboard'); 
+  const [currentPage, setCurrentPage] = useState('dashboard');
   const [userData, setUserData] = useState(initialUserData); 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -194,28 +186,23 @@ export default function DashboardPage() {
     fetchUserData();
   }, []);
 
-  const handleNavigation = (pageId) => {
-    setCurrentPage(pageId);
-  };
-
   const renderPage = () => {
     if (isLoading) return <div className="text-center py-10 text-xl font-medium">Loading user dashboard...</div>;
     if (error) return <div className="text-center py-10 text-xl font-medium text-red-600">Error: {error}</div>;
 
     switch (currentPage) {
       case 'dashboard':
-        return <DashboardContent userData={userData} handleNavigation={handleNavigation} />;
+        return <DashboardContentArea userData={userData} />;
       case 'courses':
         return <CoursesPage courses={userData.courses} />; 
       default:
-        return <DashboardContent userData={userData} handleNavigation={handleNavigation} />;
+        return <DashboardContentArea userData={userData} />;
     }
   };
 
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
-      {/* Hidden spans for Tailwind JIT compilation to ensure colors are included */}
       <div className="hidden">
         <span className="text-blue-600 bg-blue-500 border-blue-200 bg-blue-50 border-blue-300 bg-blue-100"></span>
         <span className="text-yellow-600 bg-yellow-500 border-yellow-200 bg-yellow-50 border-yellow-300 bg-yellow-100"></span>
@@ -229,63 +216,10 @@ export default function DashboardPage() {
       </div>
 
 
-      <header className="sticky top-0 z-10 bg-white shadow-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
-          
-          <div className="flex items-center space-x-2 cursor-pointer" onClick={() => handleNavigation('dashboard')}>
-            <span className="text-xl font-extrabold text-gray-900">
-              CodeQuest
-            </span>
-          </div>
-
-          <nav className="hidden md:flex space-x-1">
-            {navLinks.map(link => (
-              <a 
-                key={link.id}
-                href="#"
-                onClick={(e) => { e.preventDefault(); handleNavigation(link.id); }}
-                className={`flex items-center space-x-1 px-3 py-2 rounded-lg text-sm font-medium transition duration-150 ease-in-out 
-                  ${currentPage === link.id
-                    ? 'bg-indigo-50 text-indigo-600 font-semibold shadow-inner' 
-                    : 'text-gray-500 hover:text-indigo-600 hover:bg-gray-50'
-                  }`}
-              >
-                <link.icon className="w-4 h-4" />
-                <span>{link.name}</span>
-              </a>
-            ))}
-          </nav>
-
-          <div className="relative">
-            <button 
-              className="flex items-center space-x-2 p-1.5 rounded-full hover:bg-gray-100 transition duration-150"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              <div className="w-8 h-8 flex items-center justify-center text-white font-semibold text-sm">
-                {userData.userLogin}
-              </div>
-              <User className="w-4 h-4 text-gray-500 hidden sm:block" />
-            </button>
-
-            {isMenuOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-1 z-20">
-                <a 
-                  href="#logout" 
-                  onClick={() => {
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('userId');
-                    window.location.replace('/');
-                  }}
-                  className="flex items-center space-x-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span>Logout</span>
-                </a>
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
+      <Header
+        userLogin={userData.userLogin} 
+        currentPage={currentPage}
+      />
       
       <main className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         {renderPage()}

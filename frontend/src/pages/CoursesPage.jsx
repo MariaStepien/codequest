@@ -1,14 +1,35 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Header from '../components/Header'; 
 
 const CoursesPage = () => {
     const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [userLogin, setUserLogin] = useState('Guest'); 
     const navigate = useNavigate();
+    
+    const currentPageIdentifier = 'courses';
 
     useEffect(() => {
-        const fetchCourses = async () => {
+        const fetchUserData = async (jwtToken) => {
+            try {
+                const response = await fetch('/api/user/me', { 
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${jwtToken}` },
+                });
+                if (response.ok) {
+                    const userDetails = await response.json();
+                    setUserLogin(userDetails.userLogin || 'Guest');
+                } else {
+                    console.error("Failed to fetch user data. Status:", response.status);
+                }
+            } catch (err) {
+                console.error("Error fetching user data:", err);
+            }
+        };
+
+        const fetchCoursesAndUser = async () => {
             setLoading(true);
             setError(null);
             
@@ -19,7 +40,9 @@ const CoursesPage = () => {
                 setLoading(false);
                 return;
             }
-
+            
+            await fetchUserData(jwtToken);
+            
             try {
                 const response = await fetch('/api/courses/with-progress', { 
                     method: 'GET',
@@ -40,7 +63,7 @@ const CoursesPage = () => {
             }
         };
 
-        fetchCourses();
+        fetchCoursesAndUser();
     }, []);
 
     const handleButtonClick = (courseId) => {
@@ -52,16 +75,8 @@ const CoursesPage = () => {
         return Math.min(100, Math.round((completed / total) * 100));
     };
 
-    if (loading) {
-        return <div style={styles.container}>Loading courses...</div>;
-    }
-
-    if (error) {
-        return <div style={styles.container}>Error: {error.message}</div>;
-    }
-
-    return (
-        <div style={styles.container}>
+    const courseContent = (
+        <div style={styles.contentWrapper}>
             <h1 style={styles.pageTitle}>Available Courses</h1>
             <div style={styles.coursesGrid}>
                 {courses.map((course) => {
@@ -85,7 +100,7 @@ const CoursesPage = () => {
                                 <div style={{...styles.progressBarFill, width: `${progressPercentage}%`, backgroundColor: accentColor}}></div>
                             </div>
                             <p style={styles.overallProgress}>
-                                 Overall Progress: {progressPercentage}% ({completed} / {course.totalLessons})
+                                Overall Progress: {progressPercentage}% ({completed} / {course.totalLessons})
                             </p>
                             <button 
                                 onClick={() => handleButtonClick(course.id)} 
@@ -94,7 +109,6 @@ const CoursesPage = () => {
                                     backgroundColor: accentColor
                                 }}
                             >
-                                {/* Change button text based on progress */}
                                 {progressPercentage === 0 ? 'Start Course →' : 'Continue Learning →'}
                             </button>
                         </div>
@@ -103,14 +117,28 @@ const CoursesPage = () => {
             </div>
         </div>
     );
+    
+    const renderContent = () => {
+        if (loading) return <div className="text-center py-10 text-xl font-medium">Loading courses...</div>;
+        if (error) return <div className="text-center py-10 text-xl font-medium text-red-600">Error: {error.message}</div>;
+        return courseContent;
+    };
+
+
+    return (
+        <div className="min-h-screen bg-gray-50 font-sans">
+            <Header userLogin={userLogin} currentPage={currentPageIdentifier} /> 
+            
+            <main className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+                {renderContent()}
+            </main>
+        </div>
+    );
 };
 
 const styles = {
-    container: {
+    contentWrapper: {
         fontFamily: 'Arial, sans-serif',
-        padding: '20px',
-        maxWidth: '1200px',
-        margin: '0 auto',
     },
     pageTitle: {
         textAlign: 'center',
