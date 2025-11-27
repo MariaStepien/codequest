@@ -5,6 +5,12 @@ import LevelButton from '../components/LevelButton';
 const SPACING_Y = 120; 
 const INITIAL_OFFSET_Y = 60; 
 
+// Path Styling Constants
+const ACTIVE_PATH_COLOR = '#60a5fa'; // Tailwind blue-400
+const DISABLED_PATH_COLOR = '#9ca3af'; // Tailwind gray-400
+const PATH_STROKE_WIDTH = 10;
+const BUTTON_CENTER_OFFSET_PX = 32; // Half the size of LevelButton (used for Y-coordinates)
+
 {/*Generates positions for levels in a straight vertical line.*/}
 const generateHorizontalPositions = (totalLevels) => {
     const positions = {};
@@ -13,8 +19,7 @@ const generateHorizontalPositions = (totalLevels) => {
 
     for (let i = 1; i <= totalLevels; i++) {
         const y = INITIAL_OFFSET_Y + (i - 1) * SPACING_Y;
-
-        positions[i] = { y: y, x: 50};
+        positions[i] = { y: y, x: 50}; 
 
         if (i === totalLevels) {
             finalY = y;
@@ -24,16 +29,6 @@ const generateHorizontalPositions = (totalLevels) => {
         positions,
         mapHeight: finalY + INITIAL_OFFSET_Y 
     }
-};
-
-
-{ /* Creates connections between sequential levels */}
-const generateSequentialPaths = (totalLevels) => {
-    const paths = [];
-    for (let i = 1; i < totalLevels; i++) {
-        paths.push([i, i + 1]);
-    }
-    return paths;
 };
 
 export default function LevelSelectionPage() {
@@ -47,7 +42,7 @@ export default function LevelSelectionPage() {
         const jwtToken = localStorage.getItem('token');
     
         if (!jwtToken) {
-            setIsLoading(false);
+            setLoading(false);
             setError("Not logged in. Cannot fetch user data. Redirecting to login...");
             
             setTimeout(() => {
@@ -97,11 +92,6 @@ export default function LevelSelectionPage() {
         [totalLessons]    
     );
 
-    const paths = useMemo(() => 
-        generateSequentialPaths(totalLessons), 
-        [totalLessons]
-    );
-
     const levelStatus = useMemo(() => {
         const status = {};
         for (let i = 1; i <= totalLessons; i++) {
@@ -111,30 +101,6 @@ export default function LevelSelectionPage() {
     }, [totalLessons, lastCompletedLevel]);
 
     const levelButtonOffset = '32px'; 
-
-    const drawPaths = useMemo(() => {
-        return paths.map(([startLevel, endLevel]) => {
-            const start = normalizedPositions[startLevel];
-            const end = normalizedPositions[endLevel];
-            
-            if (!start || !end) return null;
-
-            const isPathUnlocked = levelStatus[startLevel] && levelStatus[endLevel];
-
-            return (
-                <line 
-                    key={`${startLevel}-${endLevel}`}
-                    x1={`${start.x}%`} 
-                    y1={start.y}
-                    x2={`${end.x}%`} 
-                    y2={end.y}
-                    stroke={isPathUnlocked ? "#7DD3FC" : "#D1D5AA"}
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                />
-            );
-        }).filter(Boolean);
-    }, [paths, normalizedPositions, levelStatus]);
 
     if (loading) {
         return <div className="p-8 text-center text-xl">Loading course details...</div>;
@@ -172,13 +138,35 @@ export default function LevelSelectionPage() {
                             className="relative w-full"
                             style={{ height: `${mapHeight}px` }} 
                         >
-                            <svg 
-                                className="absolute inset-0 w-full h-full z-0" 
-                                viewBox={`0 0 100 ${mapHeight}`} 
-                                preserveAspectRatio="xMidYMin slice"
+                            
+                            <svg
+                                className="absolute top-0 left-0 w-full h-full"
+                                style={{ height: `${mapHeight}px` }}
+                                preserveAspectRatio="none"
                             >
-                                {drawPaths}
-                            </svg>
+                                {Object.keys(normalizedPositions).map(level => {
+                                    const n = Number(level);
+                                    if (n === 1) return null;
+
+                                    const p1 = normalizedPositions[n - 1];
+                                    const p2 = normalizedPositions[n];
+                                    const active = (n - 1) <= lastCompletedLevel;
+
+                                    return (
+                                        <line
+                                            key={`line-${n - 1}-${n}`}
+                                            x1={`${p1.x}%`} 
+                                            y1={p1.y + BUTTON_CENTER_OFFSET_PX}
+                                            x2={`${p2.x}%`} 
+                                            y2={p2.y - BUTTON_CENTER_OFFSET_PX}
+                                            stroke={active ? ACTIVE_PATH_COLOR : DISABLED_PATH_COLOR}
+                                            strokeWidth={PATH_STROKE_WIDTH}
+                                            strokeLinecap="round"
+                                        />
+                                    );
+                                })}
+                        </svg>
+
                             
                             {/* Render Level Buttons */}
                             {Object.keys(normalizedPositions).map(level => {
@@ -191,7 +179,7 @@ export default function LevelSelectionPage() {
                                         key={level} 
                                         className="absolute z-10"
                                         style={{
-                                            left: `calc(${pos.x}% - ${levelButtonOffset})`,
+                                            left: `calc(${pos.x}% - ${levelButtonOffset})`, 
                                             top: `calc(${pos.y}px - ${levelButtonOffset})`, 
                                         }}
                                     >
