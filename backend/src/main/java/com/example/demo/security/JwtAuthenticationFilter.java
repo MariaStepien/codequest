@@ -1,20 +1,22 @@
-// New File: src/main/java/com/example/demo/security/JwtAuthenticationFilter.java
-
 package com.example.demo.security;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User; // Use Spring Security's User
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.example.demo.service.JwtService;
+import com.example.demo.service.UserService;
 
-import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterChain; // <--- NEW IMPORT
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,9 +25,11 @@ import jakarta.servlet.http.HttpServletResponse;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
+    private final UserService userService;
 
-    public JwtAuthenticationFilter(JwtService jwtService) {
+    public JwtAuthenticationFilter(JwtService jwtService, UserService userService) {
         this.jwtService = jwtService;
+        this.userService = userService;
     }
 
     @Override
@@ -35,41 +39,45 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
         
-        // 1. Extract the Authorization header
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         Long userId = null;
 
-        // Check if the header is present and starts with "Bearer "
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 2. Extract the token (skip "Bearer ")
         jwt = authHeader.substring(7);
-
-        // 3. Validate and extract user ID from the token
         userId = jwtService.extractUserId(jwt);
 
-        // 4. Set Authentication in Security Context
         if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             
-            // Create a UserDetails object using the extracted userId.
-            // Note: We use the userId as the username/principal here.
-            User userDetails = new User(userId.toString(), "", Collections.emptyList());
+            com.example.demo.domain.User appUser;
+            try {
+                appUser = userService.findUserById(userId);
+            } catch (RuntimeException e) {
+                filterChain.doFilter(request, response);
+                return;
+            }
             
-            // Create an Authentication object
+            List<GrantedAuthority> authorities = Collections.singletonList(
+                new SimpleGrantedAuthority("ROLE_" + appUser.getRole())
+            );
+
+            User userDetails = new User(
+                userId.toString(),
+                "",
+                authorities 
+            );
+            
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                    userDetails, // This principal holds the userId
+                    userDetails,
                     null,
                     userDetails.getAuthorities()
             );
 
-            // Add request details
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-            // Set the Authentication in the Security Context
             SecurityContextHolder.getContext().setAuthentication(authToken);
         }
 

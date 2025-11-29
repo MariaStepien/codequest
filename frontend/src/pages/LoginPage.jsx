@@ -7,7 +7,6 @@ export default function LoginPage() {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Function to handle the login attempt
   const handleLogin = async (e) => {
     e.preventDefault();
     setError(null);
@@ -32,18 +31,24 @@ export default function LoginPage() {
       const responseData = await response.json();
 
       if (response.ok) {
-        console.log("Login successful!", responseData);
         localStorage.setItem('token', responseData.token); 
         localStorage.setItem('userId', responseData.userId); 
+        
+        const userRole = responseData.role;
+        localStorage.setItem('role', userRole);
 
-        window.location.href = '/dashboard';
+        if (userRole === 'ADMIN') {
+            window.location.href = '/admin-dashboard';
+        } else {
+            window.location.href = '/dashboard';
+        }
+        
       } else {
         const errorMessage = responseData.message || "Invalid login or password.";
         setError(errorMessage);
         alertMessage(errorMessage, "error");
       }
     } catch (err) {
-      console.error("Network or Fetch Error:", err);
       setError("Could not reach the server. Please check your connection.");
       alertMessage("Could not reach the server. Try again later.", "error");
     } finally {
@@ -72,7 +77,6 @@ export default function LoginPage() {
           Welcome to CodeQuest
         </h2>
         
-        {/* Custom Alert Box */}
         <div id="custom-alert" className="opacity-0 transition-opacity duration-300"></div>
 
         {error && (

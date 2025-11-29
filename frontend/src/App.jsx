@@ -7,6 +7,7 @@ import RegisterPage from './pages/RegisterPage'
 import { useParams } from 'react-router-dom';
 import LevelTemplate from './components/LevelTemplate'
 import CoursesPage from './pages/CoursesPage'
+import AdminDashboardPage from './pages/AdminDashboardPage'
 
 function App() {
   return (
@@ -33,6 +34,8 @@ function App() {
       <Route path="/courses" element={<CoursesPage />} />
 
       <Route path="/course/:courseId/level/:levelNumber" element={<LevelTemplate />} />
+
+      <Route path='/admin-dashboard' element={<AdminDashboardPage/>} />
 
       {/* Error screen */}
       <Route path="*" element={<h1>404 Not Found</h1>} />

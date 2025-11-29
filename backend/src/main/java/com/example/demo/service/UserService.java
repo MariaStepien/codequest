@@ -37,6 +37,8 @@ public class UserService {
         String hashedPassword = passwordEncoder.encode(request.getPassword());
         newUser.setPassword(hashedPassword);
 
+        newUser.setRole("USER");
+
         return userRepository.save(newUser);
     }
     

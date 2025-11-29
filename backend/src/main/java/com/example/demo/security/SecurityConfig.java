@@ -7,19 +7,17 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter; // <--- NEW IMPORT
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
     
-    // --- NEW FIELD & CONSTRUCTOR INJECTION ---
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
-    // ------------------------------------------
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -30,6 +28,8 @@ public class SecurityConfig {
             
             .authorizeHttpRequests(registry -> {
                 registry.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
+                
+                registry.requestMatchers("/api/admin/**").hasRole("ADMIN"); 
                 
                 registry.requestMatchers("/api/lessons/**").permitAll();
 
@@ -57,7 +57,6 @@ public class SecurityConfig {
             
             .formLogin(form -> form.disable())
             
-            // --- NEW: Add the JWT filter BEFORE the standard authentication filter ---
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) 
             
             .build();

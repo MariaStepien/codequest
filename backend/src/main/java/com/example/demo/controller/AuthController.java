@@ -40,7 +40,8 @@ public class AuthController {
             LoginResponse response = new LoginResponse(
                 token, 
                 "Authentication successful!", 
-                authenticatedUser.getId()
+                authenticatedUser.getId(),
+                authenticatedUser.getRole()
             );
             return new ResponseEntity<>(response, HttpStatus.OK);
             

@@ -15,7 +15,7 @@ public interface  UserCourseProgressRepository extends JpaRepository<UserCourseP
     Optional<UserCourseProgress> findByUserIdAndCourseId(Long userId, Long courseId);
     // Custom query to find the single progress record for a user
     // ordered by the most recent lastUpdated date
-    @Query("SELECT p FROM UserCourseProgress p WHERE p.user.id = :userId ORDER BY p.lastUpdated DESC")
+    @Query("SELECT p FROM UserCourseProgress p WHERE p.user.id = :userId ORDER BY p.lastUpdated DESC LIMIT 1")
     Optional<UserCourseProgress> findLatestProgressByUserId(@Param("userId") Long userId);
 }
 
