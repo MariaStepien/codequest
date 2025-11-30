@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,6 +32,19 @@ public class CourseService {
     public Optional<CourseDTO> findCourseDetailsById(Long id) {
         return courseRepository.findById(id)
             .map(this::mapToDTO);
+    }
+
+    public CourseDTO createCourse(CourseDTO courseDTO) {
+        Course course = new Course();
+        course.setTitle(courseDTO.getTitle());
+        course.setTotalLessons(courseDTO.getTotalLessons());
+        course.setEstimatedHours(courseDTO.getEstimatedHours());
+        course.setDateCreated(OffsetDateTime.now());
+        course.setLastUpdated(OffsetDateTime.now());
+
+        Course savedCourse = courseRepository.save(course);
+
+        return mapToDTO(savedCourse);
     }
 
     private CourseDTO mapToDTO(Course course) {

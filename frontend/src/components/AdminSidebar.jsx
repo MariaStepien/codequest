@@ -4,7 +4,7 @@ import { LogOut, LayoutDashboard, BookOpenText, ListPlus, Edit, User } from 'luc
 const navLinks = [
   { id: 'admin-dashboard', name: 'Dashboard', icon: LayoutDashboard, href: '/admin-dashboard' },
   { id: 'admin-courses', name: 'List Courses', icon: BookOpenText, href: '/admin/courses' },
-  { id: 'edit-course', name: 'Add/Edit Course', icon: ListPlus, href: '/admin/courses/edit' },
+  { id: 'add-course', name: 'Add Course', icon: ListPlus, href: '/admin/create-course' },
   { id: 'edit-lesson', name: 'Add/Edit Lesson', icon: Edit, href: '/admin/lessons/edit' }
 ];
 

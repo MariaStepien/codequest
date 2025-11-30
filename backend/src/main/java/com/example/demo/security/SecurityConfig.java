@@ -30,6 +30,8 @@ public class SecurityConfig {
                 registry.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
                 
                 registry.requestMatchers("/api/admin/**").hasRole("ADMIN"); 
+
+                registry.requestMatchers("/api/courses/create-course").hasRole("ADMIN");
                 
                 registry.requestMatchers("/api/lessons/**").permitAll();
 
