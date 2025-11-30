@@ -5,15 +5,15 @@ export default function OptionSelectionPage() {
 
   const handleOptionClick = (option) => {
     setSelectedOption(option);
-    console.log(`User selected: ${option}`);
+    console.log(`Użytkownik wybrał: ${option}`);
   };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-yellow-100 p-4">
-      <h1 className="text-3xl font-bold text-gray-800 mb-8">What is your experience with programing?</h1>
+      <h1 className="text-3xl font-bold text-gray-800 mb-8">Jakie masz doświadczenie w programowaniu?</h1>
 
       <div className="space-y-6 w-full max-w-sm">
-        {['None', 'a little bit', 'I learned some things', 'professional programer'].map((option) => (
+        {['Żadne', 'troszkę', 'Początkujący programista', 'profesjonalny programista'].map((option) => (
           <button
             key={option}
             onClick={() => handleOptionClick(option)}
@@ -36,13 +36,13 @@ export default function OptionSelectionPage() {
 
       {selectedOption && (
         <p className="mt-8 text-lg text-gray-700">
-          You have selected: <span className="font-bold text-brown-800">{selectedOption.charAt(0).toUpperCase() + selectedOption.slice(1)}</span>
+          Wybrano: <span className="font-bold text-brown-800">{selectedOption.charAt(0).toUpperCase() + selectedOption.slice(1)}</span>
         </p>
       )}
 
       <p className="text-center text-sm text-gray-600 mt-2">
             <a href="/" className= "text-pink-600 font-medium hover:underline">
-            Go further
+            Idź dalej
             </a>
         </p>
     </div>

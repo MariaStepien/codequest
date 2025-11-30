@@ -25,7 +25,7 @@ export default function CourseCreationPage() {
     
     if (!jwtToken) {
         setIsLoading(false);
-        setError("Not logged in. Cannot fetch user data. Redirecting to login...");
+        setError("Użytkownik nie zalogowany. Przenoszę do strony logowania...");
         
         setTimeout(() => {
             window.location.replace('/'); 
@@ -45,7 +45,7 @@ export default function CourseCreationPage() {
 
         if (!response.ok) {
           if (response.status === 401 || response.status === 403) {
-            console.error("Authentication failed or session expired. Logging out.");
+            console.error("Autoryzacja nie udana lub sesja wygasła. Wylogowanie użytkownika...");
             localStorage.removeItem('token');
             localStorage.removeItem('userId');
             localStorage.removeItem('role'); 
@@ -53,7 +53,7 @@ export default function CourseCreationPage() {
             return;
           }
           
-          throw new Error('Failed to fetch user data.');
+          throw new Error('Nie udało się pobrać danych użytkownika.');
         }
 
         const data = await response.json();
@@ -61,7 +61,7 @@ export default function CourseCreationPage() {
         setIsDataLoading(false);
 
       } catch (error) {
-        console.error("User data fetch error:", error);
+        console.error("Błąd pobrania danych użytkownika:", error);
       }
     };
 
@@ -83,13 +83,13 @@ export default function CourseCreationPage() {
     setSuccessMessage('');
     
     if (!jwtToken || localStorage.getItem('role') !== 'ADMIN') {
-      setError("Authorization failed. Please ensure you are logged in as an ADMIN.");
+      setError("Autoryzacja nieudana. Upewnij się, że jesteś na koncie z uprawnieniami admina.");
       setIsLoading(false);
       return;
     }
     
     if (!formData.title || formData.totalLessons <= 0 || formData.estimatedHours <= 0) {
-        setError("Please fill in all fields correctly (lessons and hours must be greater than 0).");
+        setError("Wypełnij poprawnie wszystkie pola (liczba lekcji i godzin musi być większa od 0).");
         setIsLoading(false);
         return;
     }
@@ -105,20 +105,20 @@ export default function CourseCreationPage() {
       });
 
       if (response.status === 403) {
-        throw new Error('Access Denied. Only ADMIN users can create courses. Check your JWT role.');
+        throw new Error('Dostęp zabroniony. Tylko użytkownicy z uprawnieniem admina mogą tworzyć kursy.');
       }
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: 'Failed to create course due to server error.' }));
-        throw new Error(errorData.message || 'Failed to create course. Check server logs.');
+        const errorData = await response.json().catch(() => ({ message: 'Nie udało się utworzyć kursu z powodu błędu serwera.' }));
+        throw new Error(errorData.message || 'Nie udało się utworzyć kursu.');
       }
 
       const createdCourse = await response.json();
-      setSuccessMessage(`Course "${createdCourse.title}" (ID: ${createdCourse.id}) created successfully!`);
+      setSuccessMessage(`Kurs "${createdCourse.title}" (ID: ${createdCourse.id}) został utworzony.`);
       setFormData(initialCourseData);
       
     } catch (err) {
-      console.error("Course creation error:", err);
+      console.error("Błąd tworzenia kursu:", err);
       setError(err.message); 
     } finally {
       setIsLoading(false);
@@ -128,7 +128,7 @@ export default function CourseCreationPage() {
   if (isDataLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-xl font-medium text-indigo-600">Loading User Data and Authorization...</div>
+        <div className="text-xl font-medium text-indigo-600">Ładowanie danych użytkownika i autoryzacji...</div>
       </div>
     );
   }
@@ -173,7 +173,7 @@ export default function CourseCreationPage() {
                 {/* Title Field */}
                 <div>
                   <label htmlFor="title" className="block text-sm font-semibold text-gray-700 mb-1">
-                    Course Title
+                    Tytuł kursu
                   </label>
                   <input
                     type="text"
@@ -181,7 +181,7 @@ export default function CourseCreationPage() {
                     id="title"
                     value={formData.title}
                     onChange={handleChange}
-                    placeholder="e.g., Introduction to Spring Boot Security"
+                    placeholder="np. Wstęp do baz danych"
                     required
                     className="text-black mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-3 border transition duration-150 ease-in-out"
                   />
@@ -191,7 +191,7 @@ export default function CourseCreationPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                       <label htmlFor="totalLessons" className="block text-sm font-semibold text-gray-700 mb-1">
-                        Total Lessons (Count)
+                        Liczba lekcji
                       </label>
                       <input
                         type="number"
@@ -208,7 +208,7 @@ export default function CourseCreationPage() {
                   {/* Estimated Hours Field */}
                   <div>
                       <label htmlFor="estimatedHours" className="block text-sm font-semibold text-gray-700 mb-1">
-                        Estimated Time to complete
+                        Szacowany czas wykonania
                       </label>
                       <input
                         type="number"
@@ -239,12 +239,12 @@ export default function CourseCreationPage() {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      Publishing...
+                      Udostępnianie...
                     </>
                   ) : (
                     <>
                       <Upload className="w-5 h-5 mr-2" />
-                      Publish Course
+                      Utwórz kurs
                     </>
                   )}
                 </button>

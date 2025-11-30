@@ -43,7 +43,7 @@ export default function LevelSelectionPage() {
     
         if (!jwtToken) {
             setLoading(false);
-            setError("Not logged in. Cannot fetch user data. Redirecting to login...");
+            setError("Użytkownik niezalogowany. Przekierowanie do logowania...");
             
             setTimeout(() => {
                 window.location.replace('/'); 
@@ -55,7 +55,7 @@ export default function LevelSelectionPage() {
             try {
                 const response = await fetch(`/api/courses/${courseId}`); 
                 if (!response.ok) {
-                    throw new Error(`Course not found (ID: ${courseId})`);
+                    throw new Error(`Nieznaleziono kursu (ID: ${courseId})`);
                 }
                 const data = await response.json();
                 setCourseDetails(data);
@@ -68,7 +68,7 @@ export default function LevelSelectionPage() {
                     },
                 });
                 if (!progressResponse.ok) {
-                    console.error(`Failed to fetch progress for course ${courseId}. Status: ${progressResponse.status}`);
+                    console.error(`Nie udało się pobrać postępu użytkownika dla kursu ${courseId}. Status: ${progressResponse.status}`);
                     setLastCompletedLevel(0);
                 } else {
                     const completedLevels = await progressResponse.json();
@@ -84,7 +84,7 @@ export default function LevelSelectionPage() {
         fetchDetails();
     }, [courseId]);
 
-    const courseTitle = courseDetails?.title || 'Loading Course...';
+    const courseTitle = courseDetails?.title || 'Ładowanie kursu...';
     const totalLessons = courseDetails?.totalLessons || 1;
 
     const { positions: normalizedPositions, mapHeight } = useMemo(() => 
@@ -103,11 +103,11 @@ export default function LevelSelectionPage() {
     const levelButtonOffset = '32px'; 
 
     if (loading) {
-        return <div className="p-8 text-center text-xl">Loading course details...</div>;
+        return <div className="p-8 text-center text-xl">Ładowanie szczegółów kursu</div>;
     }
 
     if (error) {
-        return <div className="p-8 text-center text-red-600 font-semibold">Error: {error}</div>;
+        return <div className="p-8 text-center text-red-600 font-semibold">Błąd: {error}</div>;
     }
 
     return (
@@ -119,7 +119,7 @@ export default function LevelSelectionPage() {
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
-                        <span>Go back to Courses</span>
+                        <span>Powrót do kursów</span>
                     </Link>
                     <h1 className="text-4xl font-extrabold text-blue-400">
                         {courseTitle}

@@ -26,7 +26,7 @@ const DashboardContentArea = ({ userData }) => {
   const latestActivity = userData.latestActivity;
   
   const formatTimeAgo = (isoString) => {
-      if (!isoString) return "No recent activity";
+      if (!isoString) return "Brak ostatniej aktywności";
       const date = new Date(isoString);
       return date.toLocaleString();
   };
@@ -35,7 +35,7 @@ const DashboardContentArea = ({ userData }) => {
       <div className="space-y-8">
           <div className="p-6 bg-white rounded-xl shadow-lg border-l-4 border-indigo-500">
               <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                  Welcome back, {userData.userLogin}
+                  Witaj spowrotem, {userData.userLogin}
               </h2>
           </div>
 
@@ -44,19 +44,19 @@ const DashboardContentArea = ({ userData }) => {
               <div className="lg:col-span-2 space-y-8">
                   <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-8 rounded-xl shadow-xl text-white">
                       <p className="text-sm font-semibold mb-2 opacity-80">
-                          LATEST ACTIVITY: {latestActivity ? formatTimeAgo(latestActivity.lastUpdated) : "Never"}
+                          Ostatnia aktywność: {latestActivity ? formatTimeAgo(latestActivity.lastUpdated) : "Nigdy"}
                       </p>
                       <h3 className="text-2xl font-bold mb-4">
                           {latestActivity ? 
-                              `${latestActivity.courseTitle}: Level ${latestActivity.completedLevelOrderIndex} completed` : 
-                              "Start your first course!"
+                              `${latestActivity.courseTitle}: Poziom ${latestActivity.completedLevelOrderIndex} ukończony` : 
+                              "Zacznij swój pierwszy kurs!"
                           }
                       </h3>
                       <a 
                         href={latestActivity ? `/course/${latestActivity.courseId}` : '/courses'} 
                         className="flex items-center space-x-2 bg-white text-indigo-600 px-6 py-2 rounded-full font-semibold shadow-lg hover:bg-indigo-50 transition duration-150"
                       >
-                          <span>{latestActivity ? 'Go to Next Level' : 'Start a Course'}</span>
+                          <span>{latestActivity ? 'Przejdź do następnego poziomu' : 'Zacznij kurs'}</span>
                           <ArrowRight className="w-5 h-5" />
                       </a>
                   </div>
@@ -66,18 +66,18 @@ const DashboardContentArea = ({ userData }) => {
                   
                   <div className="bg-white p-6 rounded-xl shadow-lg">
                       <h3 className="text-xl font-bold text-gray-900 mb-4 border-b pb-2">
-                          User's Stats
+                          Statystyki gracza
                       </h3>
                       <div className="grid grid-cols-3 gap-4 text-center">
                           <DashboardStatCard 
                               value={userData.xp} 
-                              label="Total XP" 
+                              label="Zdobyty EXP" 
                               icon={Zap} 
                               color="teal"
                           />
                           <DashboardStatCard 
                               value={userData.level}
-                              label="Player level"
+                              label="Poziom"
                               icon={Star}
                               color='yellow'
                           />
@@ -101,7 +101,7 @@ export default function DashboardPage() {
     
     if (!jwtToken) {
         setIsLoading(false);
-        setError("Not logged in. Cannot fetch user data. Redirecting to login...");
+        setError("Użytkownik niezalogowany. Przekierowanie do logowania...");
         
         setTimeout(() => {
             window.location.replace('/'); 
@@ -128,10 +128,10 @@ export default function DashboardPage() {
                     }));
                 }
             } else {
-                console.error("Failed to fetch latest activity. Status:", response.status);
+                console.error("Nie udało się pobrać ostatniej aktywności. Status:", response.status);
             }
         } catch (err) {
-            console.error("Error fetching latest activity:", err);
+            console.error("Błąd podczas pobierania ostatniej aktywności:", err);
         }
     };
 
@@ -147,7 +147,7 @@ export default function DashboardPage() {
 
         if (!response.ok) {
           localStorage.removeItem('token');
-          throw new Error('Session expired or invalid. Please log in again.');
+          throw new Error('Sesja wygasła lub jest nieprawidłowa. Zaloguj się ponownie.');
         }
 
         const userDetails = await response.json();
@@ -170,10 +170,10 @@ export default function DashboardPage() {
         await fetchLatestActivity();
         
       } catch (err) {
-        console.error("Error fetching user data:", err);
+        console.error("Błąd podczas pobierania danych użytkownika:", err);
         setError(err.message);
         
-        if (err.message.includes('Session expired')) {
+        if (err.message.includes('Sesja wygasła')) {
             setTimeout(() => {
                 window.location.replace('/'); 
             }, 3000); 
@@ -187,8 +187,8 @@ export default function DashboardPage() {
   }, []);
 
   const renderPage = () => {
-    if (isLoading) return <div className="text-center py-10 text-xl font-medium">Loading user dashboard...</div>;
-    if (error) return <div className="text-center py-10 text-xl font-medium text-red-600">Error: {error}</div>;
+    if (isLoading) return <div className="text-center py-10 text-xl font-medium">Ładowanie panelu użytkownika...</div>;
+    if (error) return <div className="text-center py-10 text-xl font-medium text-red-600">Błąd: {error}</div>;
 
     switch (currentPage) {
       case 'dashboard':

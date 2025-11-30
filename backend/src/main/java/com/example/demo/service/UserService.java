@@ -28,7 +28,7 @@ public class UserService {
     public User registerNewUser(RegisterRequest request) {
         Optional<User> existingUser = userRepository.findByUserLogin(request.getUserLogin());
         if (existingUser.isPresent()) {
-            throw new RuntimeException("User with login '" + request.getUserLogin() + "' already exists.");
+            throw new RuntimeException("Użytkownik już istnieje.");
         }
 
         User newUser = new User();
@@ -51,12 +51,12 @@ public class UserService {
      */
     public User authenticateUser(String userLogin, String password) {
         User user = userRepository.findByUserLogin(userLogin)
-                .orElseThrow(() -> new RuntimeException("Invalid login or password."));
+                .orElseThrow(() -> new RuntimeException("Niepoprawny login lub hasło."));
 
         if (passwordEncoder.matches(password, user.getPassword())) {
             return user;
         } else {
-            throw new RuntimeException("Invalid login or password.");
+            throw new RuntimeException("Niepoprawny login lub hasło.");
         }
     }
 
@@ -66,8 +66,8 @@ public class UserService {
      * @return The User entity.
      * @throws RuntimeException if the user is not found.
      */
-    public User findUserById(Long userId) { // <--- NEW METHOD
+    public User findUserById(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+                .orElseThrow(() -> new RuntimeException("Nie znaleziono użytkownika z ID: " + userId));
     }
 }

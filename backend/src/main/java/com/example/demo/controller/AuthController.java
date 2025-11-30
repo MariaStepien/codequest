@@ -39,7 +39,7 @@ public class AuthController {
 
             LoginResponse response = new LoginResponse(
                 token, 
-                "Authentication successful!", 
+                "Autoryzacja udana!", 
                 authenticatedUser.getId(),
                 authenticatedUser.getRole()
             );
@@ -56,7 +56,7 @@ public class AuthController {
         try {
             userService.registerNewUser(registerRequest);
             
-            return new ResponseEntity<>("{\"message\": \"User registered successfully!\"}", HttpStatus.CREATED);
+            return new ResponseEntity<>("{\"message\": \"Użytkownik zarejestrowany!\"}", HttpStatus.CREATED);
         } catch (RuntimeException e) {
             String jsonError = String.format("{\"message\": \"%s\"}", e.getMessage());
             return new ResponseEntity<>(jsonError, HttpStatus.BAD_REQUEST);

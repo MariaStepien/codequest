@@ -15,13 +15,13 @@ export default function FillInTheBlank({ sentence, correctAnswers, onTaskComplet
     if (safeSentence === "") {
         return (
              <div className="text-red-600 p-4 border border-red-300 rounded-md">
-                Data Error: FillInTheBlank received no sentence.
+                Błąd danych: FillInTheBlank nie otrzymał żadnego zdania.
              </div>
         );
     }
     return (
       <div className="text-red-600 p-4 border border-red-300 rounded-md">
-        Configuration Error: Must provide {textSegments.length - 1} correct answers, but {correctAnswers.length} were given.
+        Błąd konfiguracji: Należy podać {textSegments.length - 1} poprawnych odpowiedzi, ale podano {correctAnswers.length}.
       </div>
     );
   }
@@ -82,8 +82,8 @@ export default function FillInTheBlank({ sentence, correctAnswers, onTaskComplet
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-      <h3 className="text-xl font-bold mb-4 text-gray-700">Fill In The Blank</h3>
-      <p className="mb-4 text-gray-600">Complete the ritual sentence by filling in the missing runes.</p>
+      <h3 className="text-xl font-bold mb-4 text-gray-700">Uzupełnij puste pola</h3>
+      <p className="mb-4 text-gray-600">Dokończ zdanie wstawiając odpowiednie słowa do tekstu.</p>
       
       <div className="text-xl text-black mb-8 flex flex-wrap items-center leading-relaxed">
         {textSegments.map((segment, index) => (
@@ -114,7 +114,7 @@ export default function FillInTheBlank({ sentence, correctAnswers, onTaskComplet
       <div className="space-y-3">
         {hasSucceeded && (
           <p className="text-sm text-green-600 font-bold mt-2 text-center">
-            Correct Runes Sealed! 🎉 (Attempt {attempts})
+            Poprawnie rozwiązano zadanie! 🎉 (Próba {attempts})
           </p>
         )}
         
@@ -122,8 +122,7 @@ export default function FillInTheBlank({ sentence, correctAnswers, onTaskComplet
           <button
             onClick={handleTryAgain}
             className="w-full py-2 px-4 font-semibold rounded-md transition duration-150 bg-yellow-500 text-white hover:bg-yellow-600"
-          >
-            Try Again (Attempt {attempts} Failed)
+          >Spróbuj ponownie (Nieudana próba {attempts})
           </button>
         ) : (
           <button
@@ -137,13 +136,13 @@ export default function FillInTheBlank({ sentence, correctAnswers, onTaskComplet
               }
             `}
           >
-            {hasSucceeded ? 'Task Completed' : 'Check Runes'}
+            {hasSucceeded ? 'Zadanie wykonane' : 'Sprawdź'}
           </button>
         )}
         
         {isSubmitted && !allCorrect && (
           <p className="text-sm text-red-600 text-center">
-            The glyphs are vibrating... Review your answers. Some runes are placed incorrectly.
+            Glify wibrują... Sprawdź swoje odpowiedzi. Niektóre odpowiedzi są nieprawidłowo umieszczone.
           </p>
         )}
       </div>

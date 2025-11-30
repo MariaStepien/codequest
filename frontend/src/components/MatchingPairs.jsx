@@ -34,20 +34,20 @@ export default function MatchingPairs({ items, onTaskComplete }) {
 
     const handleSubmit = () => {
         if (!leftSelectionKey || !rightSelectionKey) {
-            setFeedback({ type: 'error', message: 'Please select one item from each column.' });
+            setFeedback({ type: 'error', message: 'Wybierz jeden element z każdej kolumny.' });
             return;
         }
 
         if (leftSelectionKey === rightSelectionKey) { 
             const newMatchedKeys = [...matchedPairsKeys, leftSelectionKey];
             setMatchedPairsKeys(newMatchedKeys);
-            setFeedback({ type: 'success', message: 'Correct match! Pair completed.' });
+            setFeedback({ type: 'success', message: 'Poprawne dopasowanie! Para skompletowana.' });
             
             if (newMatchedKeys.length === items.length) {
                 onTaskComplete(true);
             }
         } else {
-            setFeedback({ type: 'error', message: 'Incorrect pairing. Try again!' });
+            setFeedback({ type: 'error', message: 'Nieprawidłowe parowanie. Spróbuj ponownie!' });
         }
         setLeftSelectionKey(null);
         setRightSelectionKey(null);
@@ -71,12 +71,12 @@ export default function MatchingPairs({ items, onTaskComplete }) {
     return (
         <div className="bg-gray-50 p-6 rounded-xl shadow-2xl w-full max-w-2xl mx-auto space-y-6">
             <h3 className="text-2xl font-bold text-gray-800 border-b pb-3">
-                Match the Ancient Runes
+                Dopasuj w pary
             </h3>
 
             <div className="flex justify-between space-x-6">
                 <div className="w-1/2 space-y-3">
-                    <h4 className="text-lg font-semibold text-gray-700 mb-2">Glyphs</h4>
+                    <h4 className="text-lg font-semibold text-gray-700 mb-2">Definicje</h4>
                     {items.map(item => (
                         <div
                             key={item.key} 
@@ -92,7 +92,7 @@ export default function MatchingPairs({ items, onTaskComplete }) {
                 </div>
 
                 <div className="w-1/2 space-y-3">
-                    <h4 className="text-lg text-black font-semibold text-gray-700 mb-2">Meanings</h4>
+                    <h4 className="text-lg text-black font-semibold text-gray-700 mb-2">Znaczenia</h4>
                     {shuffledRightItems.map(item => (
                         <div
                             key={item.key} 
@@ -129,7 +129,7 @@ export default function MatchingPairs({ items, onTaskComplete }) {
                         }
                     `}
                 >
-                    {isFinished ? 'Sealed All Bonds! 🎉' : 'Forge Pairing'}
+                    {isFinished ? 'Pary sparowane! 🎉' : 'Sparuj parę'}
                 </button>
             </div>
         </div>

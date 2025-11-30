@@ -13,7 +13,7 @@ export default function LevelButton({ levelNumber, isUnlocked = true }) {
     const handleClick = () => {
         if (isUnlocked) {
             navigate(`/level/${levelNumber}`); 
-            console.log(`Navigating to Level ${levelNumber}`);
+            console.log(`Przechodzenie do poziomu: ${levelNumber}`);
         }
     };
 
@@ -36,7 +36,7 @@ export default function LevelButton({ levelNumber, isUnlocked = true }) {
         <button
             onClick={handleClick}
             disabled={!isUnlocked}
-            title={isUnlocked ? `Start Level ${levelNumber}` : 'Level Locked'}
+            title={isUnlocked ? `Zacznij poziom ${levelNumber}` : 'Poziom zablokowany'}
             className={`
                 w-16 h-16 rounded-full 
                 flex items-center justify-center

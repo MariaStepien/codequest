@@ -84,8 +84,8 @@ export default function MultipleChoice({ question, options, correctAnswer, onTas
                 {isSubmitted && (
                     <p className={`mb-3 text-center font-medium ${isCorrect ? 'text-green-600' : 'text-red-600'}`}>
                         {isCorrect 
-                            ? `Correct! Rune power accepted (Attempt ${attempts}).` 
-                            : `Incorrect. Try again, apprentice. (Attempt ${attempts})`}
+                            ? `Poprawna odpowiedź! (Próba ${attempts}).` 
+                            : `Niepoprawna odpowiedź, spróbuj ponownie. (Próba ${attempts})`}
                     </p>
                 )}
 
@@ -101,7 +101,7 @@ export default function MultipleChoice({ question, options, correctAnswer, onTas
                             }
                         `}
                     >
-                        {disableInteraction ? 'Task Completed' : 'Forge Rune'}
+                        {disableInteraction ? 'Zadanie wykonane' : 'Zaznacz odpowiedź'}
                     </button>
                 )}
                 
@@ -110,7 +110,7 @@ export default function MultipleChoice({ question, options, correctAnswer, onTas
                         onClick={handleTryAgain}
                         className="w-full py-3 px-4 font-semibold rounded-lg transition duration-200 bg-yellow-500 text-white hover:bg-yellow-600"
                     >
-                        Try Again
+                        Spróbuj ponownie
                     </button>
                 )}
             </div>

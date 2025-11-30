@@ -57,7 +57,7 @@ export default function OrderableList({ initialItems, correctOrder, onTaskComple
     return (
         <div className="bg-white p-6 rounded-lg shadow-xl space-y-3 w-full max-w-xl mx-auto">
             <h3 className="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">
-                Arrange the Steps
+                Ustaw kolejność
             </h3>
             
             <div className="space-y-3">
@@ -117,12 +117,12 @@ export default function OrderableList({ initialItems, correctOrder, onTaskComple
                         }
                     `}
                 >
-                    {isSubmitted && isCorrect ? 'Order Sealed!' : 'Submit Sequence'}
+                    {isSubmitted && isCorrect ? 'Kolejność ustawiona!' : 'Prześlij sekwencję'}
                 </button>
             </div>
             {isSubmitted && !isCorrect && (
                 <p className="text-center text-red-600 font-medium">
-                    The incantation sequence is out of order. Try again!
+                   Sekwencja zaklęć jest nieprawidłowa. Spróbuj ponownie!
                 </p>
             )}
         </div>

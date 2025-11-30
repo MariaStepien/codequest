@@ -41,7 +41,7 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
         const jwtToken = localStorage.getItem('token');
         
         if (!jwtToken) {
-            console.error("Authentication token missing. Cannot save progress.");
+            console.error("Brak tokena uwierzytelniającego. Nie można zapisać postępu.");
             return;
         }
 
@@ -59,18 +59,18 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
             });
 
             if (!response.ok) {
-                console.error("Failed to save progress.", await response.json());
+                console.error("Nie udało się zapisać postępu.", await response.json());
             } else {
-                console.log("Progress saved successfully!", await response.json());
+                console.log("Pomyślnie zapisano postęp!", await response.json());
             }
         } catch (e) {
-            console.error("Network error while saving progress:", e);
+            console.error("Błąd sieciowy podczas zapisywania postępu:", e);
         }
     };
 
     useEffect(() => {
         if (!courseId || !orderIndex) {
-            setError("Course ID or Level Number (Order Index) is missing from the route.");
+            setError("Na trasie brakuje identyfikatora kursu lub numeru poziomu (indeksu kolejności).");
             setIsLoading(false);
             return;
         }
@@ -84,7 +84,7 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
                 
                 if (!response.ok) {
                     if (response.status === 404) {
-                        throw new Error(`Lesson not found for Course ID ${courseId} and Order Index ${orderIndex}. (Status 404)`);
+                        throw new Error(`Lekcja nieznaleziona dla kursu o ID ${courseId} i indeksie kolejności ${orderIndex}. (Status 404)`);
                     }
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -93,7 +93,7 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
                 setLessonData(data);
                 
             } catch (err) {
-                console.error("Failed to fetch lesson data:", err);
+                console.error("Nie udało się pobrać danych lekcji:", err);
                 setError(err.message);
             } finally {
                 setIsLoading(false);
@@ -121,10 +121,10 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
     const handleTaskCompletion = (isCorrect) => {
         if (isCorrect) {
             setIsCurrentTaskComplete(true);
-            setFeedbackMessage('Task successful! Ready to move on.');
+            setFeedbackMessage('Zadanie zakończone sukcesem! Możemy ruszać dalej.');
         } else {
             setIsCurrentTaskComplete(false);
-            setFeedbackMessage('Halt! Your rune sequence is incorrect. Try again.');
+            setFeedbackMessage('Stój! Zadanie jest źle wykonane. Spróbuj ponownie.');
         }
     };
 
@@ -144,7 +144,7 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
                 setCurrentTaskIndex(tasks.length);
                 
                 setIsCurrentTaskComplete(false);
-                setFeedbackMessage('Progress saved!');
+                setFeedbackMessage('Postęp zapisany!');
             }
         }
     };
@@ -163,7 +163,7 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
 
     const currentTaskNumber = currentTaskIndex + 1;
     const totalTasks = tasks.length;
-    const levelTitle = lessonData?.title || `Level ${orderIndex || '?'}`;
+    const levelTitle = lessonData?.title || `Poziom ${orderIndex || '?'}`;
     const backgroundStyle = {
         backgroundImage: `url(${backgroundImage})`,
         backgroundSize: 'cover', 
@@ -174,15 +174,15 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
     };
 
     if (isLoading) {
-        return <div className="text-center py-20 text-xl font-semibold">Loading Lesson...</div>;
+        return <div className="text-center py-20 text-xl font-semibold">Ładowanie lekcji...</div>;
     }
 
     if (error) {
-        return <div className="text-center py-20 text-xl font-bold text-red-600">Error: {error}</div>;
+        return <div className="text-center py-20 text-xl font-bold text-red-600">Błąd: {error}</div>;
     }
     
     if (tasks.length === 0 && !isLoading) {
-        return <div className="text-center py-20 text-xl font-bold text-orange-600">No tasks found for this lesson.</div>;
+        return <div className="text-center py-20 text-xl font-bold text-orange-600">Nie znaleziono zadań dla tej lekcji.</div>;
     }
 
     return (
@@ -197,7 +197,7 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
                     className="fixed top-4 left-4 p-3 rounded-full bg-red-500 text-white text-xl hover:bg-red-600 transition duration-200 shadow-lg z-50"
                     title="Exit Level (Return to Dashboard)"
                 >
-                    <span className="sr-only">Exit Level</span>
+                    <span className="sr-only">Opuść poziom</span>
                     &times;
                 </button>
             )}
@@ -208,7 +208,7 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
                         <h2 className="text-3xl font-bold text-gray-800">{levelTitle}</h2>
                         {!isLevelComplete && (
                             <p className="text-sm text-indigo-500 font-semibold mt-2">
-                                Step {currentTaskNumber} of {totalTasks}
+                                {currentTaskNumber} z {totalTasks}
                             </p>
                         )}
                     </div>
@@ -223,20 +223,20 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
                                     onTaskComplete={handleTaskCompletion} 
                                 />
                             ) : (
-                                <p className="text-red-500 font-bold">Error: No component found for task type: "{currentTaskObject?.type}"</p>
+                                <p className="text-red-500 font-bold">Błąd: Nie znaleziono żadnego komponentu dla typu zadania: "{currentTaskObject?.type}"</p>
                             )}
                         </>
                     ) : (
                         <div className="text-center py-10">
                             <p className="text-3xl font-extrabold text-green-700 mb-4">
-                                👑 Quest Complete! 👑
+                                👑 Poziom ukończony! 👑
                             </p>
-                            <p className="text-xl text-gray-600 mb-8">You successfully finished your quest.</p>
+                            <p className="text-xl text-gray-600 mb-8">Pomyślnie ukończyłeś swoje zadanie.</p>
                             <button
                                 onClick={handleLevelCompletion}
                                 className="px-8 py-4 rounded-full bg-indigo-600 text-white font-bold text-lg hover:bg-indigo-700 transition duration-200 shadow-lg"
                             >
-                                Return to the World Map
+                                Powróć do mapy
                             </button>
                         </div>
                     )}
@@ -261,7 +261,7 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
                                 }
                             `}
                         >
-                            {currentTaskIndex < tasks.length - 1 ? 'Next Task' : 'Finish Level'}
+                            {currentTaskIndex < tasks.length - 1 ? 'Następne zadanie' : 'Ukończ poziom'}
                         </button>
                     </div>
                 )}
@@ -270,22 +270,22 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
             {showExitConfirmation && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-20 backdrop-blur-sm">
                     <div className="bg-white p-8 rounded-xl shadow-2xl max-w-sm w-full text-center">
-                        <h3 className="text-xl font-bold text-gray-800 mb-4">Are you sure you want to exit the level?</h3>
+                        <h3 className="text-xl font-bold text-gray-800 mb-4">Czy na pewno chcesz opuścić ten poziom?</h3>
                         <p className="text-red-500 mb-6 font-medium">
-                            Progress won't be saved!
+                            Postęp nie zostanie zapisany!
                         </p>
                         <div className="flex justify-center space-x-4">
                             <button
                                 onClick={handleConfirmExit}
                                 className="px-6 py-2 rounded-md bg-red-600 text-white font-semibold hover:bg-red-700 transition duration-150"
                             >
-                                Yes (Exit)
+                                Tak (Opuść)
                             </button>
                             <button
                                 onClick={handleCancelExit}
-                                className="px-6 py-2 rounded-md bg-gray-200 text-white-800 font-semibold hover:bg-gray-300 transition duration-150"
+                                className="px-6 py-2 rounded-md bg-black-200 text-white-800 font-semibold hover:bg-gray-300 transition duration-150"
                             >
-                                No (Stay)
+                                Nie (Zostań)
                             </button>
                         </div>
                     </div>

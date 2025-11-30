@@ -46,10 +46,10 @@ public class UserCourseProgressService {
     public UserCourseProgress updateProgress(Long userId, Long courseId, int newCompletedLessons) {
         
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+                .orElseThrow(() -> new RuntimeException("Nie znaleziono użytkownika z ID: " + userId));
         
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new RuntimeException("Course not found with ID: " + courseId));
+                .orElseThrow(() -> new RuntimeException("Nie znaleziono kursu z ID: " + courseId));
         
         Optional<UserCourseProgress> existingProgress = userCourseProgressRepository
                 .findByUserIdAndCourseId(userId, courseId);

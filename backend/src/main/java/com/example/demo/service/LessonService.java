@@ -75,12 +75,12 @@ public class LessonService {
                 
                 lessonDto.setTasks(tasks);
             } else {
-                System.err.println("Error parsing tasks JSON for lesson ID " + lesson.getId() + ": 'tasks' array field is missing or invalid in JSON structure.");
+                System.err.println("Błąd przetwarzania zadań z JSON dla lekcji o ID " + lesson.getId() + ": 'tasks' jest brakujące lub struktura JSON jest niepoprawna.");
                 lessonDto.setTasks(List.of()); 
             }
             
         } catch (Exception e) {
-            System.err.println("Error parsing tasks JSON for lesson ID " + lesson.getId() + ": " + e.getMessage());
+            System.err.println("Błąd przetwarzania zadań z JSON dla lekcji o ID " + lesson.getId() + ": " + e.getMessage());
             lessonDto.setTasks(List.of());
         }
 

@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { LogOut, LayoutDashboard, BookOpenText, ListPlus, Edit, User } from 'lucide-react';
 
 const navLinks = [
-  { id: 'admin-dashboard', name: 'Dashboard', icon: LayoutDashboard, href: '/admin-dashboard' },
-  { id: 'admin-courses', name: 'List Courses', icon: BookOpenText, href: '/admin/courses' },
-  { id: 'add-course', name: 'Add Course', icon: ListPlus, href: '/admin/create-course' },
-  { id: 'edit-lesson', name: 'Add/Edit Lesson', icon: Edit, href: '/admin/lessons/edit' }
+  { id: 'admin-dashboard', name: 'Panel', icon: LayoutDashboard, href: '/admin-dashboard' },
+  { id: 'admin-courses', name: 'Lista kursów', icon: BookOpenText, href: '/admin/courses' },
+  { id: 'add-course', name: 'Dodaj kurs', icon: ListPlus, href: '/admin/create-course' },
+  { id: 'edit-lesson', name: 'Dodaj lekcję', icon: Edit, href: '/admin/create-lesson' }
 ];
 
 export default function AdminSidebar({ userLogin, currentPage }) { 
@@ -69,7 +69,7 @@ export default function AdminSidebar({ userLogin, currentPage }) {
                 className="flex items-center space-x-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
               >
                 <LogOut className="w-4 h-4" />
-                <span>Logout</span>
+                <span>Wyloguj</span>
               </a>
             </div>
           )}

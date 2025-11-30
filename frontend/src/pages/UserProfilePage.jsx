@@ -42,12 +42,12 @@ export default function App() {
           <div className="flex items-center space-x-2">
             <Zap className="text-indigo-600 w-7 h-7" />
             <span className="text-xl font-extrabold text-gray-900">
-              CodeLaunch Profile
+              CodeQuest Profil
             </span>
           </div>
           <button className="flex items-center space-x-2 bg-red-100 text-red-600 px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-red-200 transition duration-150">
             <LogOut className="w-4 h-4" />
-            <span>Logout</span>
+            <span>Wyloguj</span>
           </button>
         </div>
       </header>

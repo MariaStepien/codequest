@@ -7,7 +7,7 @@ const AdminDashboardContentArea = ({ userLogin }) => {
       <div className="space-y-10">
           <div className="p-6 bg-white rounded-xl shadow-lg border-l-4 border-red-500">
               <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                Welcome {userLogin}
+                Witaj {userLogin}
               </h2>
           </div>
         </div>
@@ -28,7 +28,7 @@ export default function AdminDashboardPage() {
     
     if (!jwtToken) {
         setIsLoading(false);
-        setError("Not logged in. Cannot fetch user data. Redirecting to login...");
+        setError("Użytkownik nie zalogowany. Przenoszę do strony logowania...");
         
         setTimeout(() => {
             window.location.replace('/'); 
@@ -48,7 +48,7 @@ export default function AdminDashboardPage() {
 
         if (!response.ok) {
           if (response.status === 401 || response.status === 403) {
-            console.error("Authentication failed or session expired. Logging out.");
+            console.error("Autoryzacja nie udana lub sesja wygasła. Wylogowanie użytkownika...");
             localStorage.removeItem('token');
             localStorage.removeItem('userId');
             localStorage.removeItem('role'); 
@@ -56,7 +56,7 @@ export default function AdminDashboardPage() {
             return;
           }
           
-          throw new Error('Failed to fetch user data.');
+          throw new Error('Nie udało się pobrać danych użytkownika.');
         }
 
         const data = await response.json();
@@ -64,7 +64,7 @@ export default function AdminDashboardPage() {
         setIsLoading(false);
 
       } catch (error) {
-        console.error("User data fetch error:", error);
+        console.error("Błąd pobrania danych użytkownika:", error);
       }
     };
 

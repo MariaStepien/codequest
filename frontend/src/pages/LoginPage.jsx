@@ -44,13 +44,13 @@ export default function LoginPage() {
         }
         
       } else {
-        const errorMessage = responseData.message || "Invalid login or password.";
+        const errorMessage = responseData.message || "Niepoprawny login lub hasło";
         setError(errorMessage);
-        alertMessage(errorMessage, "error");
+        alertMessage(errorMessage, "błąd");
       }
     } catch (err) {
-      setError("Could not reach the server. Please check your connection.");
-      alertMessage("Could not reach the server. Try again later.", "error");
+      setError("Nie można nawiązać połączenia z serwerem. Sprawdź swoje połączenie.");
+      alertMessage("Nie udało się połączyć z serwerem. Spróbuj ponownie później.", "błąd");
     } finally {
       setIsLoading(false);
     }
@@ -74,7 +74,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-cyan-500 to-blue-1000 p-4">
       <div className="bg-white/90 backdrop-blur-md p-10 rounded-3xl shadow-2xl w-full max-w-md">
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">
-          Welcome to CodeQuest
+          CodeQuest
         </h2>
         
         <div id="custom-alert" className="opacity-0 transition-opacity duration-300"></div>
@@ -91,7 +91,7 @@ export default function LoginPage() {
               htmlFor="userLogin"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Login / Username
+              Login / nazwa użytkownika
             </label>
             <input
               id="userLogin"
@@ -100,7 +100,7 @@ export default function LoginPage() {
               onChange={(e) => setUserLogin(e.target.value)}
               required
               className="w-full px-5 py-3 text-lg border-2 border-transparent rounded-2xl shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-cyan-300 outline-none transition duration-300 placeholder-gray-700 text-gray-900"
-              placeholder="Enter your login name"
+              placeholder="Wprowadź swoją nazwę użytkownika"
               disabled={isLoading}
             />
           </div>
@@ -110,7 +110,7 @@ export default function LoginPage() {
               htmlFor="password"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Password
+              Hasło
             </label>
             <input
               id="password"
@@ -119,7 +119,7 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               className="w-full px-5 py-3 text-lg border-2 border-transparent rounded-2xl shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-cyan-300 outline-none transition duration-300 placeholder-gray-700 text-gray-900"
-              placeholder="Enter your password"
+              placeholder="Wprowadź hasło"
               disabled={isLoading}
             />
           </div>
@@ -136,24 +136,24 @@ export default function LoginPage() {
             {isLoading ? (
                 <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>Logging In...</span>
+                    <span>Logowanie...</span>
                 </>
             ) : (
-                <span>Login</span>
+                <span>Zaloguj</span>
             )}
           </button>
         </form>
 
         <p className="text-center text-sm text-gray-600 mt-6">
-          Don't have an account?{" "}
+          Nie posiadasz konta?{" "}
           <a href="/register" className="text-pink-600 font-medium hover:underline">
-            Sign up
+            Zarejestruj się
           </a>
         </p>
         <p className="text-center text-sm text-gray-600 mt-2">
-            Or {" "}
+            Lub {" "}
             <a href="/course/1/level/1" className= "text-pink-600 font-medium hover:underline">
-            try the app without loginning in
+            wypróbuj aplikację bez logowania
             </a>
         </p>
       </div>

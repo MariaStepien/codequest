@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { LogOut, BarChart3, BookOpenText, User } from 'lucide-react';
 
 const navLinks = [
-  { id: 'dashboard', name: 'Dashboard', icon: BarChart3, href: '/dashboard' },
-  { id: 'courses', name: 'Courses', icon: BookOpenText, href: '/courses' }
+  { id: 'dashboard', name: 'Panel', icon: BarChart3, href: '/dashboard' },
+  { id: 'courses', name: 'Kursy', icon: BookOpenText, href: '/courses' }
 ];
 
 export default function Header({ userLogin, currentPage }) { 
@@ -66,7 +66,7 @@ export default function Header({ userLogin, currentPage }) {
                 className="flex items-center space-x-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
               >
                 <LogOut className="w-4 h-4" />
-                <span>Logout</span>
+                <span>Wyloguj</span>
               </a>
             </div>
           )}

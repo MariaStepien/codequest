@@ -22,10 +22,10 @@ const CoursesPage = () => {
                     const userDetails = await response.json();
                     setUserLogin(userDetails.userLogin || 'Guest');
                 } else {
-                    console.error("Failed to fetch user data. Status:", response.status);
+                    console.error("Nie udało się pobrać danych użytkownika. Status:", response.status);
                 }
             } catch (err) {
-                console.error("Error fetching user data:", err);
+                console.error("Błąd podczas pobierania danych użytkownika:", err);
             }
         };
 
@@ -36,7 +36,7 @@ const CoursesPage = () => {
             const jwtToken = localStorage.getItem('token'); 
             
             if (!jwtToken) {
-                setError("Authentication token missing. Please log in.");
+                setError("Brak tokena uwierzytelniającego. Zaloguj się.");
                 setLoading(false);
                 return;
             }
@@ -77,7 +77,7 @@ const CoursesPage = () => {
 
     const courseContent = (
         <div style={styles.contentWrapper}>
-            <h1 style={styles.pageTitle}>Available Courses</h1>
+            <h1 style={styles.pageTitle}>Dostępne kursy</h1>
             <div style={styles.coursesGrid}>
                 {courses.map((course) => {
                     const completed = course.completedLevels || 0; 
@@ -90,17 +90,17 @@ const CoursesPage = () => {
                             <h2 style={styles.courseTitle}>{course.title}</h2>
                             <div style={styles.courseInfo}>
                                 <p style={styles.infoText}>
-                                    <span role="img" aria-label="lessons">📖</span> {course.totalLessons} Lessons
+                                    <span role="img" aria-label="lessons">📖</span> {course.totalLessons} Lekcje
                                 </p>
                                 <p style={styles.infoText}>
-                                    <span role="img" aria-label="time">🕒</span> ~{course.estimatedHours} Hours
+                                    <span role="img" aria-label="time">🕒</span> ~{course.estimatedHours} Godziny
                                 </p>
                             </div>
                             <div style={styles.progressBarContainer}>
                                 <div style={{...styles.progressBarFill, width: `${progressPercentage}%`, backgroundColor: accentColor}}></div>
                             </div>
                             <p style={styles.overallProgress}>
-                                Overall Progress: {progressPercentage}% ({completed} / {course.totalLessons})
+                                Ogólny postęp: {progressPercentage}% ({completed} / {course.totalLessons})
                             </p>
                             <button 
                                 onClick={() => handleButtonClick(course.id)} 
@@ -109,7 +109,7 @@ const CoursesPage = () => {
                                     backgroundColor: accentColor
                                 }}
                             >
-                                {progressPercentage === 0 ? 'Start Course →' : 'Continue Learning →'}
+                                {progressPercentage === 0 ? 'Zacznij kurs →' : 'Kontynuuj →'}
                             </button>
                         </div>
                     );
@@ -119,8 +119,8 @@ const CoursesPage = () => {
     );
     
     const renderContent = () => {
-        if (loading) return <div className="text-center py-10 text-xl font-medium">Loading courses...</div>;
-        if (error) return <div className="text-center py-10 text-xl font-medium text-red-600">Error: {error.message}</div>;
+        if (loading) return <div className="text-center py-10 text-xl font-medium">Ładowanie kursów...</div>;
+        if (error) return <div className="text-center py-10 text-xl font-medium text-red-600">Błąd: {error.message}</div>;
         return courseContent;
     };
 

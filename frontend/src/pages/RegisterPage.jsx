@@ -16,7 +16,7 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match.");
+      setError("Hasła się nie zgadzają.");
       setIsLoading(false);
       return;
     }
@@ -40,18 +40,18 @@ export default function RegisterPage() {
       const responseData = await response.json();
 
       if (response.ok) {
-        setSuccess(responseData.message || "Registration successful! You can now log in.");
+        setSuccess(responseData.message || "Rejestracja pomyślna! Możesz się teraz zalogować.");
         setUserLogin("");
         setPassword("");
         setConfirmPassword("");
 
       } else {
-        const errorMessage = responseData.message || "Registration failed. Please try a different login name.";
+        const errorMessage = responseData.message || "Rejestracja nie powiodła się. Spróbuj inną nazwę użytkownika.";
         setError(errorMessage);
       }
     } catch (err) {
-      console.error("Network or Fetch Error:", err);
-      setError("Could not reach the server. Please check your connection.");
+      console.error("Błąd sieciowy lub pobierania:", err);
+      setError("Nie można nawiązać połączenia z serwerem. Sprawdź swoje połączenie.");
     } finally {
       setIsLoading(false);
     }
@@ -62,7 +62,7 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-400 via-pink-300 to-red-500 p-4">
       <div className="bg-white/90 backdrop-blur-md p-10 rounded-3xl shadow-2xl w-full max-w-md">
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">
-          Create Your CodeQuest Account
+          Utwórz swoje konto w CodeQuest
         </h2>
         
         {success && (
@@ -82,7 +82,7 @@ export default function RegisterPage() {
               htmlFor="userLogin"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Login / Username
+              Login / Nazwa użytkownika
             </label>
             <input
               id="userLogin"
@@ -91,7 +91,7 @@ export default function RegisterPage() {
               onChange={(e) => setUserLogin(e.target.value)}
               required
               className="w-full px-5 py-3 text-lg border-2 border-transparent rounded-2xl shadow-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-300 outline-none transition duration-300 text-gray-900"
-              placeholder="Choose a unique login name"
+              placeholder="Wybierz unikalną nazwę logowania"
               disabled={isLoading}
             />
           </div>
@@ -101,7 +101,7 @@ export default function RegisterPage() {
               htmlFor="password"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Password
+              Hasło
             </label>
             <input
               id="password"
@@ -110,7 +110,7 @@ export default function RegisterPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               className="w-full px-5 py-3 text-lg border-2 border-transparent rounded-2xl shadow-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-300 outline-none transition duration-300 text-gray-900"
-              placeholder="Enter your password"
+              placeholder="Wprowadź hasło"
               disabled={isLoading}
             />
           </div>
@@ -120,7 +120,7 @@ export default function RegisterPage() {
               htmlFor="confirmPassword"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Confirm Password
+              Powtórz hasło
             </label>
             <input
               id="confirmPassword"
@@ -129,7 +129,7 @@ export default function RegisterPage() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
               className="w-full px-5 py-3 text-lg border-2 border-transparent rounded-2xl shadow-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-300 outline-none transition duration-300 text-gray-900"
-              placeholder="Re-enter your password"
+              placeholder="Powtórz hasło"
               disabled={isLoading}
             />
           </div>
@@ -146,18 +146,18 @@ export default function RegisterPage() {
             {isLoading ? (
                 <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>Registering...</span>
+                    <span>Rejestrowanie konta...</span>
                 </>
             ) : (
-                <span>Register Account</span>
+                <span>Zarejestruj konto</span>
             )}
           </button>
         </form>
 
         <p className="text-center text-sm text-gray-600 mt-6">
-          Already have an account?{" "}
+          Masz już konto?{" "}
           <a href="/" className="text-pink-600 font-medium hover:underline">
-            Log in here
+            Zaloguj się tutaj
           </a>
         </p>
       </div>
