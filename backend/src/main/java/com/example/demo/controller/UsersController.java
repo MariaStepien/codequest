@@ -27,14 +27,10 @@ public class UsersController {
     @GetMapping("/me")
     public ResponseEntity<User> getLoggedInUser(@AuthenticationPrincipal UserDetails userDetails) {
         
-        // 1. Get the User ID from the Security Context
-        // Since we set the userId.toString() as the username in the filter, we retrieve it here.
         Long userId = Long.parseLong(userDetails.getUsername());
         
-        // 2. Use the ID to perform database operation
         User loggedInUser = userService.findUserById(userId); 
         
-        // 3. Return the user's information
         return ResponseEntity.ok(loggedInUser);
     }
 }
