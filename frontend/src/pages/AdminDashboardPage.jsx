@@ -5,10 +5,11 @@ const AdminDashboardContentArea = ({ userLogin }) => {
 
   return (
       <div className="space-y-10">
-          <div className="p-6 bg-white rounded-xl shadow-lg border-l-4 border-red-500">
+          <div className="p-6 bg-white rounded-xl shadow-md border-l-4 border-indigo-500"> 
               <h2 className="text-3xl font-bold text-gray-900 mb-2">
                 Witaj {userLogin}
               </h2>
+              <p className="text-gray-500">Panel Administracyjny - Szybki Przegląd</p>
           </div>
         </div>
   );
@@ -81,8 +82,6 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
-      
-      {/* Hidden spans for Tailwind JIT compilation, similar to DashboardPage */}
       <div className="hidden">
         <span className="text-indigo-600 border-indigo-200 bg-red-500 border-red-200 bg-red-50 border-red-300 bg-red-100"></span>
         <span className="text-green-600 border-green-200"></span>
@@ -94,8 +93,11 @@ export default function AdminDashboardPage() {
         currentPage={currentPage}
       />
       
-      <main className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        {renderContent()}
+      <main className="md:ml-64"> 
+        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <h1 className="text-4xl font-extrabold text-gray-900 mb-8">Panel Administratora</h1> 
+            {renderContent()}
+        </div>
       </main>
     </div>
   );

@@ -9,6 +9,8 @@ import LevelTemplate from './components/LevelTemplate'
 import CoursesPage from './pages/CoursesPage'
 import AdminDashboardPage from './pages/AdminDashboardPage'
 import CourseCreationPage from './pages/CourseCreationPage'
+import AdminCoursesPage from './pages/AdminCoursesPage'
+import EditCoursePage from './pages/EditCoursePage'
 
 function App() {
   return (
@@ -39,6 +41,10 @@ function App() {
       <Route path='/admin-dashboard' element={<AdminDashboardPage/>} />
 
       <Route path='/admin/create-course' element={<CourseCreationPage/>} />
+
+      <Route path='/admin/courses' element={<AdminCoursesPage/>} />
+
+      <Route path='/admin/edit-course/:id' element={<EditCoursePage/>} />
 
       {/* Error screen */}
       <Route path="*" element={<h1>404 Not Found</h1>} />

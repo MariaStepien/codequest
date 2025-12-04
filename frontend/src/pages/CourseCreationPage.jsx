@@ -148,7 +148,6 @@ export default function CourseCreationPage() {
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
       
-      {/* Hidden spans for Tailwind JIT compilation */}
       <div className="hidden">
         <span className="text-red-500 border-red-200 bg-red-50 border-red-300 bg-red-100"></span>
         <span className="text-green-800 bg-green-100 ring-1 ring-green-300"></span>
@@ -159,7 +158,7 @@ export default function CourseCreationPage() {
 
       <AdminSidebar
         userLogin={userData.userLogin || "Admin"} 
-        currentPage="edit-course" 
+        currentPage="add-course" 
       />
       
       <main className="md:ml-64"> 
@@ -170,7 +169,6 @@ export default function CourseCreationPage() {
               {statusMessage}
               <form onSubmit={handleSubmit} className="space-y-6">
                 
-                {/* Title Field */}
                 <div>
                   <label htmlFor="title" className="block text-sm font-semibold text-gray-700 mb-1">
                     Tytuł kursu
@@ -187,7 +185,6 @@ export default function CourseCreationPage() {
                   />
                 </div>
 
-                {/* Total Lessons Field */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                       <label htmlFor="totalLessons" className="block text-sm font-semibold text-gray-700 mb-1">
@@ -205,7 +202,6 @@ export default function CourseCreationPage() {
                       />
                   </div>
 
-                  {/* Estimated Hours Field */}
                   <div>
                       <label htmlFor="estimatedHours" className="block text-sm font-semibold text-gray-700 mb-1">
                         Szacowany czas wykonania
@@ -223,7 +219,6 @@ export default function CourseCreationPage() {
                   </div>
                 </div>
 
-                {/* Submit Button */}
                 <button
                   type="submit"
                   disabled={isLoading}
@@ -243,7 +238,6 @@ export default function CourseCreationPage() {
                     </>
                   ) : (
                     <>
-                      <Upload className="w-5 h-5 mr-2" />
                       Utwórz kurs
                     </>
                   )}

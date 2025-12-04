@@ -12,4 +12,5 @@ public class CourseDTO {
     private String title;
     private int totalLessons;
     private int estimatedHours;
+    private Boolean isPublished;
 }

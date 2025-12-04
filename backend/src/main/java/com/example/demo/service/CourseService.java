@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.domain.Course;
 import com.example.demo.dto.CourseDTO;
@@ -41,10 +42,30 @@ public class CourseService {
         course.setEstimatedHours(courseDTO.getEstimatedHours());
         course.setDateCreated(OffsetDateTime.now());
         course.setLastUpdated(OffsetDateTime.now());
+        course.setIsPublished(false);
 
         Course savedCourse = courseRepository.save(course);
 
         return mapToDTO(savedCourse);
+    }
+
+    @Transactional
+    public Optional<CourseDTO> updateCourse(Long id, CourseDTO courseDTO) {
+        return courseRepository.findById(id).map(existingCourse -> {
+            
+            existingCourse.setTitle(courseDTO.getTitle());
+            existingCourse.setTotalLessons(courseDTO.getTotalLessons());
+            existingCourse.setEstimatedHours(courseDTO.getEstimatedHours());
+            
+            if (courseDTO.getIsPublished() != null) {
+                existingCourse.setIsPublished(courseDTO.getIsPublished());
+            }
+            
+            existingCourse.setLastUpdated(OffsetDateTime.now()); 
+            Course updatedCourse = courseRepository.save(existingCourse);
+            
+            return mapToDTO(updatedCourse);
+        });
     }
 
     private CourseDTO mapToDTO(Course course) {
@@ -52,7 +73,8 @@ public class CourseService {
             course.getId(),
             course.getTitle(),
             course.getTotalLessons(),
-            course.getEstimatedHours()
+            course.getEstimatedHours(),
+            course.getIsPublished()
         );
     }
 
@@ -72,5 +94,21 @@ public class CourseService {
 
     public int getCompletedLevelsForCourse(Long userId, Long courseId) {
         return progressService.getCompletedLevelsForCourse(userId, courseId);
+    }
+
+    public List<CourseDTO> findAllPublishedCourses() {
+        List<Course> courses = courseRepository.findByIsPublishedTrue();
+        
+        return courses.stream()
+            .map(this::mapToDTO)
+            .collect(Collectors.toList());
+    }
+
+    public List<CourseDTO> findAllUnpublishedCourses() {
+        List<Course> courses = courseRepository.findByIsPublishedFalse();
+        
+        return courses.stream()
+            .map(this::mapToDTO)
+            .collect(Collectors.toList());
     }
 }

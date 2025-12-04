@@ -43,6 +43,8 @@ public class SecurityConfig {
 
                 registry.requestMatchers("/api/courses").permitAll();
 
+                registry.requestMatchers("/api/user/me").permitAll();
+
                 registry.requestMatchers("/api/courses/**").permitAll();
 
                 registry.requestMatchers("/api/progress/update").permitAll();
@@ -52,6 +54,12 @@ public class SecurityConfig {
                 registry.requestMatchers("/api/progress/latest-activity").permitAll();
                 
                 registry.requestMatchers("/api/courses/completed-levels/**").permitAll();
+
+                registry.requestMatchers("/api/courses/published").hasRole("ADMIN");
+
+                registry.requestMatchers("/api/courses/unpublished").hasRole("ADMIN");
+
+                registry.requestMatchers("/api/courses/{id}").hasRole("ADMIN");
 
                 // All other requests still require authentication
                 registry.anyRequest().authenticated();

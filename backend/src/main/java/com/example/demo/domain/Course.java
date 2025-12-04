@@ -32,6 +32,9 @@ public class Course {
     @Column
     private int estimatedHours;
 
+    @Column(columnDefinition = "boolean default false")
+    private Boolean isPublished;
+
     @CreatedDate
     private OffsetDateTime dateCreated;
 

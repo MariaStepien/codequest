@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +20,8 @@ import com.example.demo.dto.CourseWithProgressDto;
 import com.example.demo.service.CourseService;
 
 import lombok.RequiredArgsConstructor;
+
+
 
 @RestController
 @RequestMapping("/api/courses")
@@ -45,6 +48,15 @@ public class CourseController {
     public ResponseEntity<CourseDTO> createCourse(@RequestBody CourseDTO courseDTO) {
         CourseDTO createdCourse = courseService.createCourse(courseDTO);
         return new ResponseEntity<>(createdCourse, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity updateCourse(@PathVariable Long id, @RequestBody CourseDTO courseDTO) {
+        courseDTO.setId(id);
+        return courseService.updateCourse(id, courseDTO)
+            .map(ResponseEntity::ok)
+            .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     /**
@@ -74,4 +86,19 @@ public class CourseController {
         
         return ResponseEntity.ok(completedLevels);
     }
+
+    @GetMapping("/published")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<CourseDTO>> getAllPublishedCourses() {
+        List<CourseDTO> courses = courseService.findAllPublishedCourses();
+        return ResponseEntity.ok(courses);
+    }
+
+    @GetMapping("/unpublished")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<CourseDTO>> getAllUnpublishedCourses() {
+        List<CourseDTO> courses = courseService.findAllUnpublishedCourses();
+        return ResponseEntity.ok(courses);
+    }
+    
 }
