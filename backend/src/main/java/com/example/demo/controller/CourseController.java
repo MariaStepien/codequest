@@ -52,7 +52,7 @@ public class CourseController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity updateCourse(@PathVariable Long id, @RequestBody CourseDTO courseDTO) {
+    public ResponseEntity<CourseDTO> updateCourse(@PathVariable Long id, @RequestBody CourseDTO courseDTO) {
         courseDTO.setId(id);
         return courseService.updateCourse(id, courseDTO)
             .map(ResponseEntity::ok)
@@ -67,7 +67,7 @@ public class CourseController {
     public ResponseEntity<List<CourseWithProgressDto>> getAllCoursesWithProgress(
             @AuthenticationPrincipal UserDetails userDetails) {
         
-        Long userId = Long.parseLong(userDetails.getUsername());
+        Long userId = Long.valueOf(userDetails.getUsername());
         
         List<CourseWithProgressDto> coursesWithProgress = 
             courseService.getAllCoursesWithProgressForUser(userId);
@@ -80,7 +80,7 @@ public class CourseController {
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetails userDetails) {
         
-        Long userId = Long.parseLong(userDetails.getUsername());
+        Long userId = Long.valueOf(userDetails.getUsername());
         
         int completedLevels = courseService.getCompletedLevelsForCourse(userId, id);
         
