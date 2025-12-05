@@ -79,7 +79,7 @@ public class CourseService {
     }
 
     public List<CourseWithProgressDto> getAllCoursesWithProgressForUser(Long userId) {
-        List<Course> courses = courseRepository.findAll();
+        List<Course> courses = courseRepository.findByIsPublishedTrue();
 
         return courses.stream().map(course -> {
             CourseWithProgressDto dto = CourseWithProgressDto.fromCourse(course);
