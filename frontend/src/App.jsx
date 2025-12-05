@@ -11,6 +11,7 @@ import AdminDashboardPage from './pages/AdminDashboardPage'
 import CourseCreationPage from './pages/CourseCreationPage'
 import AdminCoursesPage from './pages/AdminCoursesPage'
 import EditCoursePage from './pages/EditCoursePage'
+import LessonCreationPage from './pages/LessonCreationPage'
 
 function App() {
   return (
@@ -45,6 +46,8 @@ function App() {
       <Route path='/admin/courses' element={<AdminCoursesPage/>} />
 
       <Route path='/admin/edit-course/:id' element={<EditCoursePage/>} />
+
+      <Route path='admin/create-lesson' element={<LessonCreationPage />} />
 
       {/* Error screen */}
       <Route path="*" element={<h1>404 Not Found</h1>} />

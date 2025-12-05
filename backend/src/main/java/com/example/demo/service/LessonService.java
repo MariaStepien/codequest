@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.domain.Lesson;
+import com.example.demo.dto.LessonCreationDto;
 import com.example.demo.dto.LessonDto;
 import com.example.demo.dto.TaskDto;
 import com.example.demo.repos.LessonRepository;
@@ -58,6 +59,33 @@ public class LessonService {
 
         return lessonOptional.map(this::mapToDtoWithTasks);
     }
+
+    public LessonDto createLesson(LessonCreationDto creationDto) {
+        Lesson lesson = new Lesson();
+        lesson.setCourseId(creationDto.getCourseId());
+        lesson.setTitle(creationDto.getTitle());
+        lesson.setOrderIndex(creationDto.getOrderIndex());
+        
+        try {
+            JsonNode rootNode = objectMapper.readTree(creationDto.getTasksJson());
+            JsonNode tasksNode = rootNode.get("tasks");
+            
+            if (tasksNode == null || !tasksNode.isArray()) {
+                 throw new IllegalArgumentException("Tasks JSON must contain a root 'tasks' array.");
+            }
+            objectMapper.readValue(tasksNode.traverse(), new TypeReference<List<TaskDto>>() {});
+            
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid tasks JSON provided: " + e.getMessage());
+        }
+        
+        lesson.setTasksJson(creationDto.getTasksJson());
+        
+        Lesson savedLesson = lessonRepository.save(lesson);
+        
+        return mapToDtoWithTasks(savedLesson); 
+    }
+
     
     private LessonDto mapToDtoWithTasks(Lesson lesson) {
         LessonDto lessonDto = new LessonDto();
