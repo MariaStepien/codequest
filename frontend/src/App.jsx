@@ -13,6 +13,7 @@ import AdminCoursesPage from './pages/AdminCoursesPage'
 import EditCoursePage from './pages/EditCoursePage'
 import LessonCreationPage from './pages/LessonCreationPage'
 import AdminLessonsPage from './pages/AdminLessonsPage'
+import EditLessonPage from './pages/EditLessonPage'
 
 function App() {
   return (
@@ -51,6 +52,8 @@ function App() {
       <Route path='/admin/create-lesson' element={<LessonCreationPage />} />
 
       <Route path='/admin/course-lessons/:courseId' element={<AdminLessonsPage/>} />
+
+      <Route path="/admin/edit-lesson/:lessonId" element={<EditLessonPage />} />
 
       {/* Error screen */}
       <Route path="*" element={<h1>404 Not Found</h1>} />

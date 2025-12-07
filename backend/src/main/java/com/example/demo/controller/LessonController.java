@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -63,5 +64,24 @@ public class LessonController {
     public ResponseEntity<List<LessonDto>> getLessonsByCourseId(@PathVariable Long courseId) {
         List<LessonDto> lessons = lessonService.getLessonsByCourseId(courseId);
         return ResponseEntity.ok(lessons);
+    }
+
+    @PutMapping("/{lessonId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<LessonDto> updateLesson(
+            @PathVariable Long lessonId, 
+            @RequestBody LessonCreationDto updateDto) {
+        try {
+            LessonDto updatedLesson = lessonService.updateLesson(lessonId, updateDto);
+            return ResponseEntity.ok(updatedLesson);
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("not found")) {
+                 return ResponseEntity.notFound().build();
+            }
+            if (e instanceof IllegalArgumentException) {
+                 return ResponseEntity.badRequest().build();
+            }
+            throw e; 
+        }
     }
 }

@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.domain.Lesson;
 import com.example.demo.dto.LessonCreationDto;
@@ -93,6 +94,34 @@ public class LessonService {
         return lessons.stream()
                 .map(this::mapToSimpleDto)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public LessonDto updateLesson(Long lessonId, LessonCreationDto updateDto) {
+        Lesson lesson = lessonRepository.findById(lessonId)
+            .orElseThrow(() -> new RuntimeException("Lesson not found with ID: " + lessonId));
+
+        lesson.setTitle(updateDto.getTitle());
+        lesson.setOrderIndex(updateDto.getOrderIndex());
+        
+        if (updateDto.getCourseId() != null) {
+             lesson.setCourseId(updateDto.getCourseId());
+        }
+
+        try {
+            JsonNode rootNode = objectMapper.readTree(updateDto.getTasksJson());
+            if (!rootNode.has("tasks") || !rootNode.get("tasks").isArray()) {
+                 throw new IllegalArgumentException("Invalid tasks JSON structure: 'tasks' array missing or malformed.");
+            }
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid tasks JSON: " + e.getMessage());
+        }
+        
+        lesson.setTasksJson(updateDto.getTasksJson());
+        
+        Lesson savedLesson = lessonRepository.save(lesson);
+        
+        return mapToDtoWithTasks(savedLesson); 
     }
 
     private LessonDto mapToSimpleDto(Lesson lesson) {

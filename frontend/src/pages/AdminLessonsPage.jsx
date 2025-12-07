@@ -5,6 +5,7 @@ import { BookOpenText, ListOrdered, X, Edit, Loader2 } from 'lucide-react';
 
 const LessonListItem = ({ lesson, navigate }) => {
   const handleEditLesson = () => {
+    navigate(`/admin/edit-lesson/${lesson.id}`);
   };
 
   return (
