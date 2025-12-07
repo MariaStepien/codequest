@@ -1,5 +1,7 @@
 package com.example.demo.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -54,5 +56,12 @@ public class LessonController {
         return lessonService.getLessonWithTasksByCourseIdAndOrderIndex(courseId, orderIndex)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/course/{courseId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<LessonDto>> getLessonsByCourseId(@PathVariable Long courseId) {
+        List<LessonDto> lessons = lessonService.getLessonsByCourseId(courseId);
+        return ResponseEntity.ok(lessons);
     }
 }

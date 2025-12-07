@@ -1,5 +1,6 @@
 package com.example.demo.repos;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,5 +15,6 @@ import com.example.demo.domain.Lesson;
 @Repository
 public interface LessonRepository extends JpaRepository<Lesson, Long> {
     Optional<Lesson> findByCourseIdAndOrderIndex(Long courseId, Integer orderIndex);
+    List<Lesson> findByCourseIdOrderByOrderIndex(Long courseId);
 
 }

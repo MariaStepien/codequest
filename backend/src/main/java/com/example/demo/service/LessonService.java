@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -86,7 +87,24 @@ public class LessonService {
         return mapToDtoWithTasks(savedLesson); 
     }
 
-    
+    public List<LessonDto> getLessonsByCourseId(Long courseId) {
+        List<Lesson> lessons = lessonRepository.findByCourseIdOrderByOrderIndex(courseId);
+
+        return lessons.stream()
+                .map(this::mapToSimpleDto)
+                .collect(Collectors.toList());
+    }
+
+    private LessonDto mapToSimpleDto(Lesson lesson) {
+        LessonDto lessonDto = new LessonDto();
+        lessonDto.setId(lesson.getId());
+        lessonDto.setTitle(lesson.getTitle());
+        lessonDto.setOrderIndex(lesson.getOrderIndex()); 
+        lessonDto.setTasks(List.of()); 
+        return lessonDto;
+    }
+
+
     private LessonDto mapToDtoWithTasks(Lesson lesson) {
         LessonDto lessonDto = new LessonDto();
         lessonDto.setId(lesson.getId());

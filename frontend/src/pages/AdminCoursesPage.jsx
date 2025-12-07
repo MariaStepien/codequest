@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BookOpenText, Eye, EyeOff, CheckCircle, X } from 'lucide-react';
+import { BookOpenText, Eye, EyeOff, CheckCircle, X, List } from 'lucide-react';
 import AdminSidebar from '../components/AdminSidebar';
 import { useNavigate } from 'react-router-dom';
 
@@ -9,6 +9,10 @@ const CourseListItem = ({ course, navigate }) => {
   const statusIcon = isPublished ? <CheckCircle className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />;
   const statusText = isPublished ? 'Opublikowany' : 'Nieopublikowany';
 
+  const handleViewLessons = () => {
+    navigate(`/admin/course-lessons/${course.id}`);
+  };
+
   return (
     <div className="flex items-center justify-between p-4 bg-white shadow-md rounded-lg mb-3 hover:shadow-lg transition duration-150">
       <div className="flex flex-col">
@@ -16,6 +20,14 @@ const CourseListItem = ({ course, navigate }) => {
         <span className="text-sm  text-left text-gray-500">ID: {course.id} | Lekcji: {course.totalLessons} | Czas: {course.estimatedHours}h</span>
       </div>
       <div className="flex items-center space-x-3">
+        <button 
+          onClick={handleViewLessons}
+          className="flex items-center space-x-1 px-3 py-1 text-sm font-medium rounded-full bg-indigo-100 text-indigo-700 hover:bg-indigo-200 transition duration-150"
+          title="Zobacz listę lekcji"
+        >
+          <List className="w-4 h-4" />
+          <span>Lekcje</span>
+        </button>
         <span className={`flex items-center space-x-1 px-3 py-1 text-xs font-medium rounded-full ${statusColor}`}>
           {statusIcon}
           <span>{statusText}</span>
@@ -49,16 +61,6 @@ export default function AdminCoursesPage() {
       setTimeout(() => window.location.replace('/'), 1500);
       return;
     }
-
-    const tabClass = (tabId) => {
-        return `
-        px-4 py-2 text-sm font-medium rounded-t-lg transition-colors duration-200
-        ${activeTab === tabId 
-            ? 'text-indigo-700 bg-white border-b-2 border-indigo-600' 
-            : 'text-gray-500 hover:text-indigo-700 hover:bg-gray-50'
-        }
-        `;
-    };
 
     const fetchAdminDataAndCourses = async () => {
       try {

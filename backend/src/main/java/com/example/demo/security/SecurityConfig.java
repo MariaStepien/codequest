@@ -63,6 +63,8 @@ public class SecurityConfig {
 
                 registry.requestMatchers("/api/lessons/create").hasRole("ADMIN");
 
+                registry.requestMatchers("/api/lessons/course/{courseId}").hasRole("ADMIN");
+
                 // All other requests still require authentication
                 registry.anyRequest().authenticated();
             })
