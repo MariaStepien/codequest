@@ -55,7 +55,7 @@ export default function MatchingPairsForm({ task, onUpdate }) {
                     value={task.prompt}
                     onChange={handlePromptChange}
                     required
-                    className="mt-1 block w-full shadow-sm border-gray-300 rounded-md p-2 border"
+                    className="text-black mt-1 block w-full shadow-sm border-gray-300 rounded-md p-2 border"
                     placeholder="Połącz definicje z ich terminami."
                 />
             </div>
@@ -71,7 +71,7 @@ export default function MatchingPairsForm({ task, onUpdate }) {
                             value={item.left}
                             onChange={(e) => handleItemChange(index, 'left', e.target.value)}
                             required
-                            className="flex-1 shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border"
+                            className="text-black flex-1 shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border"
                             placeholder="Element Lewy (np. Klasa)"
                         />
                         
@@ -82,7 +82,7 @@ export default function MatchingPairsForm({ task, onUpdate }) {
                             value={item.right}
                             onChange={(e) => handleItemChange(index, 'right', e.target.value)}
                             required
-                            className="flex-1 shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border"
+                            className="text-black flex-1 shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border"
                             placeholder="Element Prawy (np. Szablon Obiektu)"
                         />
 

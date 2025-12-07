@@ -55,7 +55,7 @@ export default function MultipleChoiceForm({ task, onUpdate }) {
                     onChange={handleInputChange}
                     rows="3"
                     required
-                    className="mt-1 block w-full shadow-sm border-gray-300 rounded-md p-2 border"
+                    className="text-black mt-1 block w-full shadow-sm border-gray-300 rounded-md p-2 border"
                     placeholder="Wpisz treść pytania (np. Jaki jest wynik 2+2?)"
                 />
             </div>
@@ -78,7 +78,7 @@ export default function MultipleChoiceForm({ task, onUpdate }) {
                             value={option}
                             onChange={(e) => handleOptionChange(index, e.target.value)}
                             required
-                            className="flex-1 shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border"
+                            className="text-black flex-1 shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border"
                             placeholder={`Opcja ${index + 1}`}
                         />
                         <button 

@@ -24,7 +24,7 @@ export default function TaskFormSelector({ onAddTask }) {
             <select
                 value={selectedType}
                 onChange={(e) => setSelectedType(e.target.value)}
-                className="block w-64 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border"
+                className="text-black block w-64 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border"
             >
                 {availableTaskTypes.map(task => (
                     <option key={task.type} value={task.type}>

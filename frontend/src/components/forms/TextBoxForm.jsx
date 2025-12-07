@@ -21,7 +21,7 @@ export default function TextBoxForm({ task, onUpdate }) {
                     onChange={handleInputChange}
                     rows="6"
                     required
-                    className="mt-1 block w-full shadow-sm border-gray-300 rounded-md p-2 border"
+                    className="text-black mt-1 block w-full shadow-sm border-gray-300 rounded-md p-2 border"
                     placeholder="Wprowadź treść, którą użytkownik ma przeczytać."
                 />
             </div>
@@ -38,7 +38,7 @@ export default function TextBoxForm({ task, onUpdate }) {
                         value={task.bgColor}
                         onChange={handleInputChange}
                         required
-                        className="mt-1 block w-full shadow-sm border-gray-300 rounded-md p-2 border"
+                        className="text-black mt-1 block w-full shadow-sm border-gray-300 rounded-md p-2 border"
                         placeholder="bg-indigo-100"
                     />
                 </div>
@@ -53,7 +53,7 @@ export default function TextBoxForm({ task, onUpdate }) {
                         value={task.borderColor}
                         onChange={handleInputChange}
                         required
-                        className="mt-1 block w-full shadow-sm border-gray-300 rounded-md p-2 border"
+                        className="text-black mt-1 block w-full shadow-sm border-gray-300 rounded-md p-2 border"
                         placeholder="border-indigo-400"
                     />
                 </div>

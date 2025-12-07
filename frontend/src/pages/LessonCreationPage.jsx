@@ -1,14 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminSidebar from '../components/AdminSidebar'; 
-import { Upload, X, CheckCircle, ArrowUp, ArrowDown } from 'lucide-react';
+import { Upload, X, CheckCircle } from 'lucide-react';
 import TaskEditor from '../components/TaskEditor';
 
 const initialLessonData = {
     courseId: '',
     title: '',
     orderIndex: '',
-    tasksJson: `{"tasks": []}`
 };
 
 export default function LessonCreationPage() { 
@@ -22,7 +21,6 @@ export default function LessonCreationPage() {
     const [userData, setUserData] = useState(null); 
     const [isDataLoading, setIsDataLoading] = useState(true);
     const currentPage = 'add-lesson';
-    const navigate = useNavigate();
 
     const jwtToken = localStorage.getItem('token');
     const storedRole = localStorage.getItem('role');
@@ -96,22 +94,37 @@ export default function LessonCreationPage() {
         setLessonData({ ...lessonData, [name]: finalValue });
     };
 
+    const handleTasksChange = useCallback((newTasks) => {
+        setTasks(newTasks);
+    }, []);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
         setSuccessMessage('');
         setIsLoading(true);
 
-        try {
-            JSON.parse(lessonData.tasksJson); 
+        if (tasks.length === 0) {
+            setError("Lekcja musi zawierać co najmniej jedno zadanie.");
+            setIsLoading(false);
+            return;
+        }
 
+        const tasksJsonString = JSON.stringify({ tasks: tasks });
+
+        const lessonPayload = {
+            ...lessonData,
+            tasksJson: tasksJsonString,
+        };
+
+        try {
             const response = await fetch('/api/lessons/create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${jwtToken}`,
                 },
-                body: JSON.stringify(lessonData),
+                body: JSON.stringify(lessonPayload),
             });
 
             if (response.status === 403) {
@@ -124,15 +137,13 @@ export default function LessonCreationPage() {
 
             const createdLesson = await response.json();
             setSuccessMessage(`Pomyślnie utworzono lekcję: ${createdLesson.title} (ID: ${createdLesson.id}).`);
+            
             setLessonData(initialLessonData);
             setLessonData(prev => ({ ...prev, courseId: courses[0]?.id || '' }));
+            setTasks([]);
 
         } catch (err) {
-            if (err instanceof SyntaxError) {
-                setError("Błąd: Tasks JSON jest niepoprawny.");
-            } else {
-                setError(err.message);
-            }
+            setError(err.message);
         } finally {
             setIsLoading(false);
         }
@@ -173,7 +184,6 @@ export default function LessonCreationPage() {
                     )}
                     
                     <form onSubmit={handleSubmit} className="bg-white p-6 md:p-10 shadow-xl rounded-lg space-y-6">
-                        
                         <div>
                             <label htmlFor="courseId" className="block text-sm font-bold text-gray-700 mb-1">
                                 Wybierz Kurs
@@ -235,30 +245,24 @@ export default function LessonCreationPage() {
                             />
                         </div>
 
-                        <div>
-                            <label htmlFor="tasksJson" className="block text-sm font-bold text-gray-700 mb-1">
-                                JSON Zadań (Tasks JSON)
-                            </label>
-                            <textarea
-                                name="tasksJson"
-                                id="tasksJson"
-                                value={lessonData.tasksJson}
-                                onChange={handleChange}
-                                required
-                                rows="12"
+                        <div className="border-t pt-6">
+                            <h2 className="text-xl font-bold text-gray-800 mb-4">Edytor Zadań Lekcji</h2>
+                            <TaskEditor 
+                                tasks={tasks} 
+                                onTasksChange={handleTasksChange} 
                                 disabled={isLoading}
-                                className="text-gray-400 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-3 border font-mono resize-none focus:ring-indigo-500 focus:border-indigo-500"
-                                placeholder={`{\n  "tasks": [\n    {\n      "id": "1",\n      "type": "MultipleChoice",\n      "question": "Twoje pytanie",\n      "options": ["a", "b", "c"],\n      "correctAnswer": "a"\n    }\n  ]\n}`}
                             />
-                            <p className="mt-2 text-xs text-gray-500">Pamiętaj: Musi to być poprawny JSON z kluczem **"tasks"**.</p>
+                            <p className="mt-2 text-xs text-gray-500">
+                                Dodaj, edytuj i zmieniaj kolejność zadań. Dane zostaną automatycznie przekształcone na JSON.
+                            </p>
                         </div>
 
                         <div className="pt-5">
                             <button
                                 type="submit"
-                                disabled={isLoading || courses.length === 0}
+                                disabled={isLoading || courses.length === 0 || tasks.length === 0}
                                 className={`w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-sm font-bold text-white transition duration-200 ease-in-out transform hover:scale-[1.01] ${
-                                    isLoading || courses.length === 0
+                                    isLoading || courses.length === 0 || tasks.length === 0
                                       ? 'bg-gray-400 cursor-not-allowed' 
                                       : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50'
                                 }`}

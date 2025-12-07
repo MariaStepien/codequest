@@ -80,7 +80,7 @@ export default function OrderableListForm({ task, onUpdate }) {
                     value={task.prompt}
                     onChange={handlePromptChange}
                     required
-                    className="mt-1 block w-full shadow-sm border-gray-300 rounded-md p-2 border"
+                    className="text-black mt-1 block w-full shadow-sm border-gray-300 rounded-md p-2 border"
                     placeholder="Ułóż kroki w poprawnej kolejności."
                 />
             </div>
@@ -119,7 +119,7 @@ export default function OrderableListForm({ task, onUpdate }) {
                             value={item.text}
                             onChange={(e) => handleItemTextChange(index, e.target.value)}
                             required
-                            className="flex-1 shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border"
+                            className="text-black flex-1 shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border"
                             placeholder={`Krok ${index + 1}`}
                         />
 

@@ -43,7 +43,7 @@ export default function FillInTheBlankForm({ task, onUpdate }) {
                     onChange={handleSentenceChange}
                     rows="4"
                     required
-                    className="mt-1 block w-full shadow-sm border-gray-300 rounded-md p-2 border font-mono"
+                    className="text-black mt-1 block w-full shadow-sm border-gray-300 rounded-md p-2 border font-mono"
                     placeholder="W Java, klasa musi być zadeklarowana jako [BLANK] aby nie można było jej dziedziczyć."
                 />
             </div>
@@ -62,7 +62,7 @@ export default function FillInTheBlankForm({ task, onUpdate }) {
                             value={task.correctAnswers[index] || ''}
                             onChange={(e) => handleAnswerChange(index, e.target.value)}
                             required
-                            className="flex-1 shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border"
+                            className="text-black flex-1 shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border"
                             placeholder={`Odpowiedź dla Luki #${index + 1}`}
                         />
                     </div>

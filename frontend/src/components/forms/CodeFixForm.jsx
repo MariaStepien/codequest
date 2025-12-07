@@ -20,7 +20,7 @@ export default function CodeFixForm({ task, onUpdate }) {
                     onChange={handleInputChange}
                     rows="2"
                     required
-                    className="mt-1 block w-full shadow-sm border-gray-300 rounded-md p-2 border"
+                    className="text-black mt-1 block w-full shadow-sm border-gray-300 rounded-md p-2 border"
                     placeholder="Popraw błąd w pętli for, aby drukowała 10 razy."
                 />
             </div>
@@ -36,7 +36,7 @@ export default function CodeFixForm({ task, onUpdate }) {
                     onChange={handleInputChange}
                     rows="8"
                     required
-                    className="mt-1 block w-full shadow-sm border-gray-300 rounded-md p-2 border font-mono text-sm"
+                    className="text-black mt-1 block w-full shadow-sm border-gray-300 rounded-md p-2 border font-mono text-sm"
                     placeholder="public class Main { ... }"
                 />
             </div>
@@ -52,7 +52,7 @@ export default function CodeFixForm({ task, onUpdate }) {
                     onChange={handleInputChange}
                     rows="8"
                     required
-                    className="mt-1 block w-full shadow-sm border-gray-300 rounded-md p-2 border font-mono text-sm bg-gray-100"
+                    className="text-black mt-1 block w-full shadow-sm border-gray-300 rounded-md p-2 border font-mono text-sm bg-gray-100"
                     placeholder="public class Main { ... }"
                 />
             </div>
