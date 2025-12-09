@@ -20,22 +20,33 @@ const TaskComponentMap = {
     'CodeFix' : CodeFix                // Matches CodeFixTaskDto.java type
 };
 
+const INITIAL_HEALTH = 100;
+const HEALTH_LOSS_ON_FAIL = 20;
+
 export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBackground }) {
     // Get levelId from the URL path
     const { courseId, levelNumber: routeLevelNumber } = useParams();
     const orderIndex = routeLevelNumber ? parseInt(routeLevelNumber, 10) : null;
     
-    // State for lesson data and loading
     const [lessonData, setLessonData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // State for task progression and exit confirmation
     const navigate = useNavigate();
     const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
     const [isCurrentTaskComplete, setIsCurrentTaskComplete] = useState(false);
     const [feedbackMessage, setFeedbackMessage] = useState('');
     const [showExitConfirmation, setShowExitConfirmation] = useState(false); 
+
+    const [health, setHealth] = useState(INITIAL_HEALTH);
+
+    const handleRetryLevel = () => {
+        setHealth(INITIAL_HEALTH);
+        setCurrentTaskIndex(0);
+        setIsCurrentTaskComplete(false);
+        setFeedbackMessage('');
+    };
+
 
     const updateUserProgress = async (courseId, completedLevelOrderIndex) => {
         const jwtToken = localStorage.getItem('token');
@@ -117,14 +128,17 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
 
     const tasks = lessonData?.tasks || [];
     const isLevelComplete = currentTaskIndex >= tasks.length; 
+    
+    const isGameOver = health <= 0;
 
     const handleTaskCompletion = (isCorrect) => {
         if (isCorrect) {
             setIsCurrentTaskComplete(true);
             setFeedbackMessage('Zadanie zakończone sukcesem! Możemy ruszać dalej.');
         } else {
+            setHealth(prevHealth => Math.max(0, prevHealth - HEALTH_LOSS_ON_FAIL));
             setIsCurrentTaskComplete(false);
-            setFeedbackMessage('Stój! Zadanie jest źle wykonane. Spróbuj ponownie.');
+            setFeedbackMessage(`Stój! Zadanie jest źle wykonane. Utracono ${HEALTH_LOSS_ON_FAIL} życia. Spróbuj ponownie.`);
         }
     };
 
@@ -172,6 +186,8 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
         backgroundAttachment: 'fixed',
         minHeight: '100vh',
     };
+    
+    const healthBarWidth = `${(health / INITIAL_HEALTH) * 100}%`;
 
     if (isLoading) {
         return <div className="text-center py-20 text-xl font-semibold">Ładowanie lekcji...</div>;
@@ -184,13 +200,34 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
     if (tasks.length === 0 && !isLoading) {
         return <div className="text-center py-20 text-xl font-bold text-orange-600">Nie znaleziono zadań dla tej lekcji.</div>;
     }
+    
+    if (isGameOver) {
+        return (
+            <div 
+                className="flex items-center justify-center p-4" 
+                style={backgroundStyle}
+            >
+                <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-2xl p-10 w-full max-w-lg border-t-8 border-red-600 text-center">
+                    <p className="text-5xl font-extrabold text-red-700 mb-4">
+                        Misja nieudana
+                    </p>
+                    <p className="text-xl text-gray-600 mb-8">Wykorzystałeś całe swoje życie.</p>
+                    <button
+                        onClick={handleRetryLevel}
+                        className="px-8 py-4 rounded-full bg-indigo-600 text-white font-bold text-lg hover:bg-indigo-700 transition duration-200 shadow-lg"
+                    >
+                        Ponów poziom
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div 
             className="flex items-center justify-center p-4" 
             style={backgroundStyle}
         >
-            {/* NEW: Top-left fixed Exit Button */}
             {!isLevelComplete && (
                 <button
                     onClick={handleExitLevel}
@@ -204,12 +241,26 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
 
             <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-2xl p-8 w-full max-w-3xl border-t-8 border-indigo-500">
                 <header className="mb-6 border-b pb-4">
-                    <div>
-                        <h2 className="text-3xl font-bold text-gray-800">{levelTitle}</h2>
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <h2 className="text-3xl font-bold text-gray-800">{levelTitle}</h2>
+                            {!isLevelComplete && (
+                                <p className="text-sm text-indigo-500 font-semibold mt-2">
+                                    {currentTaskNumber} z {totalTasks}
+                                </p>
+                            )}
+                        </div>
+                        
                         {!isLevelComplete && (
-                            <p className="text-sm text-indigo-500 font-semibold mt-2">
-                                {currentTaskNumber} z {totalTasks}
-                            </p>
+                            <div className="w-1/3 min-w-[120px] ml-4">
+                                <p className="text-sm font-semibold text-red-600 mb-1">Życie: {health}%</p>
+                                <div className="h-4 bg-gray-200 rounded-full overflow-hidden border border-gray-300">
+                                    <div 
+                                        className="h-full bg-red-500 transition-all duration-500 ease-out" 
+                                        style={{ width: healthBarWidth }}
+                                    ></div>
+                                </div>
+                            </div>
                         )}
                     </div>
                 </header>
@@ -219,6 +270,7 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
                         <>
                             {CurrentTaskComponent ? (
                                 <CurrentTaskComponent 
+                                    key={currentTaskIndex}
                                     {...taskProps} 
                                     onTaskComplete={handleTaskCompletion} 
                                 />
@@ -242,7 +294,6 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
                     )}
                 </div>
 
-                {/* Task Progression Button Area */}
                 {!isLevelComplete && (
                     <div className="mt-8 pt-4 border-t flex justify-end">
                         {feedbackMessage && (
@@ -283,7 +334,7 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
                             </button>
                             <button
                                 onClick={handleCancelExit}
-                                className="px-6 py-2 rounded-md bg-black-200 text-white-800 font-semibold hover:bg-gray-300 transition duration-150"
+                                className="px-6 py-2 rounded-md bg-gray-300 text-gray-800 font-semibold hover:bg-gray-400 transition duration-150"
                             >
                                 Nie (Zostań)
                             </button>

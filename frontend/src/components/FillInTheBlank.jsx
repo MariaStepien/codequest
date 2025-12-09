@@ -53,6 +53,8 @@ export default function FillInTheBlank({ sentence, correctAnswers, onTaskComplet
 
     if (allCorrect) {
         onTaskComplete(true);
+    } else {
+        onTaskComplete(false);
     }
   };
 

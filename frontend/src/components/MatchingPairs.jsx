@@ -48,6 +48,7 @@ export default function MatchingPairs({ items, onTaskComplete }) {
             }
         } else {
             setFeedback({ type: 'error', message: 'Nieprawidłowe parowanie. Spróbuj ponownie!' });
+            onTaskComplete(false);
         }
         setLeftSelectionKey(null);
         setRightSelectionKey(null);

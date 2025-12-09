@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
  * @param {string} props.question The question text.
  * @param {string[]} props.options An array of possible answer strings.
  * @param {string} props.correctAnswer The correct answer string (must match one of the options).
- * @param {function} props.onTaskComplete Callback to signal LevelTemplate (true for correct, false for incorrect).
+ * @param {function} props.onTaskComplete Callback to signal LevelTemplate (true for correct, false for incorrect/try again).
  */
 export default function MultipleChoice({ question, options, correctAnswer, onTaskComplete }) {
     const [selectedOption, setSelectedOption] = useState(null);
@@ -25,6 +25,8 @@ export default function MultipleChoice({ question, options, correctAnswer, onTas
 
             if (selectedOption === correctAnswer) {
                 onTaskComplete(true);
+            } else {
+                onTaskComplete(false);
             }
         }
     };
