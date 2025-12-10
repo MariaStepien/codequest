@@ -23,6 +23,35 @@ const TaskComponentMap = {
 const INITIAL_HEALTH = 100;
 const HEALTH_LOSS_ON_FAIL = 20;
 
+const formatTime = (totalSeconds) => {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    const pad = (num) => String(num).padStart(2, '0');
+    return `${pad(minutes)}:${pad(seconds)}`;
+};
+
+const calculateStars = (currentHealth) => {
+    if (currentHealth === 100) {
+        return 3;
+    } else if (currentHealth >= 60) {
+        return 2;
+    } else if (currentHealth >= 20) {
+        return 1;
+    } else {
+        return 0;
+    }
+};
+
+const calculatePoints = (timeTakenSeconds) => {
+    const MAX_POINTS = 1000;
+    const TIME_PENALTY_RATE = 1;
+    const MIN_POINTS = 50;
+
+    let calculatedPoints = MAX_POINTS - (timeTakenSeconds * TIME_PENALTY_RATE);
+
+    return Math.max(MIN_POINTS, calculatedPoints);
+};
+
 export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBackground }) {
     // Get levelId from the URL path
     const { courseId, levelNumber: routeLevelNumber } = useParams();
@@ -39,12 +68,33 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
     const [showExitConfirmation, setShowExitConfirmation] = useState(false); 
 
     const [health, setHealth] = useState(INITIAL_HEALTH);
+    const [startTime, setStartTime] = useState(Date.now());
+    const [elapsedTime, setElapsedTime] = useState(0);
+
+    const tasks = lessonData?.tasks || [];
+    const isLevelComplete = currentTaskIndex >= tasks.length; 
+    const isGameOver = health <= 0;
+    
+    useEffect(() => {
+        let interval;
+        if (!isLevelComplete && !isGameOver) {
+            interval = setInterval(() => {
+                setElapsedTime(Math.round((Date.now() - startTime) / 1000));
+            }, 1000);
+        } else {
+            clearInterval(interval);
+        }
+        
+        return () => clearInterval(interval);
+    }, [isLevelComplete, isGameOver, startTime]); 
 
     const handleRetryLevel = () => {
         setHealth(INITIAL_HEALTH);
         setCurrentTaskIndex(0);
         setIsCurrentTaskComplete(false);
         setFeedbackMessage('');
+        setStartTime(Date.now());
+        setElapsedTime(0);
     };
 
 
@@ -52,7 +102,7 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
         const jwtToken = localStorage.getItem('token');
         
         if (!jwtToken) {
-            console.error("Brak tokena uwierzytelniającego. Nie można zapisać postępu.");
+            console.error("Brak tokena uwierzytelniającego. Nie można zapisać postępu kursu.");
             return;
         }
 
@@ -70,14 +120,51 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
             });
 
             if (!response.ok) {
-                console.error("Nie udało się zapisać postępu.", await response.json());
+                console.error("Nie udało się zapisać postępu kursu.", await response.json());
             } else {
-                console.log("Pomyślnie zapisano postęp!", await response.json());
+                console.log("Pomyślnie zapisano postęp kursu!", await response.json());
             }
         } catch (e) {
-            console.error("Błąd sieciowy podczas zapisywania postępu:", e);
+            console.error("Błąd sieciowy podczas zapisywania postępu kursu:", e);
         }
     };
+    
+    const recordLessonProgress = async (lessonId, courseId, timeTakenSeconds, starsEarned, pointsEarned) => {
+        const jwtToken = localStorage.getItem('token');
+        
+        if (!jwtToken) {
+            console.error("Brak tokena uwierzytelniającego. Nie można zapisać postępu lekcji.");
+            return;
+        }
+        
+        const progressData = {
+            lessonId: lessonId,
+            courseId: courseId,
+            starsEarned: starsEarned, 
+            timeTakenSeconds: timeTakenSeconds,
+            pointsEarned: pointsEarned,
+        };
+        
+        try {
+            const response = await fetch('http://localhost:8080/api/lesson-progress/record', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${jwtToken}`,
+                },
+                body: JSON.stringify(progressData),
+            });
+
+            if (!response.ok) {
+                console.error("Nie udało się zapisać postępu lekcji.", await response.json());
+            } else {
+                console.log("Pomyślnie zapisano postęp lekcji!", await response.json());
+            }
+        } catch (e) {
+            console.error("Błąd sieciowy podczas zapisywania postępu lekcji:", e);
+        }
+    };
+
 
     useEffect(() => {
         if (!courseId || !orderIndex) {
@@ -126,11 +213,6 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
         setShowExitConfirmation(false);
     };
 
-    const tasks = lessonData?.tasks || [];
-    const isLevelComplete = currentTaskIndex >= tasks.length; 
-    
-    const isGameOver = health <= 0;
-
     const handleTaskCompletion = (isCorrect) => {
         if (isCorrect) {
             setIsCurrentTaskComplete(true);
@@ -150,7 +232,16 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
                 setFeedbackMessage('');
             } else {
                 const courseIdNum = parseInt(courseId, 10);
+                const lessonIdNum = lessonData?.id; 
                 
+                const timeTakenSeconds = elapsedTime;
+                const starsEarned = calculateStars(health);
+                const pointsEarned = calculatePoints(timeTakenSeconds);
+
+                if (courseIdNum && lessonIdNum) {
+                    await recordLessonProgress(lessonIdNum, courseIdNum, timeTakenSeconds, starsEarned, pointsEarned);
+                }
+
                 if (courseIdNum && orderIndex) {
                     await updateUserProgress(courseIdNum, orderIndex);
                 }
@@ -250,6 +341,13 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
                                 </p>
                             )}
                         </div>
+                        
+                        {!isLevelComplete && (
+                            // Wyświetlanie licznika czasu
+                            <div className="text-xl font-bold text-gray-700 self-center mr-4">
+                                ⏱️ Czas: {formatTime(elapsedTime)}
+                            </div>
+                        )}
                         
                         {!isLevelComplete && (
                             <div className="w-1/3 min-w-[120px] ml-4">

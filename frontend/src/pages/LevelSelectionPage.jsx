@@ -1,6 +1,7 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useCallback } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import LevelButton from '../components/LevelButton';
+import LevelDetailsModal from '../components/LevelDetailsModal'; 
 
 const SPACING_Y = 120; 
 const INITIAL_OFFSET_Y = 60; 
@@ -37,6 +38,10 @@ export default function LevelSelectionPage() {
     const [lastCompletedLevel, setLastCompletedLevel] = useState(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    
+    const [selectedLevelDetails, setSelectedLevelDetails] = useState(null);
+    const [selectedLevelProgress, setSelectedLevelProgress] = useState(null);
+    const [isDetailsLoading, setIsDetailsLoading] = useState(false);
 
     useEffect(() => {
         const jwtToken = localStorage.getItem('token');
@@ -99,6 +104,62 @@ export default function LevelSelectionPage() {
         }
         return status;
     }, [totalLessons, lastCompletedLevel]);
+    
+    const fetchLevelDetails = useCallback(async (levelNumber) => {
+        setIsDetailsLoading(true);
+        setSelectedLevelDetails(null);
+        setSelectedLevelProgress(null);
+        setError(null);
+
+        const jwtToken = localStorage.getItem('token');
+        if (!jwtToken) {
+            setIsDetailsLoading(false);
+            return;
+        }
+        
+        try {
+            const lessonResponse = await fetch(`/api/lessons/course/${courseId}/order/${levelNumber}`);
+            if (!lessonResponse.ok) {
+                throw new Error(`Nie znaleziono detali dla poziomu ${levelNumber}`);
+            }
+            const lessonDetails = await lessonResponse.json();
+            setSelectedLevelDetails(lessonDetails);
+
+            const progressResponse = await fetch(`/api/lesson-progress/lesson/${lessonDetails.id}`, {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${jwtToken}` },
+            });
+
+            if (progressResponse.ok) {
+                const progressData = await progressResponse.json();
+                setSelectedLevelProgress(progressData);
+            } else if (progressResponse.status === 404) {
+                setSelectedLevelProgress(null); 
+            } else {
+                console.error(`Błąd podczas pobierania postępu dla lekcji ${lessonDetails.id}. Status: ${progressResponse.status}`);
+                setSelectedLevelProgress(null);
+            }
+            
+        } catch (err) {
+            console.error("Błąd ładowania detali poziomu:", err.message);
+            setError("Błąd ładowania detali poziomu.");
+        } finally {
+            setIsDetailsLoading(false);
+        }
+    }, [courseId]);
+
+    const handleLevelClick = (e, levelNumber, isUnlocked) => {
+        if (isUnlocked) {
+            e.preventDefault(); 
+            fetchLevelDetails(levelNumber);
+        }
+    };
+    
+    const handleCloseModal = () => {
+        setSelectedLevelDetails(null);
+        setSelectedLevelProgress(null);
+        setError(null); 
+    }
 
     const levelButtonOffset = '32px'; 
 
@@ -106,7 +167,7 @@ export default function LevelSelectionPage() {
         return <div className="p-8 text-center text-xl">Ładowanie szczegółów kursu</div>;
     }
 
-    if (error) {
+    if (error && !selectedLevelDetails) {
         return <div className="p-8 text-center text-red-600 font-semibold">Błąd: {error}</div>;
     }
 
@@ -128,6 +189,15 @@ export default function LevelSelectionPage() {
 
                 {/* Level Map Container */}
                 <div className="border-4 border-blue-200 rounded-xl shadow-xl bg-white p-4 sm:p-6 md:p-8"> 
+                    
+                    {(selectedLevelDetails || isDetailsLoading) && (
+                         <LevelDetailsModal 
+                            lessonDetails={selectedLevelDetails}
+                            progress={selectedLevelProgress}
+                            onClose={handleCloseModal}
+                            courseId={courseId}
+                        />
+                    )}
 
                     <div 
                         className="relative w-full overflow-y-scroll overflow-x-hidden" 
@@ -185,9 +255,7 @@ export default function LevelSelectionPage() {
                                     >
                                         <Link 
                                             to={isUnlocked ? `/course/${courseId}/level/${levelNumber}` : '#'}
-                                            onClick={(e) => {
-                                                if (!isUnlocked) e.preventDefault();
-                                            }}
+                                            onClick={(e) => handleLevelClick(e, levelNumber, isUnlocked)}
                                             className={!isUnlocked ? 'cursor-not-allowed' : ''}
                                         >
                                             <LevelButton 

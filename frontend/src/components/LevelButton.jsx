@@ -8,14 +8,6 @@ import { useNavigate } from 'react-router-dom';
  * @param {boolean} props.isUnlocked If true, the button is clickable.
  */
 export default function LevelButton({ levelNumber, isUnlocked = true }) {
-    const navigate = useNavigate();
-
-    const handleClick = () => {
-        if (isUnlocked) {
-            navigate(`/level/${levelNumber}`); 
-            console.log(`Przechodzenie do poziomu: ${levelNumber}`);
-        }
-    };
 
     const colorMap = {
         1: 'bg-red-300 border-red-400 hover:bg-red-400',
@@ -34,7 +26,6 @@ export default function LevelButton({ levelNumber, isUnlocked = true }) {
 
     return (
         <button
-            onClick={handleClick}
             disabled={!isUnlocked}
             title={isUnlocked ? `Zacznij poziom ${levelNumber}` : 'Poziom zablokowany'}
             className={`
