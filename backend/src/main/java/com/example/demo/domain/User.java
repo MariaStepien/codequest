@@ -28,4 +28,13 @@ public class User {
 
     @Column(columnDefinition = "varchar(255) default 'USER'")
     private String role;
+
+    @Column(columnDefinition= "integer default 0")
+    private int coins;
+
+    @Column(columnDefinition= "integer default 0")
+    private int points;
+
+    @Column(columnDefinition= "integer default 0")
+    private int rank;
 }

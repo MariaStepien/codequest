@@ -28,6 +28,12 @@ public class UserLessonProgressService {
     private final CourseRepository courseRepository; 
     private final LessonRepository lessonRepository; 
 
+    // 0 stars: 0 coins
+    // 1 star: 5 coins
+    // 2 stars: 10 coins
+    // 3 stars: 20 coins
+    private static final int[] STAR_COIN_REWARDS = {0, 5, 10, 20};
+
     @Transactional
     public UserLessonProgressDto recordProgress(Long userId, UserLessonProgressCreationDto creationDto) {
         
@@ -51,15 +57,38 @@ public class UserLessonProgressService {
             boolean shouldUpdate = false;
             
             if (creationDto.getPointsEarned() > progress.getPointsEarned()) {
-                progress.setPointsEarned(creationDto.getPointsEarned());
-                shouldUpdate = true;
-            }
-            if (creationDto.getStarsEarned() > progress.getStarsEarned()) {
-                progress.setStarsEarned(creationDto.getStarsEarned());
+                
+                int oldPoints = progress.getPointsEarned();
+                int newPoints = creationDto.getPointsEarned();
+                int pointsToAdd = newPoints - oldPoints;
+                
+                user.setPoints(user.getPoints() + pointsToAdd);
+                userRepository.save(user); 
+                
+                progress.setPointsEarned(newPoints);
                 shouldUpdate = true;
             }
             if (progress.getTimeTakenSeconds() == null || creationDto.getTimeTakenSeconds() < progress.getTimeTakenSeconds()) {
                 progress.setTimeTakenSeconds(creationDto.getTimeTakenSeconds());
+                shouldUpdate = true;
+            }
+
+            if (creationDto.getStarsEarned() > progress.getStarsEarned()) {
+                
+                int oldStars = progress.getStarsEarned();
+                int newStars = creationDto.getStarsEarned();
+
+                int oldMaxCoins = oldStars < STAR_COIN_REWARDS.length ? STAR_COIN_REWARDS[oldStars] : STAR_COIN_REWARDS[STAR_COIN_REWARDS.length - 1];
+                int newMaxCoins = newStars < STAR_COIN_REWARDS.length ? STAR_COIN_REWARDS[newStars] : STAR_COIN_REWARDS[STAR_COIN_REWARDS.length - 1];
+
+                int coinsToAward = newMaxCoins - oldMaxCoins;
+                
+                if (coinsToAward > 0) {
+                     user.setCoins(user.getCoins() + coinsToAward);
+                     userRepository.save(user); 
+                }
+
+                progress.setStarsEarned(newStars); 
                 shouldUpdate = true;
             }
 
@@ -68,6 +97,19 @@ public class UserLessonProgressService {
             }
             
         } else {
+            int initialStars = creationDto.getStarsEarned();
+            int initialCoins = initialStars < STAR_COIN_REWARDS.length ? STAR_COIN_REWARDS[initialStars] : STAR_COIN_REWARDS[STAR_COIN_REWARDS.length - 1];
+            
+            if (initialCoins > 0) {
+                 user.setCoins(user.getCoins() + initialCoins);
+            }
+            
+            if (creationDto.getPointsEarned() > 0) {
+                 user.setPoints(user.getPoints() + creationDto.getPointsEarned());
+            }
+
+            userRepository.save(user); 
+            
             progress = new UserLessonProgress();
             progress.setUser(user); 
             progress.setCourse(course); 

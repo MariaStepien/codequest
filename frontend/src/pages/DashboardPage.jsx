@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Zap, ArrowRight, Star } from 'lucide-react';
+import { Zap, ArrowRight, Star, Coins, Award, Trophy } from 'lucide-react';
 import Header from '../components/Header';
 import CoursesPage from './CoursesPage';
 
@@ -9,8 +9,9 @@ const initialUserData = {
   currentCourse: "N/A",
   currentLesson: "N/A",
   courses: [],
-  xp: 0,
-  level: 15,
+  points: 0,
+  coins: 0,
+  rank: 15,
   latestActivity: null
 };
 
@@ -70,16 +71,22 @@ const DashboardContentArea = ({ userData }) => {
                       </h3>
                       <div className="grid grid-cols-3 gap-4 text-center">
                           <DashboardStatCard 
-                              value={userData.xp} 
-                              label="Zdobyty EXP" 
-                              icon={Zap} 
+                                value={userData.coins}
+                                label="Monety"
+                                icon={Coins}
+                                color='yellow'
+                          />
+                          <DashboardStatCard 
+                              value={userData.points} 
+                              label="Punkty" 
+                              icon={Award} 
                               color="teal"
                           />
                           <DashboardStatCard 
-                              value={userData.level}
-                              label="Poziom"
-                              icon={Star}
-                              color='yellow'
+                            value={userData.rank}
+                            label="Ranking"
+                            icon={Trophy}
+                            color="blue"
                           />
                       </div>
                   </div>
@@ -155,7 +162,7 @@ export default function DashboardPage() {
         setUserData(prevData => ({
             ...prevData,
             userLogin: userDetails.userLogin,
-            progress: 70, 
+            progress: 70,
             currentCourse: "Python for Beginners",
             currentLesson: "Lesson 5: Loops and Iteration",
             courses: [
@@ -163,8 +170,9 @@ export default function DashboardPage() {
               { id: 2, title: "Modern JavaScript", progress: 45, color: "yellow", lessons: 30, hours: 25, status: 'In Progress' },
               { id: 4, title: "Introduction to HTML & CSS", progress: 100, color: "green", lessons: 10, hours: 5, status: 'Completed' },
             ],
-            xp: 1250,
-            level: 15,
+            points: userDetails.points,
+            coins: userDetails.coins,
+            rank: userDetails.rank
         }));
 
         await fetchLatestActivity();
