@@ -1,9 +1,13 @@
 import { useState } from 'react';
-import { LogOut, BarChart3, BookOpenText, User } from 'lucide-react';
+import { LogOut, BarChart3, BookOpenText, User, Backpack, Trophy, Award, MessageSquare } from 'lucide-react';
 
 const navLinks = [
   { id: 'dashboard', name: 'Panel', icon: BarChart3, href: '/dashboard' },
-  { id: 'courses', name: 'Kursy', icon: BookOpenText, href: '/courses' }
+  { id: 'courses', name: 'Kursy', icon: BookOpenText, href: '/courses' },
+  { id: 'equipment', name: 'Ekwipunek', icon: Backpack, href: '/user-equipment' },
+  { id: 'trofies', name: 'Trofea', icon: Trophy, href: '/user-trophies' },
+  { id: 'ranking', name: 'Ranking', icon: Award, href: '/ranking' },
+  { id: 'forum', name: 'Forum', icon: MessageSquare, href: '/forum'}
 ];
 
 export default function Header({ userLogin, currentPage }) { 

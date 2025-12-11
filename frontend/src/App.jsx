@@ -14,6 +14,7 @@ import EditCoursePage from './pages/EditCoursePage'
 import LessonCreationPage from './pages/LessonCreationPage'
 import AdminLessonsPage from './pages/AdminLessonsPage'
 import EditLessonPage from './pages/EditLessonPage'
+import RankingPage from './pages/RankingPage'
 
 function App() {
   return (
@@ -54,6 +55,8 @@ function App() {
       <Route path='/admin/course-lessons/:courseId' element={<AdminLessonsPage/>} />
 
       <Route path="/admin/edit-lesson/:lessonId" element={<EditLessonPage />} />
+
+      <Route path='/ranking' element={<RankingPage/>} />
 
       {/* Error screen */}
       <Route path="*" element={<h1>404 Not Found</h1>} />

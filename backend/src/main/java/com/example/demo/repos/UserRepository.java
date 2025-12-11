@@ -1,5 +1,6 @@
 package com.example.demo.repos;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,4 +21,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @return An Optional containing the Users entity if found.
      */
     Optional<User> findByUserLogin(String userLogin);
+
+    List<User> findByRoleOrderByPointsDesc(String user);
+
+
 }

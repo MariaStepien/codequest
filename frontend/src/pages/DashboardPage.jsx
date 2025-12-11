@@ -36,7 +36,7 @@ const DashboardContentArea = ({ userData }) => {
       <div className="space-y-8">
           <div className="p-6 bg-white rounded-xl shadow-lg border-l-4 border-indigo-500">
               <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                  Witaj spowrotem, {userData.userLogin}
+                  Witaj {userData.userLogin}
               </h2>
           </div>
 
