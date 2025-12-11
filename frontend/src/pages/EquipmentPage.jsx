@@ -41,7 +41,7 @@ const getItemIcon = (imgSource, type) => {
     try {
         return new URL(`../assets/${folder}/${imgSource}`, import.meta.url).href;
     } catch (e) {
-        return new URL('placeholder.png', import.meta.url).href;
+        return new URL('sprite_1_1.png', import.meta.url).href;
     }
 };
 
