@@ -69,6 +69,12 @@ public class SecurityConfig {
 
                 registry.requestMatchers("/api/ranking/me").permitAll();
 
+                registry.requestMatchers("/api/user-equipment/**").permitAll();
+
+                registry.requestMatchers("/api/user-bought-equipment/**").permitAll();
+
+                registry.requestMatchers("/api/equipment/**").permitAll();
+
                 // All other requests still require authentication
                 registry.anyRequest().authenticated();
             })
