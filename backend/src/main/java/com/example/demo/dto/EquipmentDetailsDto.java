@@ -10,4 +10,5 @@ public class EquipmentDetailsDto {
     String name;
     String type;
     String imgSource;
+    int itemNumber;
 }

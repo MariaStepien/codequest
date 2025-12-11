@@ -41,5 +41,8 @@ public class Equipment {
     
     @Column(nullable = false)
     private String imgSource;
+
+    @Column
+    private int itemNumber;
     
 }
