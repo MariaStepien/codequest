@@ -9,7 +9,9 @@ public class CodeFixTaskDto implements TaskDto {
     private String type = "CodeFix"; // Must match the name in @JsonSubTypes
     private String instructions;
     private String incorrectCode;
-    private String fixedCode;
+    
     private Integer fixLineStart;
-    private Integer fixLineEnd;
+    private Integer fixCharStart;
+    private Integer fixCharEnd;
+    private String correctGapText;
 }
