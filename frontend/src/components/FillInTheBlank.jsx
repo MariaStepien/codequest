@@ -1,5 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
+
+const shuffleArray = (array) => {
+    let newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+};
 
 export default function FillInTheBlank({ sentence, correctAnswers, onTaskComplete }) {
   const safeSentence = sentence || ""; 
@@ -11,6 +20,8 @@ export default function FillInTheBlank({ sentence, correctAnswers, onTaskComplet
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [attempts, setAttempts] = useState(0); 
   
+  const shuffledWords = useMemo(() => shuffleArray(correctAnswers), [correctAnswers]);
+
   if (textSegments.length - 1 !== correctAnswers.length) {
     if (safeSentence === "") {
         return (
@@ -32,21 +43,23 @@ export default function FillInTheBlank({ sentence, correctAnswers, onTaskComplet
   });
   const hasSucceeded = isSubmitted && allCorrect;
   const hasFailed = isSubmitted && !allCorrect;
+  
+  const disableInteraction = hasSucceeded || hasFailed;
 
   const handleInputChange = (index, value) => {
-    if (hasSucceeded) return; 
+    if (disableInteraction) return; 
 
     const newInputs = [...userInputs];
     newInputs[index] = value;
     setUserInputs(newInputs);
 
-    if (isSubmitted) {
+    if (isSubmitted && !hasFailed) {
         setIsSubmitted(false);
     }
   };
 
   const handleSubmit = () => {
-    if (!allFilled) return;
+    if (!allFilled || hasSucceeded || hasFailed) return;
     
     setIsSubmitted(true);
     setAttempts(prev => prev + 1);
@@ -87,6 +100,20 @@ export default function FillInTheBlank({ sentence, correctAnswers, onTaskComplet
       <h3 className="text-xl font-bold mb-4 text-gray-700">Uzupełnij puste pola</h3>
       <p className="mb-4 text-gray-600">Dokończ zdanie wstawiając odpowiednie słowa do tekstu.</p>
       
+      <div className="mb-6 p-4 bg-indigo-50 rounded-lg border border-indigo-200">
+        <p className="font-semibold text-indigo-800 mb-2">Dostępne słowa:</p>
+        <div className="flex flex-wrap gap-2">
+            {shuffledWords.map((word, index) => (
+                <span 
+                    key={index} 
+                    className="px-3 py-1 text-sm font-medium bg-indigo-200 text-indigo-900 rounded-full shadow-sm select-none"
+                >
+                    {word}
+                </span>
+            ))}
+        </div>
+      </div>
+      
       <div className="text-xl text-black mb-8 flex flex-wrap items-center leading-relaxed">
         {textSegments.map((segment, index) => (
           <React.Fragment key={index}>
@@ -96,7 +123,7 @@ export default function FillInTheBlank({ sentence, correctAnswers, onTaskComplet
                 type="text"
                 value={userInputs[index]}
                 onChange={(e) => handleInputChange(index, e.target.value)}
-                disabled={hasSucceeded}
+                disabled={disableInteraction}
                 placeholder={`Answer ${index + 1}`}
                 className={`
                   mx-2 p-2 

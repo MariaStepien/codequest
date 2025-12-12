@@ -62,7 +62,7 @@ export default function MultipleChoice({ question, options, correctAnswer, onTas
         return classes;
     };
     
-    const disableInteraction = hasSucceeded; 
+    const disableInteraction = hasSucceeded || hasFailed; 
 
     return (
         <div className="bg-white p-6 rounded-xl shadow-2xl w-full max-w-lg mx-auto space-y-6">
@@ -94,16 +94,16 @@ export default function MultipleChoice({ question, options, correctAnswer, onTas
                 {!hasFailed && (
                     <button
                         onClick={handleSubmit}
-                        disabled={!selectedOption || disableInteraction}
+                        disabled={!selectedOption || hasSucceeded}
                         className={`
                             w-full py-3 px-4 font-semibold rounded-lg transition duration-200
-                            ${!selectedOption || disableInteraction
+                            ${!selectedOption || hasSucceeded
                                 ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
                                 : 'bg-indigo-600 text-white hover:bg-indigo-700'
                             }
                         `}
                     >
-                        {disableInteraction ? 'Zadanie wykonane' : 'Zaznacz odpowiedź'}
+                        {hasSucceeded ? 'Zadanie wykonane' : 'Zaznacz odpowiedź'}
                     </button>
                 )}
                 
