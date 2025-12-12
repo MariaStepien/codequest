@@ -53,7 +53,7 @@ const InventoryItemCard = ({ item, isEquipped, onAction, userCoins }) => {
     if (isOwned && isEquipped) {
         button = (
             <div
-                className="w-full py-1 text-xs font-semibold bg-green-500 text-white text-center rounded-b-lg cursor-not-allowed"
+                className="w-full py-1 text-xs font-semibold bg-green-500 text-white text-center rounded-b-lg cursor-not-allowed" 
                 title="Przedmiot już założony"
             >
                 Założone
@@ -63,7 +63,7 @@ const InventoryItemCard = ({ item, isEquipped, onAction, userCoins }) => {
         button = (
             <button 
                 onClick={() => onAction('EQUIP', item.id)}
-                className="w-full py-1 text-xs font-semibold bg-indigo-500 text-white rounded-b-lg hover:bg-indigo-600 transition"
+                className="w-full py-1 text-xs font-semibold bg-indigo-500 text-white text-center rounded-b-lg hover:bg-indigo-600 transition"
             >
                 Załóż
             </button>
@@ -73,7 +73,7 @@ const InventoryItemCard = ({ item, isEquipped, onAction, userCoins }) => {
             <button 
                 onClick={() => onAction('BUY', item.id)}
                 disabled={!canAfford}
-                className={`w-full py-1 text-xs font-semibold rounded-b-lg transition 
+                className={`w-full py-1 text-xs font-semibold text-center rounded-b-lg transition 
                             ${canAfford ? 'bg-yellow-500 text-gray-900 hover:bg-yellow-600' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
             >
                 Kup ({item.cost})
@@ -275,12 +275,12 @@ export default function EquipmentPage() {
                             <h2 className="text-2xl font-bold text-gray-900 mb-4">Ekwipunek</h2>
                             <p className="text-sm text-gray-600 mb-6">Kliknij zakładkę, aby wyświetlić przedmioty danej kategorii.</p>
 
-                            <div className="flex space-x-2 mb-6">
+                            <div className="grid grid-cols-5 gap-2 mb-6"> 
                                 {EQUIPMENT_SLOTS.map(slot => (
                                     <button
                                         key={slot.type}
                                         onClick={() => setActiveTab(slot.type)}
-                                        className={`px-4 py-2 rounded-lg font-semibold text-sm transition border
+                                        className={`w-full px-2 py-2 rounded-lg font-semibold text-sm transition border
                                             ${activeTab === slot.type
                                                 ? 'bg-indigo-600 text-white border-indigo-600 shadow-md'
                                                 : 'bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-300'}`}
@@ -292,24 +292,40 @@ export default function EquipmentPage() {
 
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                                 {tabItems.length > 0 ? (
-                                    tabItems.map(item => (
-                                        <InventoryItemCard
-                                            key={item.id}
-                                            item={{
-                                                ...item,
-                                                isOwned: equipmentData.ownedEquipment.some(o => o.id === item.id),
-                                                isEquipped: [
-                                                    equipmentData.helm?.id,
-                                                    equipmentData.armor?.id,
-                                                    equipmentData.pants?.id,
-                                                    equipmentData.shoes?.id,
-                                                    equipmentData.weapon?.id,
-                                                ].includes(item.id),
-                                            }}
-                                            userCoins={equipmentData.coins}
-                                            onAction={handleEquipmentAction}
-                                        />
-                                    ))
+                                    tabItems.map(item => {
+                                        
+                                        const currentItemId = Number(item.id); 
+
+                                        const isEquipped = (() => {
+                                            switch (item.type) {
+                                                case 'HELM':
+                                                    return Number(equipmentData.helm?.id) === currentItemId;
+                                                case 'ARMOR':
+                                                    return Number(equipmentData.armor?.id) === currentItemId;
+                                                case 'PANTS':
+                                                    return Number(equipmentData.pants?.id) === currentItemId;
+                                                case 'SHOES':
+                                                    return Number(equipmentData.shoes?.id) === currentItemId;
+                                                case 'WEAPON':
+                                                    return Number(equipmentData.weapon?.id) === currentItemId;
+                                                default:
+                                                    return false;
+                                            }
+                                        })();
+                                        
+                                        return (
+                                            <InventoryItemCard
+                                                key={item.id}
+                                                item={{
+                                                    ...item,
+                                                    isOwned: equipmentData.ownedEquipment.some(o => Number(o.id) === currentItemId),
+                                                    isEquipped: isEquipped, 
+                                                }}
+                                                userCoins={equipmentData.coins}
+                                                onAction={handleEquipmentAction}
+                                            />
+                                        );
+                                    })
                                 ) : (
                                     <p className="text-gray-500 col-span-full text-center">
                                         Brak przedmiotów w tej kategorii.

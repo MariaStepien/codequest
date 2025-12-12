@@ -35,6 +35,15 @@ public class UserBoughtEquipmentService {
             throw new IllegalStateException("Użytkownik już posiada ten przedmiot.");
         }
         
+        int itemCost = equipment.getCost();
+        
+        if (user.getCoins() < itemCost) {
+            throw new RuntimeException("Brak wystarczającej ilości monet na zakup przedmiotu.");
+        }
+        
+        user.setCoins(user.getCoins() - itemCost);
+        userRepository.save(user); 
+        
         UserBoughtEquipment boughtEquipment = new UserBoughtEquipment();
         boughtEquipment.setUser(user);
         boughtEquipment.setEquipment(equipment);
