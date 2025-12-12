@@ -16,6 +16,7 @@ import AdminLessonsPage from './pages/AdminLessonsPage'
 import EditLessonPage from './pages/EditLessonPage'
 import RankingPage from './pages/RankingPage'
 import EquipmentPage from './pages/EquipmentPage'
+import CourseUsersListPage from './pages/CourseUsersListPage'
 
 function App() {
   return (
@@ -60,6 +61,8 @@ function App() {
       <Route path='/ranking' element={<RankingPage/>} />
 
       <Route path='/user-equipment' element={<EquipmentPage />} />
+
+      <Route path='/admin/course-users-progress/:courseId' element={<CourseUsersListPage />} />
 
       {/* Error screen */}
       <Route path="*" element={<h1>404 Not Found</h1>} />

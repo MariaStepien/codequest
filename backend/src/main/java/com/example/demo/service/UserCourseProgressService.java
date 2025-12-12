@@ -1,13 +1,16 @@
 package com.example.demo.service;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.example.demo.domain.Course;
 import com.example.demo.domain.User;
 import com.example.demo.domain.UserCourseProgress;
+import com.example.demo.dto.CourseProgressByUserDetailsDto;
 import com.example.demo.repos.CourseRepository;
 import com.example.demo.repos.UserCourseProgressRepository;
 import com.example.demo.repos.UserRepository;
@@ -74,6 +77,35 @@ public class UserCourseProgressService {
         }
         
         return userCourseProgressRepository.save(progress);
+    }
+
+    public List<CourseProgressByUserDetailsDto> getCourseProgressForAllUsers(Long courseId) {
+        
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Nie znaleziono kursu z ID: " + courseId));
+        
+        List<UserCourseProgress> progressRecords = userCourseProgressRepository.findByCourseId(courseId);
+        
+        int totalLessons = course.getTotalLessons();
+
+        return progressRecords.stream()
+            .map(progress -> {
+                boolean isCompleted;
+                if (progress.getCompletedLessons() == totalLessons) {
+                    isCompleted=true;
+                } else {
+                    isCompleted=false;
+                }
+                
+                return CourseProgressByUserDetailsDto.builder()
+                        .userId(progress.getUser().getId())
+                        .userLogin(progress.getUser().getUserLogin())
+                        .completedLessons(progress.getCompletedLessons())
+                        .totalLessons(totalLessons)
+                        .isCourseCompleted(isCompleted)
+                        .build();
+            })
+            .collect(Collectors.toList());
     }
 
     /**

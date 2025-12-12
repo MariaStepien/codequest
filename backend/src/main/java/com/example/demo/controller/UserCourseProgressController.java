@@ -1,17 +1,21 @@
 package com.example.demo.controller;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.domain.UserCourseProgress;
+import com.example.demo.dto.CourseProgressByUserDetailsDto;
 import com.example.demo.service.UserCourseProgressService;
 
 import lombok.Data;
@@ -74,5 +78,15 @@ public class UserCourseProgressController {
 
         // Return 200 OK with the DTO (or empty if no progress exists)
         return ResponseEntity.ok(latestActivity);
+    }
+
+    @GetMapping("/list-users/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<CourseProgressByUserDetailsDto>> getCourseProgressForAllUsers(@PathVariable Long id) {
+        
+        List<CourseProgressByUserDetailsDto> progressList = 
+            progressService.getCourseProgressForAllUsers(id);
+        
+        return ResponseEntity.ok(progressList);
     }
 }

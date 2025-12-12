@@ -1,5 +1,6 @@
 package com.example.demo.repos;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,5 +18,6 @@ public interface  UserCourseProgressRepository extends JpaRepository<UserCourseP
     // ordered by the most recent lastUpdated date
     @Query("SELECT p FROM UserCourseProgress p WHERE p.user.id = :userId ORDER BY p.lastUpdated DESC LIMIT 1")
     Optional<UserCourseProgress> findLatestProgressByUserId(@Param("userId") Long userId);
+    List<UserCourseProgress> findByCourseId(Long courseId);
 }
 

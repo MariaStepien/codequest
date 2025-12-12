@@ -13,6 +13,10 @@ const CourseListItem = ({ course, navigate }) => {
     navigate(`/admin/course-lessons/${course.id}`);
   };
 
+  const handleViewUsersProgress = () => {
+    navigate(`/admin/course-users-progress/${course.id}`);
+  };
+
   return (
     <div className="flex items-center justify-between p-4 bg-white shadow-md rounded-lg mb-3 hover:shadow-lg transition duration-150">
       <div className="flex flex-col">
@@ -20,6 +24,14 @@ const CourseListItem = ({ course, navigate }) => {
         <span className="text-sm  text-left text-gray-500">ID: {course.id} | Lekcji: {course.totalLessons} | Czas: {course.estimatedHours}h</span>
       </div>
       <div className="flex items-center space-x-3">
+        <button 
+          onClick={handleViewUsersProgress}
+          className="flex items-center space-x-1 px-3 py-1 text-sm font-medium rounded-full bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition duration-150"
+          title="Zobacz postępy użytkowników"
+        >
+          <List className="w-4 h-4" />
+          <span>Użytkownicy</span>
+        </button>
         <button 
           onClick={handleViewLessons}
           className="flex items-center space-x-1 px-3 py-1 text-sm font-medium rounded-full bg-indigo-100 text-indigo-700 hover:bg-indigo-200 transition duration-150"
