@@ -22,9 +22,9 @@ export default function LevelDetailsModal({ lessonDetails, progress, onClose, co
     }
     
     const allStarCriteria = [
-        "Ukończ poziom.",
-        "Przejdź poziom z conajmniej 60% życia.",
-        "Przejdź poziom z 100% życia.",
+        "Ukończ poziom.(5 monet)",
+        "Przejdź poziom z conajmniej 60% życia.(5 monet)",
+        "Przejdź poziom z 100% życia.(10 monet)",
     ];
 
     const { title, orderIndex } = lessonDetails;
