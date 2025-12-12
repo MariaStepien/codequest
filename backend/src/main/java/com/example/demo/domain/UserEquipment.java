@@ -25,6 +25,9 @@ public class UserEquipment {
     
     @Column(columnDefinition = "integer default 1")
     private int spriteNr;
+
+    @Column(columnDefinition = "varchar(255) default 'sprite_1_1.png'")
+    private String sprite_img_source;
     
     @Column(nullable = true)
     private Long helmId; 

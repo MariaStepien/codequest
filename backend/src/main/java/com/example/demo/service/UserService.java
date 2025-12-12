@@ -21,13 +21,15 @@ public class UserService {
     
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserEquipmentService userEquipmentService;
 
     @Value("${app.ranking.update.interval:300000}") 
     private long rankingUpdateInterval;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserEquipmentService userEquipmentService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userEquipmentService = userEquipmentService;
     }
 
     /**
@@ -35,6 +37,7 @@ public class UserService {
      * @param request DTO containing userLogin and password.
      * @return The newly created Users entity.
      */
+    @Transactional
     public User registerNewUser(RegisterRequest request) {
         Optional<User> existingUser = userRepository.findByUserLogin(request.getUserLogin());
         if (existingUser.isPresent()) {
@@ -48,8 +51,15 @@ public class UserService {
         newUser.setPassword(hashedPassword);
 
         newUser.setRole("USER");
+        newUser.setCoins(0);
+        newUser.setPoints(0);
+        newUser.setRank(0);
 
-        return userRepository.save(newUser);
+        User savedUser = userRepository.save(newUser);
+
+        userEquipmentService.initializeBaseEquipment(savedUser.getId());
+
+        return savedUser;
     }
     
     /**

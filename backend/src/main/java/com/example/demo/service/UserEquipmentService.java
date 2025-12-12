@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.domain.Equipment;
 import com.example.demo.domain.Equipment.EquipmentType;
+import com.example.demo.domain.User;
 import com.example.demo.domain.UserBoughtEquipment;
 import com.example.demo.domain.UserEquipment;
 import com.example.demo.dto.EquipmentDetailsDto;
@@ -18,6 +19,7 @@ import com.example.demo.dto.UserEquipmentDto;
 import com.example.demo.repos.EquipmentRepository;
 import com.example.demo.repos.UserBoughtEquipmentRepository;
 import com.example.demo.repos.UserEquipmentRepository;
+import com.example.demo.repos.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,6 +29,7 @@ public class UserEquipmentService {
     private final EquipmentRepository equipmentRepository;
     private final UserEquipmentRepository userEquipmentRepository;
     private final UserBoughtEquipmentRepository userBoughtEquipmentRepository;
+    private final UserRepository userRepository;
     
     private EquipmentDetailsDto mapEquipmentToDetailsDto(Equipment equipment) {
         if (equipment == null) return null;
@@ -82,6 +85,47 @@ public class UserEquipmentService {
                 .ownedEquipment(ownedEquipment)
                 .build();
     }
+
+    @Transactional
+    public void initializeBaseEquipment(Long userId) {
+        List<Equipment> baseItems = equipmentRepository.findByItemNumber(1); 
+        
+        if (baseItems.isEmpty()) {
+            System.err.println("Brak podstawowych przedmiotów (itemNumber=1) w bazie danych. Inicjalizacja ekwipunku pominięta.");
+            return;
+        }
+
+        UserEquipment userEquipment = new UserEquipment();
+        userEquipment.setUserId(userId);
+        userEquipment.setSpriteNr(1);
+        userEquipment.setSprite_img_source("sprite_1_1.png");
+        
+        Map<EquipmentType, Long> itemIdsByType = baseItems.stream()
+            .collect(Collectors.toMap(Equipment::getType, Equipment::getId));
+        
+        userEquipment.setHelmId(itemIdsByType.get(EquipmentType.HELM));
+        userEquipment.setArmorId(itemIdsByType.get(EquipmentType.ARMOR));
+        userEquipment.setPantsId(itemIdsByType.get(EquipmentType.PANTS));
+        userEquipment.setShoesId(itemIdsByType.get(EquipmentType.SHOES));
+        userEquipment.setWeaponId(itemIdsByType.get(EquipmentType.WEAPON));
+        
+        userEquipmentRepository.save(userEquipment);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Nie znaleziono użytkownika do inicjalizacji ekwipunku."));
+        
+        List<UserBoughtEquipment> boughtItems = baseItems.stream()
+            .map(equipment -> {
+                UserBoughtEquipment bought = new UserBoughtEquipment();
+                bought.setUser(user);
+                bought.setEquipment(equipment);
+                bought.setType(equipment.getType());
+                return bought;
+            })
+            .collect(Collectors.toList());
+            
+        userBoughtEquipmentRepository.saveAll(boughtItems);
+    }
     
     @Transactional
     public UserEquipmentDto equipItem(Long userId, Long equipmentId) {
@@ -97,7 +141,8 @@ public class UserEquipmentService {
                     return newEq;
                 });
 
-        switch (equipmentToEquip.getType()) {
+        EquipmentType type = equipmentToEquip.getType();
+        switch (type) {
             case HELM:
                 userEquipment.setHelmId(equipmentId);
                 break;
@@ -116,10 +161,15 @@ public class UserEquipmentService {
             default:
                 throw new IllegalArgumentException("Nieznany typ ekwipunku: " + equipmentToEquip.getType());
         }
-        
+
+        if (type == EquipmentType.ARMOR || type == EquipmentType.PANTS) {
+        updateSpriteInfo(userEquipment);
+        }
+
         userEquipmentRepository.save(userEquipment);
         
         return getUserEquipment(userId);
+
     }
     
     @Transactional
@@ -146,9 +196,32 @@ public class UserEquipmentService {
             default:
                 throw new IllegalArgumentException("Nieznany typ slotu: " + slotType);
         }
+
+        if (slotType == EquipmentType.ARMOR || slotType == EquipmentType.PANTS) {
+        updateSpriteInfo(userEquipment);
+        }
         
         userEquipmentRepository.save(userEquipment);
         
         return getUserEquipment(userId);
     }
+
+    private void updateSpriteInfo(UserEquipment userEquipment) {
+    Long armorId = userEquipment.getArmorId();
+    Long pantsId = userEquipment.getPantsId();
+
+    Equipment armor = (armorId != null) 
+        ? equipmentRepository.findById(armorId).orElse(null) 
+        : null;
+    
+    Equipment pants = (pantsId != null) 
+        ? equipmentRepository.findById(pantsId).orElse(null) 
+        : null;
+
+    int armorNum = (armor != null) ? armor.getItemNumber() : 1;
+    int pantsNum = (pants != null) ? pants.getItemNumber() : 1;
+    
+    String newSpriteSource = String.format("sprite_%d_%d.png", armorNum, pantsNum);
+    userEquipment.setSprite_img_source(newSpriteSource);
+}
 }

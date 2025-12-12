@@ -53,7 +53,7 @@ const InventoryItemCard = ({ item, isEquipped, onAction, userCoins }) => {
     if (isOwned && isEquipped) {
         button = (
             <div
-                className="w-full py-1 text-xs font-semibold bg-green-500 text-white text-center rounded-b-lg cursor-not-allowed" 
+                className="w-full py-1 text-xs font-semibold bg-green-500 text-white flex items-center justify-center rounded-b-lg cursor-not-allowed"
                 title="Przedmiot już założony"
             >
                 Założone
@@ -63,7 +63,7 @@ const InventoryItemCard = ({ item, isEquipped, onAction, userCoins }) => {
         button = (
             <button 
                 onClick={() => onAction('EQUIP', item.id)}
-                className="w-full py-1 text-xs font-semibold bg-indigo-500 text-white text-center rounded-b-lg hover:bg-indigo-600 transition"
+                className="w-full py-1 text-xs font-semibold bg-indigo-500 text-white flex items-center justify-center rounded-b-lg hover:bg-indigo-600 transition"
             >
                 Załóż
             </button>
@@ -73,7 +73,7 @@ const InventoryItemCard = ({ item, isEquipped, onAction, userCoins }) => {
             <button 
                 onClick={() => onAction('BUY', item.id)}
                 disabled={!canAfford}
-                className={`w-full py-1 text-xs font-semibold text-center rounded-b-lg transition 
+                className={`w-full py-1 text-xs font-semibold flex items-center justify-center rounded-b-lg transition 
                             ${canAfford ? 'bg-yellow-500 text-gray-900 hover:bg-yellow-600' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
             >
                 Kup ({item.cost})
@@ -83,7 +83,7 @@ const InventoryItemCard = ({ item, isEquipped, onAction, userCoins }) => {
 
     return (
         <div className={`flex flex-col rounded-lg shadow-md overflow-hidden transition duration-200 
-                         ${isEquipped ? 'border-2 border-green-500' : 'border border-gray-200 bg-white hover:shadow-lg'}`}>
+                         ${isEquipped ? 'border-2 border-green-500' : 'border border-gray-200 bg-white hover:shadow-lg'}`}> 
             <div className="p-2 flex-grow">
                 <div className="w-full h-20 flex items-center justify-center bg-gray-100 rounded-md mb-2">
                     <img 
@@ -323,6 +323,7 @@ export default function EquipmentPage() {
                                                 }}
                                                 userCoins={equipmentData.coins}
                                                 onAction={handleEquipmentAction}
+                                                isEquipped={isEquipped}
                                             />
                                         );
                                     })

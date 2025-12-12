@@ -9,4 +9,6 @@ import com.example.demo.domain.Equipment.EquipmentType;
 
 public interface EquipmentRepository extends JpaRepository<Equipment, Long>{
     List<Equipment> findByType(EquipmentType type);
+
+    public List<Equipment> findByItemNumber(int i);
 }
