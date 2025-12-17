@@ -42,4 +42,7 @@ public class UserCourseProgress {
     @LastModifiedDate
     private OffsetDateTime lastUpdated;
 
+    @Column(columnDefinition = "boolean default false")
+    private Boolean isFinished;
+
 }

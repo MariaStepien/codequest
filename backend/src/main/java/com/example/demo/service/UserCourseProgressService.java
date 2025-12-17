@@ -66,6 +66,11 @@ public class UserCourseProgressService {
                 progress.setCompletedLessons(newCompletedLessons);
                 progress.setLastUpdated(OffsetDateTime.now());
             }
+
+            if (newCompletedLessons == course.getTotalLessons()) {
+                progress.setIsFinished(true);
+                progress.setLastUpdated(OffsetDateTime.now());
+            }
             
         } else {
             progress = new UserCourseProgress();
@@ -90,19 +95,12 @@ public class UserCourseProgressService {
 
         return progressRecords.stream()
             .map(progress -> {
-                boolean isCompleted;
-                if (progress.getCompletedLessons() == totalLessons) {
-                    isCompleted=true;
-                } else {
-                    isCompleted=false;
-                }
-                
                 return CourseProgressByUserDetailsDto.builder()
                         .userId(progress.getUser().getId())
                         .userLogin(progress.getUser().getUserLogin())
                         .completedLessons(progress.getCompletedLessons())
                         .totalLessons(totalLessons)
-                        .isCourseCompleted(isCompleted)
+                        .isCourseCompleted(progress.getIsFinished())
                         .build();
             })
             .collect(Collectors.toList());
