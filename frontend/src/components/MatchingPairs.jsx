@@ -13,95 +13,134 @@ const shuffleArray = (array) => {
     return shuffled;
 };
 
+const PAIR_COLORS = [
+    'bg-blue-100 border-blue-400 text-blue-900',
+    'bg-amber-100 border-amber-400 text-amber-900',
+    'bg-purple-100 border-purple-400 text-purple-900',
+    'bg-pink-100 border-pink-400 text-pink-900',
+    'bg-cyan-100 border-cyan-400 text-cyan-900',
+    'bg-orange-100 border-orange-400 text-orange-900',
+];
+
 export default function MatchingPairs({ items, onTaskComplete }) {
-    const [leftSelectionKey, setLeftSelectionKey] = useState(null); 
-    const [rightSelectionKey, setRightSelectionKey] = useState(null); 
-    const [matchedPairsKeys, setMatchedPairsKeys] = useState([]); 
-    const [feedback, setFeedback] = useState(null);
-    
-    const [shuffledRightItems] = useState(() => shuffleArray(items)); 
+    const [selected, setSelected] = useState({ key: null, side: null });
+    const [userPairs, setUserPairs] = useState({});
+    const [results, setResults] = useState(null);
+    const [shuffledRightItems, setShuffledRightItems] = useState(() => shuffleArray(items));
 
-    const handleSelect = (key, type) => {
-        if (matchedPairsKeys.includes(key)) return;
+    const handleSelect = (key, side) => {
+        if (results) return;
 
-        if (type === 'left') {
-            setLeftSelectionKey(leftSelectionKey === key ? null : key); 
+        if (selected.side && selected.side !== side) {
+            const leftKey = side === 'left' ? key : selected.key;
+            const rightKey = side === 'right' ? key : selected.key;
+
+            const newPairs = { ...userPairs };
+            
+            Object.keys(newPairs).forEach(k => {
+                if (newPairs[k] === rightKey) delete newPairs[k];
+            });
+
+            newPairs[leftKey] = rightKey;
+            setUserPairs(newPairs);
+            setSelected({ key: null, side: null });
         } else {
-            setRightSelectionKey(rightSelectionKey === key ? null : key); 
+            setSelected(selected.key === key && selected.side === side 
+                ? { key: null, side: null } 
+                : { key, side }
+            );
         }
-        setFeedback(null);
     };
 
     const handleSubmit = () => {
-        if (!leftSelectionKey || !rightSelectionKey) {
-            setFeedback({ type: 'error', message: 'Wybierz jeden element z każdej kolumny.' });
-            return;
-        }
+        let correctCount = 0;
+        const evaluation = {};
 
-        if (leftSelectionKey === rightSelectionKey) { 
-            const newMatchedKeys = [...matchedPairsKeys, leftSelectionKey];
-            setMatchedPairsKeys(newMatchedKeys);
-            setFeedback({ type: 'success', message: 'Poprawne dopasowanie! Para skompletowana.' });
-            
-            if (newMatchedKeys.length === items.length) {
-                onTaskComplete(true);
-            }
-        } else {
-            setFeedback({ type: 'error', message: 'Nieprawidłowe parowanie. Spróbuj ponownie!' });
-            onTaskComplete(false);
-        }
-        setLeftSelectionKey(null);
-        setRightSelectionKey(null);
+        items.forEach(item => {
+            const isCorrect = userPairs[item.key] === item.key;
+            evaluation[item.key] = isCorrect;
+            if (isCorrect) correctCount++;
+        });
+
+        const allCorrect = correctCount === items.length;
+        setResults(evaluation);
+        onTaskComplete(allCorrect);
     };
 
-    const isFinished = matchedPairsKeys.length === items.length;
+    const handleReset = () => {
+        setUserPairs({});
+        setResults(null);
+        setSelected({ key: null, side: null });
+        setShuffledRightItems(shuffleArray(items));
+    };
 
-    const getItemStyles = (key, type) => {
-        const isMatched = matchedPairsKeys.includes(key);
-        const isSelected = (type === 'left' && leftSelectionKey === key) || (type === 'right' && rightSelectionKey === key);
+    const isAllPaired = Object.keys(userPairs).length === items.length;
 
-        if (isMatched) return 'bg-green-100 border-green-500 text-green-800 pointer-events-none opacity-80';
+    const getItemStyles = (key, side) => {
+        const isSelected = selected.key === key && selected.side === side;
         
-        if (isSelected) {
-            return 'bg-indigo-200 border-4 border-indigo-700 text-indigo-900 shadow-xl transform scale-[1.02]';
+        let pairIndex = -1;
+        let isPaired = false;
+
+        if (side === 'left') {
+            if (userPairs[key]) {
+                isPaired = true;
+                pairIndex = items.findIndex(item => item.key === key);
+            }
+        } else {
+            const leftKey = Object.keys(userPairs).find(k => userPairs[k] === key);
+            if (leftKey) {
+                isPaired = true;
+                pairIndex = items.findIndex(item => item.key === leftKey);
+            }
+        }
+
+        if (results) {
+            const leftKey = side === 'left' ? key : Object.keys(userPairs).find(k => userPairs[k] === key);
+            const isCorrect = results[leftKey];
+            return isCorrect 
+                ? 'bg-green-200 border-green-600 text-green-900 opacity-90' 
+                : 'bg-red-200 border-red-600 text-red-900';
+        }
+
+        if (isSelected) return 'bg-indigo-600 border-indigo-900 text-white shadow-lg scale-[1.05] z-10';
+        
+        if (isPaired && pairIndex !== -1) {
+            return PAIR_COLORS[pairIndex % PAIR_COLORS.length];
         }
         
         return 'bg-white text-black border-gray-300 hover:bg-gray-100';
     };
 
     return (
-        <div className="bg-gray-50 p-6 rounded-xl shadow-2xl w-full max-w-2xl mx-auto space-y-6">
-            <h3 className="text-2xl font-bold text-gray-800 border-b pb-3">
-                Dopasuj w pary
-            </h3>
+        <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-3xl mx-auto space-y-8 border border-gray-100">
+            <div className="flex justify-between items-center border-b pb-4">
+                <h3 className="text-2xl font-extrabold text-gray-800">
+                    Dopasuj pary
+                </h3>
+            </div>
 
-            <div className="flex justify-between space-x-6">
-                <div className="w-1/2 space-y-3">
-                    <h4 className="text-lg font-semibold text-gray-700 mb-2">Definicje</h4>
+            <div className="grid grid-cols-2 gap-8">
+                <div className="space-y-3">
+                    <h4 className="text-sm uppercase tracking-wider font-bold text-gray-400 mb-4">Kolumna A</h4>
                     {items.map(item => (
                         <div
-                            key={item.key} 
+                            key={item.key}
                             onClick={() => handleSelect(item.key, 'left')}
-                            className={`
-                                p-4 border-2 rounded-lg cursor-pointer transition duration-150
-                                ${getItemStyles(item.key, 'left')} 
-                            `}
+                            className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 font-medium ${getItemStyles(item.key, 'left')}`}
                         >
                             {item.left}
                         </div>
                     ))}
                 </div>
 
-                <div className="w-1/2 space-y-3">
-                    <h4 className="text-lg text-black font-semibold text-gray-700 mb-2">Znaczenia</h4>
+                <div className="space-y-3">
+                    <h4 className="text-sm uppercase tracking-wider font-bold text-gray-400 mb-4">Kolumna B</h4>
                     {shuffledRightItems.map(item => (
                         <div
-                            key={item.key} 
+                            key={item.key}
                             onClick={() => handleSelect(item.key, 'right')}
-                            className={`
-                                p-4 border-2 rounded-lg cursor-pointer transition duration-150
-                                ${getItemStyles(item.key, 'right')} 
-                            `}
+                            className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 font-medium ${getItemStyles(item.key, 'right')}`}
                         >
                             {item.right}
                         </div>
@@ -109,29 +148,39 @@ export default function MatchingPairs({ items, onTaskComplete }) {
                 </div>
             </div>
 
-            <div className="pt-4 border-t">
-                {feedback && (
-                    <p className={`mb-3 text-center font-medium ${feedback.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
-                        {feedback.message}
-                    </p>
+            <div className="pt-6 border-t space-y-4">
+                {results && (
+                    <div className={`p-4 rounded-lg text-center font-bold ${Object.values(results).every(v => v) ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+                        {Object.values(results).every(v => v) 
+                            ? 'Brawo! Wszystko poprawnie! 🎉' 
+                            : `Wynik: ${Object.values(results).filter(v => v).length} / ${items.length} poprawnych.`}
+                    </div>
                 )}
                 
-                <button
-                    onClick={handleSubmit}
-                    disabled={isFinished || !leftSelectionKey || !rightSelectionKey}
-                    className={`
-                        w-full py-3 px-4 font-semibold rounded-lg transition duration-200
-                        ${isFinished
-                            ? 'bg-green-500 text-white cursor-default'
-                            : (!leftSelectionKey || !rightSelectionKey
-                                ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                                : 'bg-indigo-600 text-white hover:bg-indigo-700'
-                            )
-                        }
-                    `}
-                >
-                    {isFinished ? 'Pary sparowane! 🎉' : 'Sparuj parę'}
-                </button>
+                <div className="flex gap-4">
+                    {results ? (
+                        <button
+                            onClick={handleReset}
+                            className="w-full py-4 bg-gray-800 text-white font-bold rounded-xl hover:bg-gray-900 transition shadow-lg"
+                        >
+                            Spróbuj ponownie
+                        </button>
+                    ) : (
+                        <button
+                            onClick={handleSubmit}
+                            disabled={!isAllPaired}
+                            className={`
+                                w-full py-4 font-bold rounded-xl transition shadow-lg
+                                ${!isAllPaired
+                                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                    : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                                }
+                            `}
+                        >
+                            {isAllPaired ? 'Sprawdź odpowiedzi' : 'Połącz wszystkie elementy'}
+                        </button>
+                    )}
+                </div>
             </div>
         </div>
     );

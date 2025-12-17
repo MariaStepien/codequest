@@ -1,21 +1,10 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types'; 
 
-/**
- * A component to display a single sentence or piece of explanatory text
- * within a clearly defined, styled box.
- * * NOTE: This component automatically signals completion to the parent 
- * LevelTemplate component upon render, as it is non-interactive.
- * * @param {object} props
- * @param {string} props.sentence The text content to display.
- * @param {string} [props.bgColor='bg-indigo-100'] Tailwind class for background color.
- * @param {string} [props.borderColor='border-indigo-400'] Tailwind class for border color.
- * @param {function} props.onTaskComplete Callback to signal LevelTemplate (REQUIRED by LevelTemplate).
- */
 export default function TextBox({ 
   sentence, 
-  bgColor = 'bg-indigo-100', 
-  borderColor = 'border-indigo-400',
+  bgColor = 'bg-slate-900', 
+  borderColor = 'border-indigo-500',
   onTaskComplete
 }) {
   
@@ -36,9 +25,9 @@ export default function TextBox({
         hover:shadow-lg
       `}
     >
-      <p className="text-lg text-gray-800 font-medium leading-relaxed">
+      <div className="text-sm md:text-base text-gray-900 font-mono whitespace-pre-wrap leading-relaxed">
         {sentence}
-      </p>
+      </div>
     </div>
   );
 }
