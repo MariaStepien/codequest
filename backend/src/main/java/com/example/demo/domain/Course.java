@@ -41,4 +41,6 @@ public class Course {
     @LastModifiedDate
     private OffsetDateTime lastUpdated;
 
+    @Column
+    private String trophyImgSource;
 }

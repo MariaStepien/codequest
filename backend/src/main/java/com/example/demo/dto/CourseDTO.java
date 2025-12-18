@@ -13,4 +13,5 @@ public class CourseDTO {
     private int totalLessons;
     private int estimatedHours;
     private Boolean isPublished;
+    private String trophyImgSource;
 }
