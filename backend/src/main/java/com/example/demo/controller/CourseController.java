@@ -1,5 +1,10 @@
 package com.example.demo.controller;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -13,7 +18,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.dto.CourseDTO;
 import com.example.demo.dto.CourseWithProgressDto;
@@ -48,6 +55,30 @@ public class CourseController {
     public ResponseEntity<CourseDTO> createCourse(@RequestBody CourseDTO courseDTO) {
         CourseDTO createdCourse = courseService.createCourse(courseDTO);
         return new ResponseEntity<>(createdCourse, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/{id}/upload-trophy")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<CourseDTO> uploadTrophy(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+        try {
+            String fileName = "trophy-" + id + "-" + file.getOriginalFilename();
+            Path uploadPath = Paths.get("uploads", "trophies");
+            
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            Path filePath = uploadPath.resolve(fileName);
+            Files.copy(file.getInputStream(), filePath, REPLACE_EXISTING);
+
+            CourseDTO courseDTO = courseService.findCourseDetailsById(id).orElseThrow();
+            courseDTO.setTrophyImgSource("trophies/" + fileName);
+            courseService.updateCourse(id, courseDTO);
+
+            return ResponseEntity.ok(courseDTO);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PutMapping("/{id}")

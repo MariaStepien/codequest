@@ -40,6 +40,7 @@ public class CourseService {
         course.setTitle(courseDTO.getTitle());
         course.setTotalLessons(courseDTO.getTotalLessons());
         course.setEstimatedHours(courseDTO.getEstimatedHours());
+        course.setTrophyImgSource(courseDTO.getTrophyImgSource());
         course.setDateCreated(OffsetDateTime.now());
         course.setLastUpdated(OffsetDateTime.now());
         course.setIsPublished(false);
@@ -56,6 +57,7 @@ public class CourseService {
             existingCourse.setTitle(courseDTO.getTitle());
             existingCourse.setTotalLessons(courseDTO.getTotalLessons());
             existingCourse.setEstimatedHours(courseDTO.getEstimatedHours());
+            existingCourse.setTrophyImgSource(courseDTO.getTrophyImgSource());
             
             if (courseDTO.getIsPublished() != null) {
                 existingCourse.setIsPublished(courseDTO.getIsPublished());
@@ -74,7 +76,8 @@ public class CourseService {
             course.getTitle(),
             course.getTotalLessons(),
             course.getEstimatedHours(),
-            course.getIsPublished()
+            course.getIsPublished(),
+            course.getTrophyImgSource()
         );
     }
 

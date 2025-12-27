@@ -77,6 +77,10 @@ public class SecurityConfig {
 
                 registry.requestMatchers("/api/progress/list-users/**").hasRole("ADMIN");
 
+                registry.requestMatchers("/api/courses/**").hasRole("ADMIN");
+
+                registry.requestMatchers("/api/uploads/**").permitAll();
+
                 // All other requests still require authentication
                 registry.anyRequest().authenticated();
             })
