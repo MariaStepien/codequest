@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { Coins, X, Shirt, Zap, AlertTriangle } from 'lucide-react';
 import Header from '../components/Header'; 
 
+const API_BASE_URL = 'http://localhost:8080/api';
+
 const EQUIPMENT_SLOTS = [
     { type: 'HELM', label: 'Hełm' },
     { type: 'ARMOR', label: 'Zbroja' },
@@ -29,17 +31,17 @@ const getCharacterSprite = (armorItem, pantsItem) => {
     const fileName = `sprite_${armorNum}_${pantsNum}.png`;
 
     try {
-        return new URL(`../assets/sprite/${fileName}`, import.meta.url).href;
+        return `${API_BASE_URL}/uploads/sprites/sprite_${armorNum}_${pantsNum}.png`;
     } catch (error) {
         return new URL(`../assets/sprite/sprite_1_1.png`, import.meta.url).href; 
     }
 };
 
-const getItemIcon = (imgSource, type) => {
-    const folder = type.toLowerCase();
+const getItemIcon = (imgSource) => {
+    if (!imgSource) return '';
 
     try {
-        return new URL(`../assets/${folder}/${imgSource}`, import.meta.url).href;
+        return `${API_BASE_URL}/${imgSource}`;
     } catch (e) {
         return new URL('sprite_1_1.png', import.meta.url).href;
     }

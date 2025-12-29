@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { LogOut, LayoutDashboard, BookOpenText, ListPlus, Edit, User } from 'lucide-react';
+import { LogOut, LayoutDashboard, BookOpenText, ListPlus, Edit, User, Backpack, ArchiveRestore } from 'lucide-react';
 
 const navLinks = [
   { id: 'admin-dashboard', name: 'Panel', icon: LayoutDashboard, href: '/admin-dashboard' },
   { id: 'admin-courses', name: 'Lista kursów', icon: BookOpenText, href: '/admin/courses' },
   { id: 'add-course', name: 'Dodaj kurs', icon: ListPlus, href: '/admin/create-course' },
-  { id: 'add-lesson', name: 'Dodaj lekcję', icon: Edit, href: '/admin/create-lesson' }
+  { id: 'add-lesson', name: 'Dodaj lekcję', icon: Edit, href: '/admin/create-lesson' },
+  { id: 'admin-equipment-items', name: 'Lista przedmiotów', icon: Backpack, href: '/admin/equipment' },
+  { id: 'add-equipment', name: 'Dodaj ekwipunek', icon: ArchiveRestore, href: '/admin/add-equipment'}
 ];
 
 export default function AdminSidebar({ userLogin, currentPage }) { 

@@ -75,6 +75,8 @@ public class SecurityConfig {
 
                 registry.requestMatchers("/api/equipment/**").permitAll();
 
+                registry.requestMatchers("/api/equipment").hasRole("ADMIN");
+
                 registry.requestMatchers("/api/progress/list-users/**").hasRole("ADMIN");
 
                 registry.requestMatchers("/api/courses/**").hasRole("ADMIN");

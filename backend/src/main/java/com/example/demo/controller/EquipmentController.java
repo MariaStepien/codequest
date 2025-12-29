@@ -1,19 +1,25 @@
 package com.example.demo.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.domain.Equipment;
 import com.example.demo.domain.Equipment.EquipmentType;
 import com.example.demo.service.EquipmentService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,10 +36,39 @@ public class EquipmentController {
      * @param equipment new item data.
      * @return Saved Equipment.
      */
-    @PostMapping
-    public ResponseEntity<Equipment> addEquipment(@RequestBody Equipment equipment) {
-        Equipment savedEquipment = equipmentService.saveEquipment(equipment);
-        return new ResponseEntity<>(savedEquipment, HttpStatus.CREATED); 
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> addEquipment(
+            @RequestPart("equipment") String equipmentJson,
+            @RequestPart("file") MultipartFile file) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            Equipment equipment = objectMapper.readValue(equipmentJson, Equipment.class);
+            
+            Equipment saved = equipmentService.saveEquipment(equipment, file);
+            return new ResponseEntity<>(saved, HttpStatus.CREATED);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Błąd podczas zapisywania pliku: " + e.getMessage());
+        }
+    }
+
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> updateEquipment(
+            @PathVariable Long id,
+            @RequestPart("equipment") String equipmentJson,
+            @RequestPart(value = "file", required = false) MultipartFile file) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            Equipment equipmentDetails = objectMapper.readValue(equipmentJson, Equipment.class);
+            
+            Equipment updated = equipmentService.updateEquipment(id, equipmentDetails, file);
+            return ResponseEntity.ok(updated);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error updating equipment: " + e.getMessage());
+        }
     }
 
     /**
@@ -67,4 +102,12 @@ public class EquipmentController {
         List<Equipment> allEquipment = equipmentService.getAllEquipment();
         return ResponseEntity.ok(allEquipment);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Equipment> getEquipmentById(@PathVariable Long id) {
+        return equipmentService.getEquipmentById(id)
+                .map(ResponseEntity::ok)
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
 }
