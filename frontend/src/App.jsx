@@ -21,6 +21,7 @@ import TrophiesPage from './pages/TrophiesPage'
 import AddEquipmentPage from './pages/AddEquipment'
 import AdminEquipmentListPage from './pages/AdminEquipmentListPage'
 import EditEquipmentPage from './pages/EditEquipmentPage'
+import AddSpritePage from './pages/AddSpritePage'
 
 function App() {
   return (
@@ -75,6 +76,8 @@ function App() {
       <Route path='/admin/equipment' element={<AdminEquipmentListPage />} />
 
       <Route path='/admin/edit-equipment/:id' element={<EditEquipmentPage />} />
+
+      <Route path='/admin/add-sprite' element={<AddSpritePage />} />
 
       {/* Error screen */}
       <Route path="*" element={<h1>404 Not Found</h1>} />

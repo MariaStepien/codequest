@@ -81,6 +81,8 @@ public class SecurityConfig {
 
                 registry.requestMatchers("/api/courses/**").hasRole("ADMIN");
 
+                registry.requestMatchers("/api/sprites/upload").hasRole("ADMIN");
+
                 registry.requestMatchers("/api/uploads/**").permitAll();
 
                 // All other requests still require authentication
