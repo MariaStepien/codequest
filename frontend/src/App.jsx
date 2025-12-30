@@ -22,6 +22,9 @@ import AddEquipmentPage from './pages/AddEquipment'
 import AdminEquipmentListPage from './pages/AdminEquipmentListPage'
 import EditEquipmentPage from './pages/EditEquipmentPage'
 import AddSpritePage from './pages/AddSpritePage'
+import AddEnemyPage from './pages/AddEnemyPage'
+import EnemyListPage from './pages/EnemyListPage'
+import EditEnemyPage from './pages/EditEnemyPage'
 
 function App() {
   return (
@@ -78,6 +81,12 @@ function App() {
       <Route path='/admin/edit-equipment/:id' element={<EditEquipmentPage />} />
 
       <Route path='/admin/add-sprite' element={<AddSpritePage />} />
+
+      <Route path='/admin/add-enemy' element={<AddEnemyPage />} />
+
+      <Route path='/admin/enemies' element={<EnemyListPage />} />
+
+      <Route path='/admin/edit-enemy/:id' element={<EditEnemyPage />} />
 
       {/* Error screen */}
       <Route path="*" element={<h1>404 Not Found</h1>} />

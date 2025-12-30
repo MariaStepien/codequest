@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LogOut, LayoutDashboard, BookOpenText, ListPlus, Edit, User, Backpack, ArchiveRestore, PersonStanding } from 'lucide-react';
+import { LogOut, LayoutDashboard, BookOpenText, ListPlus, Edit, User, Backpack, ArchiveRestore, PersonStanding, Skull, SkullIcon } from 'lucide-react';
 
 const navLinks = [
   { id: 'admin-dashboard', name: 'Panel', icon: LayoutDashboard, href: '/admin-dashboard' },
@@ -8,7 +8,9 @@ const navLinks = [
   { id: 'add-lesson', name: 'Dodaj lekcję', icon: Edit, href: '/admin/create-lesson' },
   { id: 'admin-equipment-items', name: 'Lista przedmiotów', icon: Backpack, href: '/admin/equipment' },
   { id: 'add-equipment', name: 'Dodaj ekwipunek', icon: ArchiveRestore, href: '/admin/add-equipment'},
-  { id: 'add-sprite', name: 'Dodaj sprite', icon: PersonStanding, href: '/admin/add-sprite'}
+  { id: 'add-sprite', name: 'Dodaj sprite', icon: PersonStanding, href: '/admin/add-sprite'},
+  { id: 'admin-enemies', name: 'Lista wrogów', icon: SkullIcon, href: '/admin/enemies'},
+  { id: 'add-enemy', name: 'Dodaj wroga', icon: Skull, href: '/admin/add-enemy'}
 ];
 
 export default function AdminSidebar({ userLogin, currentPage }) { 
