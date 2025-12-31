@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import {Search, Edit, Skull} from 'lucide-react';
+import {Search, Edit, Skull, Trash2} from 'lucide-react';
 import AdminSidebar from '../components/AdminSidebar';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const API_BASE_URL = 'http://localhost:8080/api';
 
@@ -41,6 +41,25 @@ export default function EnemyListPage() {
     const filteredEnemies = enemies.filter(enemy => 
         enemy.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    const handleDelete = async (id, name) => {
+        if (window.confirm(`Czy na pewno chcesz usunąć przeciwnika: ${name}?`)) {
+            try {
+                const res = await fetch(`${API_BASE_URL}/enemies/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${jwtToken}` }
+                });
+
+                if (res.ok) {
+                    setEnemies(enemies.filter(e => e.id !== id));
+                } else {
+                    alert("Błąd podczas usuwania przeciwnika.");
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    };
 
     return (
         <div className="min-h-screen bg-gray-50 flex">
@@ -95,12 +114,20 @@ export default function EnemyListPage() {
                                                 <td className="px-6 py-4 text-sm font-medium text-gray-500">#{enemy.id}</td>
                                                 <td className="px-6 py-4 text-sm font-bold text-gray-900">{enemy.name}</td>
                                                 <td className="px-6 py-4 text-sm text-gray-500 font-mono text-xs">{enemy.imgSource}</td>
-                                                <td className="px-6 py-4 text-right">
+                                                <td className="px-6 py-4 text-right space-x-2">
                                                     <button 
                                                         onClick={() => navigate(`/admin/edit-enemy/${enemy.id}`)}
                                                         className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition"
+                                                        title="Edytuj"
                                                     >
                                                         <Edit className="w-5 h-5" />
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => handleDelete(enemy.id, enemy.name)}
+                                                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+                                                        title="Usuń"
+                                                    >
+                                                        <Trash2 className="w-5 h-5" />
                                                     </button>
                                                 </td>
                                             </tr>

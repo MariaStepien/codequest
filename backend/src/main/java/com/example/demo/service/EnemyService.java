@@ -77,4 +77,19 @@ public class EnemyService {
         return enemyRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Nie znaleziono przeciwnika"));
     }
+
+    @Transactional
+    public void deleteEnemy(Long id) throws IOException {
+        Enemy enemy = enemyRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Nie znaleziono przeciwnika o tym ID"));
+
+        Path filePath = Paths.get(enemy.getImgSource()).toAbsolutePath().normalize();
+        try {
+            Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            System.err.println("Could not delete file: " + filePath);
+        }
+
+        enemyRepository.delete(enemy);
+    }
 }
