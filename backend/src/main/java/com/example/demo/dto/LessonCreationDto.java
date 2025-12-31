@@ -18,4 +18,8 @@ public class LessonCreationDto {
     
     @NotBlank(message = "Tasks JSON cannot be empty")
     private String tasksJson;
+    
+    private boolean hasEnemy;
+
+    private Long enemyId;
 }

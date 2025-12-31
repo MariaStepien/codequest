@@ -19,6 +19,10 @@ export default function EditLessonPage() {
     const [isDataLoading, setIsDataLoading] = useState(true);
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState('');
+
+    const [enemies, setEnemies] = useState([]);
+    const [hasEnemy, setHasEnemy] = useState(false);
+    const [selectedEnemyId, setSelectedEnemyId] = useState('');
     
     const currentPage = 'edit-lesson';
     const jwtToken = localStorage.getItem('token');
@@ -35,6 +39,8 @@ export default function EditLessonPage() {
         const fetchData = async () => {
             setError(null);
             setIsDataLoading(true);
+            setHasEnemy(hasEnemy);
+            setSelectedEnemyId(selectedEnemyId || '');
 
             try {
                 const lessonResponse = await fetch(`/api/lessons/${lessonId}`, {
@@ -81,6 +87,13 @@ export default function EditLessonPage() {
                 console.error("Błąd podczas ładowania listy kursów:", err);
             }
 
+            fetch('http://localhost:8080/api/enemies', {
+                headers: { 'Authorization': `Bearer ${jwtToken}` }
+            })
+            .then(res => res.json())
+            .then(data => setEnemies(data))
+            .catch(err => console.error(err));
+
             setIsDataLoading(false);
         };
 
@@ -109,6 +122,8 @@ export default function EditLessonPage() {
         const finalData = {
             ...lessonData,
             tasksJson: JSON.stringify({ tasks }),
+            hasEnemy: hasEnemy,
+            enemyId: hasEnemy ? selectedEnemyId : null
         };
 
         setIsLoading(true);
@@ -225,6 +240,45 @@ export default function EditLessonPage() {
                                 <p className="mt-1 text-xs text-gray-500">Aktualnie: {selectedCourseTitle}</p>
                             </div>
                         </div>
+                    </div>
+
+                    <div className="bg-white p-6 rounded-xl border border-gray-200 mb-6">
+                        <div className="flex items-center justify-between mb-4">
+                            <label className="text-lg font-bold text-gray-700">Przeciwnik w lekcji</label>
+                            <button
+                                type="button"
+                                onClick={() => setHasEnemy(!hasEnemy)}
+                                className={`px-4 py-2 rounded-lg font-bold transition ${hasEnemy ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-400'}`}
+                            >
+                                {hasEnemy ? "Aktywny" : "Brak przeciwnika"}
+                            </button>
+                        </div>
+
+                        {hasEnemy && (
+                            <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
+                                <select
+                                    value={selectedEnemyId}
+                                    onChange={(e) => setSelectedEnemyId(e.target.value)}
+                                    className="text-black w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                >
+                                    <option value="">Wybierz przeciwnika...</option>
+                                    {enemies.map(enemy => (
+                                        <option key={enemy.id} value={enemy.id}>{enemy.name}</option>
+                                    ))}
+                                </select>
+                                
+                                {selectedEnemyId && enemies.find(e => e.id == selectedEnemyId) && (
+                                    <div className="flex items-center space-x-4 p-3 bg-indigo-50 rounded-lg">
+                                        <img 
+                                            src={`http://localhost:8080/api/${enemies.find(e => e.id == selectedEnemyId).imgSource}`} 
+                                            className="w-12 h-12 object-contain" 
+                                            alt="preview"
+                                        />
+                                        <span className="text-sm font-medium text-indigo-700">Podgląd wybranego przeciwnika</span>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     <div className="bg-white shadow-xl rounded-xl p-6 space-y-6">

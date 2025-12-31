@@ -28,4 +28,10 @@ public class Lesson {
 
     @Column(name = "tasks_json", columnDefinition = "TEXT")
     private String tasksJson;
+
+    @Column(name = "has_enemy", nullable = false, columnDefinition = "boolean default false")
+    private boolean hasEnemy = false;
+
+    @Column(name = "enemy_id")
+    private Long enemyId;
 }

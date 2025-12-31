@@ -11,6 +11,7 @@ public class LessonDto {
     private Long id;
     private String title;
     private Integer orderIndex;
-    
     private List<TaskDto> tasks;
+    private boolean hasEnemy;
+    private Long enemyId;
 }
