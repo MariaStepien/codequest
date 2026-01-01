@@ -310,23 +310,45 @@ export default function EditLessonPage() {
                             </button>
                         </div>
 
-                        {hasEnemy && (() => {
-                            const enemy = enemies.find(e => e.id == selectedEnemyId);
-                            if (!enemy) return null;
-
-                            return (
-                                <div className="flex items-center space-x-4 p-3 bg-indigo-50 rounded-lg">
-                                    <img
-                                        src={`http://localhost:8080/api/${enemy.imgSource}`}
-                                        className="w-12 h-12 object-contain"
-                                        alt={enemy.name}
-                                    />
-                                    <span className="text-sm font-medium text-indigo-700">
-                                        {enemy.name}
-                                    </span>
+                        {hasEnemy && (
+                            <div className="space-y-4">
+                                <div>
+                                    <label htmlFor="enemySelect" className="block text-sm font-medium text-gray-700 mb-1">Wybierz przeciwnika</label>
+                                    <select
+                                        id="enemySelect"
+                                        value={selectedEnemyId}
+                                        onChange={(e) => setSelectedEnemyId(e.target.value)}
+                                        className="text-black block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border"
+                                    >
+                                        <option value="">-- Wybierz z listy --</option>
+                                        {enemies.map(enemy => (
+                                            <option key={enemy.id} value={enemy.id}>
+                                                {enemy.name}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
-                            );
-                        })()}
+
+                                {selectedEnemyId && (
+                                    (() => {
+                                        const enemy = enemies.find(e => e.id == selectedEnemyId);
+                                        if (!enemy) return null;
+                                        return (
+                                            <div className="flex items-center space-x-4 p-3 bg-indigo-50 rounded-lg">
+                                                <img
+                                                    src={`http://localhost:8080/api/${enemy.imgSource}`}
+                                                    className="w-12 h-12 object-contain"
+                                                    alt={enemy.name}
+                                                />
+                                                <span className="text-sm font-medium text-indigo-700">
+                                                    Wybrano: {enemy.name}
+                                                </span>
+                                            </div>
+                                        );
+                                    })()
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     <div className="bg-white shadow-xl rounded-xl p-6 space-y-6">

@@ -75,7 +75,7 @@ public class EnemyService {
     @Transactional(readOnly = true)
     public Enemy getEnemyById(Long id) {
         return enemyRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Nie znaleziono przeciwnika"));
+                .orElseThrow();
     }
 
     @Transactional

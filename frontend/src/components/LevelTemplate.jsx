@@ -8,6 +8,8 @@ import MultipleChoice from './MultipleChoice';
 import OrderableList from './OrderableList';
 import TextBox from './TextBox';
 import CodeFix from './CodeFix';
+import PlayerSprite from './PlayerSprite';
+import EnemySprite from './EnemySprite';
 
 import defaultLevelBackground from '../assets/testbackground.png';
 
@@ -228,6 +230,15 @@ export default function LevelTemplate({ nextLevelPath }) {
                     &times;
                 </button>
             )}
+            
+            <div className="flex-shrink-0 mb-20">
+                {lessonData?.hasEnemy ? (
+                    <PlayerSprite/>
+                ) : (
+                    <div className="w-32 h-40"></div>
+                )}
+            </div>
+            
 
             <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-2xl p-8 w-full max-w-3xl border-t-8 border-indigo-500">
                 <header className="mb-6 border-b pb-4">
@@ -268,6 +279,14 @@ export default function LevelTemplate({ nextLevelPath }) {
                             {currentTaskIndex < tasks.length - 1 ? 'Następne zadanie' : 'Ukończ poziom'}
                         </button>
                     </div>
+                )}
+            </div>
+
+            <div className="flex-shrink-0 mb-20">
+                {lessonData?.hasEnemy && lessonData?.enemyId ? (
+                    <EnemySprite enemyId={lessonData.enemyId} />
+                ) : (
+                    <div className="w-32 h-40"></div>
                 )}
             </div>
 

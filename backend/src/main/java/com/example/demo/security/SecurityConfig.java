@@ -87,7 +87,7 @@ public class SecurityConfig {
 
                 registry.requestMatchers("/api/enemies").hasRole("ADMIN");
 
-                registry.requestMatchers("/api/enemies/**").hasRole("ADMIN");
+                registry.requestMatchers("/api/enemies/**").permitAll();
 
                 // All other requests still require authentication
                 registry.anyRequest().authenticated();
