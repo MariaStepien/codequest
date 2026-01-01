@@ -34,4 +34,7 @@ public class Lesson {
 
     @Column(name = "enemy_id")
     private Long enemyId;
+
+    @Column(name = "background_img_source")
+    private String backgroundImage;
 }

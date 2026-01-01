@@ -1,11 +1,17 @@
 package com.example.demo.service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.domain.Lesson;
 import com.example.demo.dto.LessonCreationDto;
@@ -27,6 +33,7 @@ public class LessonService {
 
     private final LessonRepository lessonRepository;
     private final ObjectMapper objectMapper; 
+    private final String UPLOAD_DIR = "uploads/backgrounds";
 
     /**
      * Retrieves a lesson by ID, including the parsed list of tasks.
@@ -62,7 +69,7 @@ public class LessonService {
         return lessonOptional.map(this::mapToDtoWithTasks);
     }
 
-    public LessonDto createLesson(LessonCreationDto creationDto) {
+    public LessonDto createLesson(LessonCreationDto creationDto, MultipartFile file) throws IOException {
         Lesson lesson = new Lesson();
         lesson.setCourseId(creationDto.getCourseId());
         lesson.setTitle(creationDto.getTitle());
@@ -87,6 +94,10 @@ public class LessonService {
         
         lesson.setTasksJson(creationDto.getTasksJson());
         
+        if (file != null && !file.isEmpty()) {
+            lesson.setBackgroundImage(saveFile(file));
+        }
+        
         Lesson savedLesson = lessonRepository.save(lesson);
         
         return mapToDtoWithTasks(savedLesson); 
@@ -101,7 +112,7 @@ public class LessonService {
     }
 
     @Transactional
-    public LessonDto updateLesson(Long lessonId, LessonCreationDto updateDto) {
+    public LessonDto updateLesson(Long lessonId, LessonCreationDto updateDto, MultipartFile file) throws IOException{
         Lesson lesson = lessonRepository.findById(lessonId)
             .orElseThrow(() -> new RuntimeException("Lesson not found with ID: " + lessonId));
 
@@ -114,6 +125,10 @@ public class LessonService {
         
         if (updateDto.getCourseId() != null) {
              lesson.setCourseId(updateDto.getCourseId());
+        }
+
+        if (file != null && !file.isEmpty()) {
+            lesson.setBackgroundImage(saveFile(file));
         }
 
         try {
@@ -142,6 +157,8 @@ public class LessonService {
         if (lesson.isHasEnemy()){
             lessonDto.setEnemyId(lesson.getEnemyId());
         }
+        lessonDto.setBackgroundImage(lesson.getBackgroundImage());
+
         return lessonDto;
     }
 
@@ -155,6 +172,8 @@ public class LessonService {
         if (lesson.isHasEnemy()){
             lessonDto.setEnemyId(lesson.getEnemyId());
         }
+        lessonDto.setBackgroundImage(lesson.getBackgroundImage());
+
         
         try {
             JsonNode rootNode = objectMapper.readTree(lesson.getTasksJson());
@@ -176,5 +195,16 @@ public class LessonService {
         }
 
         return lessonDto;
+    }
+
+    private String saveFile(MultipartFile file) throws IOException {
+        Path uploadPath = Paths.get(UPLOAD_DIR).toAbsolutePath().normalize();
+        if (!Files.exists(uploadPath)) Files.createDirectories(uploadPath);
+
+        String fileName = file.getOriginalFilename();
+        Path targetLocation = uploadPath.resolve(fileName);
+        Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+
+        return UPLOAD_DIR + "/" + fileName;
     }
 }

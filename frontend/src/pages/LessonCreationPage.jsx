@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminSidebar from '../components/AdminSidebar'; 
-import { Upload, X, CheckCircle } from 'lucide-react';
+import { Upload, X, CheckCircle, ImageIcon } from 'lucide-react';
 import TaskEditor from '../components/TaskEditor';
 
 const initialLessonData = {
@@ -25,6 +25,8 @@ export default function LessonCreationPage() {
     const [enemies, setEnemies] = useState([]);
     const [hasEnemy, setHasEnemy] = useState(false);
     const [selectedEnemyId, setSelectedEnemyId] = useState('');
+
+    const [bgFile, setBgFile] = useState(null);
 
     const jwtToken = localStorage.getItem('token');
     const storedRole = localStorage.getItem('role');
@@ -133,14 +135,19 @@ export default function LessonCreationPage() {
             enemyId: hasEnemy ? selectedEnemyId : null
         };
 
+        const formData = new FormData();
+        formData.append('lesson', new Blob([JSON.stringify(lessonPayload)], { type: 'application/json' }));
+        if (bgFile) {
+            formData.append('file', bgFile);
+        }
+
         try {
             const response = await fetch('/api/lessons/create', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${jwtToken}`,
+                    'Authorization': `Bearer ${jwtToken}`
                 },
-                body: JSON.stringify(lessonPayload),
+                body: formData,
             });
 
             if (response.status === 403) {
@@ -259,6 +266,44 @@ export default function LessonCreationPage() {
                                 className="text-black mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-3 border focus:ring-indigo-500 focus:border-indigo-500"
                                 placeholder="Np. 1, 2, 3..."
                             />
+                        </div>
+                        <div className="bg-white p-6 rounded-xl border border-gray-200 mb-6">
+                            <label className="text-lg font-bold text-gray-700 block mb-4">Tło lekcji (opcjonalnie)</label>
+                            
+                            {bgFile && (
+                                <div className="mb-4">
+                                    <p className="text-sm text-gray-500 mb-2">Wybrane zdjęcie:</p>
+                                    <div className='flex justify-center'>
+                                        <img 
+                                            src={URL.createObjectURL(bgFile)} 
+                                            alt="Background preview" 
+                                            className="h-32 rounded-lg border object-cover"
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="flex items-center justify-center w-full">
+                                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+                                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                        <ImageIcon className="w-8 h-8 text-gray-400 mb-2" />
+                                        <p className="text-sm text-gray-500 text-center px-4">
+                                            {bgFile ? (
+                                                <span className="font-medium text-indigo-600">{bgFile.name}</span>
+                                            ) : (
+                                                "Kliknij, aby dodać zdjęcie tła"
+                                            )}
+                                        </p>
+                                        <p className="text-xs text-gray-400 mt-1">PNG, JPG up to 10MB</p>
+                                    </div>
+                                    <input 
+                                        type="file" 
+                                        className="hidden" 
+                                        onChange={(e) => setBgFile(e.target.files[0])} 
+                                        accept="image/*"
+                                    />
+                                </label>
+                            </div>
                         </div>
                         <div className="bg-white p-6 rounded-xl border border-gray-200 mb-6">
                             <div className="flex items-center justify-between mb-4">

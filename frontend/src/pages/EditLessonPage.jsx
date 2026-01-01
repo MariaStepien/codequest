@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminSidebar from '../components/AdminSidebar';
-import { Save, X, CheckCircle, Loader2, Edit } from 'lucide-react';
+import { Save, X, CheckCircle, Loader2, Edit, ImageIcon } from 'lucide-react';
 import TaskEditor from '../components/TaskEditor';
 
 export default function EditLessonPage() { 
@@ -23,6 +23,11 @@ export default function EditLessonPage() {
     const [enemies, setEnemies] = useState([]);
     const [hasEnemy, setHasEnemy] = useState(false);
     const [selectedEnemyId, setSelectedEnemyId] = useState('');
+
+    const [bgFile, setBgFile] = useState(null);
+    const [currentBgImage, setCurrentBgImage] = useState('');
+    const [bgPreviewUrl, setBgPreviewUrl] = useState(null);
+
     
     const currentPage = 'edit-lesson';
     const jwtToken = localStorage.getItem('token');
@@ -61,6 +66,10 @@ export default function EditLessonPage() {
                     } else {
                         setTasks([]);
                     }
+
+                    setCurrentBgImage(lesson.backgroundImage);
+                    setHasEnemy(lesson.hasEnemy);
+                    setSelectedEnemyId(lesson.selectedEnemyId || '');
                     
                 } else {
                     setError(`Nie udało się pobrać szczegółów lekcji o ID: ${lessonId}.`);
@@ -126,6 +135,10 @@ export default function EditLessonPage() {
             enemyId: hasEnemy ? selectedEnemyId : null
         };
 
+        const formData = new FormData();
+        formData.append('lesson', new Blob([JSON.stringify(finalData)], { type: 'application/json' }));
+        if (bgFile) formData.append('file', bgFile);
+
         setIsLoading(true);
         setError(null);
         setSuccessMessage('');
@@ -134,14 +147,14 @@ export default function EditLessonPage() {
             const response = await fetch(`/api/lessons/${lessonId}`, {
                 method: 'PUT',
                 headers: { 
-                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${jwtToken}`
                 },
-                body: JSON.stringify(finalData),
+                body:formData,
             });
 
             if (response.ok) {
                 const updatedLesson = await response.json();
+                setCurrentBgImage(updatedLesson.backgroundImage);
                 setSuccessMessage(`Lekcja "${updatedLesson.title}" została pomyślnie zaktualizowana.`);
             } else if (response.status === 404) {
                 setError("Błąd: Nie znaleziono lekcji o podanym ID.");
@@ -241,6 +254,49 @@ export default function EditLessonPage() {
                             </div>
                         </div>
                     </div>
+                    <div className="bg-white p-6 rounded-xl border border-gray-200 mb-6">
+                        <label className="text-lg font-bold text-gray-700 block mb-4">Tło lekcji</label>
+                        {(bgPreviewUrl || currentBgImage) && (
+                            <div className="mb-4">
+                                <p className="text-sm text-gray-500 mb-2">
+                                    {bgPreviewUrl ? "Podgląd nowego zdjęcia:" : "Aktualne tło:"}
+                                </p>
+                                <div className="flex justify-center">
+                                    <img
+                                        src={bgPreviewUrl || `http://localhost:8080/api/${currentBgImage}`}
+                                        alt="Background preview"
+                                        className="h-32 rounded-lg border object-cover"
+                                    />
+                                </div>
+                            </div>
+                        )}
+                        <div className="flex items-center justify-center w-full">
+                            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+                                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                    <ImageIcon className="w-8 h-8 text-gray-400 mb-2" />
+                                    <p className="text-sm text-gray-500 text-center px-4">
+                                        {bgFile ? (
+                                            <span className="font-medium text-indigo-600">{bgFile.name}</span>
+                                        ) : (
+                                            "Kliknij, aby zmienić zdjęcie tła"
+                                        )}
+                                    </p>
+                                </div>
+                                <input 
+                                    type="file"
+                                    className="hidden"
+                                    accept="image/*"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                            setBgFile(file);
+                                            setBgPreviewUrl(URL.createObjectURL(file));
+                                        }
+                                    }}
+                                />
+                            </label>
+                        </div>
+                    </div>
 
                     <div className="bg-white p-6 rounded-xl border border-gray-200 mb-6">
                         <div className="flex items-center justify-between mb-4">
@@ -254,31 +310,23 @@ export default function EditLessonPage() {
                             </button>
                         </div>
 
-                        {hasEnemy && (
-                            <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
-                                <select
-                                    value={selectedEnemyId}
-                                    onChange={(e) => setSelectedEnemyId(e.target.value)}
-                                    className="text-black w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                >
-                                    <option value="">Wybierz przeciwnika...</option>
-                                    {enemies.map(enemy => (
-                                        <option key={enemy.id} value={enemy.id}>{enemy.name}</option>
-                                    ))}
-                                </select>
-                                
-                                {selectedEnemyId && enemies.find(e => e.id == selectedEnemyId) && (
-                                    <div className="flex items-center space-x-4 p-3 bg-indigo-50 rounded-lg">
-                                        <img 
-                                            src={`http://localhost:8080/api/${enemies.find(e => e.id == selectedEnemyId).imgSource}`} 
-                                            className="w-12 h-12 object-contain" 
-                                            alt="preview"
-                                        />
-                                        <span className="text-sm font-medium text-indigo-700">Podgląd wybranego przeciwnika</span>
-                                    </div>
-                                )}
-                            </div>
-                        )}
+                        {hasEnemy && (() => {
+                            const enemy = enemies.find(e => e.id == selectedEnemyId);
+                            if (!enemy) return null;
+
+                            return (
+                                <div className="flex items-center space-x-4 p-3 bg-indigo-50 rounded-lg">
+                                    <img
+                                        src={`http://localhost:8080/api/${enemy.imgSource}`}
+                                        className="w-12 h-12 object-contain"
+                                        alt={enemy.name}
+                                    />
+                                    <span className="text-sm font-medium text-indigo-700">
+                                        {enemy.name}
+                                    </span>
+                                </div>
+                            );
+                        })()}
                     </div>
 
                     <div className="bg-white shadow-xl rounded-xl p-6 space-y-6">

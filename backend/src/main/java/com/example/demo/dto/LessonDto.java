@@ -14,4 +14,5 @@ public class LessonDto {
     private List<TaskDto> tasks;
     private boolean hasEnemy;
     private Long enemyId;
+    private String backgroundImage;
 }

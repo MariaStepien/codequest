@@ -9,9 +9,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.dto.LessonCreationDto;
 import com.example.demo.dto.LessonDto;
@@ -37,13 +38,15 @@ public class LessonController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/create")
+    @PostMapping(value = "/create", consumes = {"multipart/form-data"})
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<LessonDto> createLesson(@RequestBody LessonCreationDto creationDto) {
+    public ResponseEntity<LessonDto> createLesson(
+            @RequestPart("lesson") LessonCreationDto creationDto,
+            @RequestPart(value = "file", required = false) MultipartFile file) {
         try {
-            LessonDto createdLesson = lessonService.createLesson(creationDto);
+            LessonDto createdLesson = lessonService.createLesson(creationDto, file);
             return new ResponseEntity<>(createdLesson, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             return ResponseEntity.badRequest().build(); 
         }
     }
@@ -66,22 +69,20 @@ public class LessonController {
         return ResponseEntity.ok(lessons);
     }
 
-    @PutMapping("/{lessonId}")
+    @PutMapping(value = "/{lessonId}", consumes = {"multipart/form-data"})
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<LessonDto> updateLesson(
             @PathVariable Long lessonId, 
-            @RequestBody LessonCreationDto updateDto) {
+            @RequestPart("lesson") LessonCreationDto updateDto,
+            @RequestPart(value = "file", required = false) MultipartFile file) {
         try {
-            LessonDto updatedLesson = lessonService.updateLesson(lessonId, updateDto);
+            LessonDto updatedLesson = lessonService.updateLesson(lessonId, updateDto, file);
             return ResponseEntity.ok(updatedLesson);
-        } catch (RuntimeException e) {
-            if (e.getMessage().contains("not found")) {
-                 return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            if (e.getMessage() != null && e.getMessage().contains("not found")) {
+                return ResponseEntity.notFound().build();
             }
-            if (e instanceof IllegalArgumentException) {
-                 return ResponseEntity.badRequest().build();
-            }
-            throw e; 
+            return ResponseEntity.badRequest().build();
         }
     }
 }
