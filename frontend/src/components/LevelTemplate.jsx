@@ -9,7 +9,7 @@ import OrderableList from './OrderableList';
 import TextBox from './TextBox';
 import CodeFix from './CodeFix';
 
-import levelBackground from '../assets/testbackground.png';
+import defaultLevelBackground from '../assets/testbackground.png';
 
 const TaskComponentMap = {
     'TextBox': TextBox,
@@ -30,28 +30,21 @@ const formatTime = (totalSeconds) => {
 };
 
 const calculateStars = (currentHealth) => {
-    if (currentHealth === 100) {
-        return 3;
-    } else if (currentHealth >= 60) {
-        return 2;
-    } else if (currentHealth >= 20) {
-        return 1;
-    } else {
-        return 0;
-    }
+    if (currentHealth === 100) return 3;
+    if (currentHealth >= 60) return 2;
+    if (currentHealth >= 20) return 1;
+    return 0;
 };
 
 const calculatePoints = (timeTakenSeconds) => {
     const MAX_POINTS = 1000;
     const TIME_PENALTY_RATE = 1;
     const MIN_POINTS = 50;
-
     let calculatedPoints = MAX_POINTS - (timeTakenSeconds * TIME_PENALTY_RATE);
-
     return Math.max(MIN_POINTS, calculatedPoints);
 };
 
-export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBackground }) {
+export default function LevelTemplate({ nextLevelPath }) {
     const { courseId, levelNumber: routeLevelNumber } = useParams();
     const orderIndex = routeLevelNumber ? parseInt(routeLevelNumber, 10) : null;
     
@@ -195,8 +188,15 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
         }
     };
 
+    const getBackgroundImage = () => {
+        if (lessonData && lessonData.backgroundImage) {
+            return `url(http://localhost:8080/api/${lessonData.backgroundImage})`;
+        }
+        return `url(${defaultLevelBackground})`;
+    };
+
     const backgroundStyle = {
-        backgroundImage: `url(${backgroundImage})`,
+        backgroundImage: getBackgroundImage(),
         backgroundSize: 'cover', 
         backgroundRepeat: 'no-repeat', 
         backgroundPosition: 'center',
@@ -288,5 +288,4 @@ export default function LevelTemplate({ nextLevelPath, backgroundImage = levelBa
 
 LevelTemplate.propTypes = {
     nextLevelPath: PropTypes.string,
-    backgroundImage: PropTypes.string,
 };
