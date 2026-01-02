@@ -19,5 +19,6 @@ public interface  UserCourseProgressRepository extends JpaRepository<UserCourseP
     @Query("SELECT p FROM UserCourseProgress p WHERE p.user.id = :userId ORDER BY p.lastUpdated DESC LIMIT 1")
     Optional<UserCourseProgress> findLatestProgressByUserId(@Param("userId") Long userId);
     List<UserCourseProgress> findByCourseId(Long courseId);
+    void deleteByCourseId(Long courseId);
 }
 

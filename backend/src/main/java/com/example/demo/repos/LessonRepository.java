@@ -18,5 +18,5 @@ public interface LessonRepository extends JpaRepository<Lesson, Long> {
     List<Lesson> findByCourseIdOrderByOrderIndex(Long courseId);
     Optional<Lesson> findTopByCourseIdOrderByOrderIndexDesc(Long courseId);
     boolean existsByCourseIdAndOrderIndex(Long courseId, Integer orderIndex);
-
+    void deleteByCourseId(Long courseId);
 }

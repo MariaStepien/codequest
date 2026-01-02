@@ -1,5 +1,9 @@
 package com.example.demo.service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -12,6 +16,9 @@ import com.example.demo.domain.Course;
 import com.example.demo.dto.CourseDTO;
 import com.example.demo.dto.CourseWithProgressDto;
 import com.example.demo.repos.CourseRepository;
+import com.example.demo.repos.LessonRepository;
+import com.example.demo.repos.UserCourseProgressRepository;
+import com.example.demo.repos.UserLessonProgressRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,6 +27,9 @@ import lombok.RequiredArgsConstructor;
 public class CourseService {
 
     private final CourseRepository courseRepository;
+    private final UserCourseProgressRepository userCourseProgressRepository;
+    private final UserLessonProgressRepository userLessonProgressRepository;
+    private final LessonRepository lessonRepository;
     private final UserCourseProgressService progressService;
 
     public List<CourseDTO> findAllCourses() {
@@ -68,6 +78,31 @@ public class CourseService {
             
             return mapToDTO(updatedCourse);
         });
+    }
+
+    @Transactional
+    public void deleteCourse(Long courseId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Course not found"));
+
+        if (Boolean.TRUE.equals(course.getIsPublished())) {
+            throw new IllegalStateException("Cannot delete a published course. Unpublish it first.");
+        }
+
+        userCourseProgressRepository.deleteByCourseId(courseId);
+        userLessonProgressRepository.deleteByCourseId(courseId);
+        lessonRepository.deleteByCourseId(courseId);
+
+        if (course.getTrophyImgSource() != null) {
+            try {
+                Path path = Paths.get("uploads").resolve(course.getTrophyImgSource());
+                Files.deleteIfExists(path);
+            } catch (IOException e) {
+                System.err.println("Could not delete trophy file: " + e.getMessage());
+            }
+        }
+
+        courseRepository.delete(course);
     }
 
     private CourseDTO mapToDTO(Course course) {
