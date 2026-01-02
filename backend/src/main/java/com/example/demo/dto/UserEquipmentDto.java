@@ -17,6 +17,6 @@ public class UserEquipmentDto {
     EquipmentDetailsDto weapon;
     
     List<EquipmentDetailsDto> ownedEquipment;
-    
-    int spriteNr; 
+    int spriteNr;
+    String spriteImgSource;
 }

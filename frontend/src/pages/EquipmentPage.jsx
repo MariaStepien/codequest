@@ -16,6 +16,7 @@ const initialEquipmentState = {
     userLogin: "Guest",
     coins: 0,
     spriteNr: 1,
+    spriteImgSource: null,
     helm: null,
     armor: null,
     pants: null,
@@ -24,16 +25,13 @@ const initialEquipmentState = {
     ownedEquipment: [],
 };
 
-const getCharacterSprite = (armorItem, pantsItem) => {
-    const armorNum = armorItem?.itemNumber ?? 1;
-    const pantsNum = pantsItem?.itemNumber ?? 1;
-
-    const fileName = `sprite_${armorNum}_${pantsNum}.png`;
+const getCharacterSprite = (spriteImgSource) => {
+    const fileName = spriteImgSource || 'sprite_1_1_1_1_1.png';
 
     try {
-        return `${API_BASE_URL}/uploads/sprites/sprite_${armorNum}_${pantsNum}.png`;
+        return `${API_BASE_URL}/uploads/sprites/${fileName}`;
     } catch (error) {
-        return new URL(`../assets/sprite/sprite_1_1.png`, import.meta.url).href; 
+        return new URL(`${API_BASE_URL}/uploads/sprites/sprite_1_1_1_1_1.png`, import.meta.url).href; 
     }
 };
 
@@ -43,7 +41,7 @@ const getItemIcon = (imgSource) => {
     try {
         return `${API_BASE_URL}/${imgSource}`;
     } catch (e) {
-        return new URL('sprite_1_1.png', import.meta.url).href;
+        return new URL(`${API_BASE_URL}/uploads/sprites/sprite_1_1_1_1_1.png`, import.meta.url).href;
     }
 };
 
@@ -265,7 +263,7 @@ export default function EquipmentPage() {
 
                             <div className="w-full aspect-square rounded-lg flex items-center justify-center p-2">
                                 <img 
-                                    src={getCharacterSprite(equipmentData.armor, equipmentData.pants)}
+                                    src={getCharacterSprite(equipmentData.spriteImgSource)}
                                     alt="Postać" 
                                     className="max-w-full max-h-full object-contain" 
                                 />

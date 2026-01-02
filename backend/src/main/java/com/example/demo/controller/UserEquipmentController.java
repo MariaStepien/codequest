@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.domain.Equipment.EquipmentType;
 import com.example.demo.dto.UserEquipmentDto;
 import com.example.demo.service.UserEquipmentService;
 
@@ -37,21 +36,6 @@ public class UserEquipmentController {
             UserEquipmentDto updatedDto = userEquipmentService.equipItem(userId, equipmentId);
             return ResponseEntity.ok(updatedDto);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-    }
-
-    @PutMapping("/unequip/{userId}/{slotType}")
-    public ResponseEntity<UserEquipmentDto> unequipItem(
-            @PathVariable Long userId, 
-            @PathVariable String slotType) {
-        try {
-            EquipmentType type = EquipmentType.valueOf(slotType.toUpperCase());
-            UserEquipmentDto updatedDto = userEquipmentService.unequipItem(userId, type);
-            return ResponseEntity.ok(updatedDto);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }

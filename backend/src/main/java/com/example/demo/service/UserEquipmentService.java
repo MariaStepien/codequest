@@ -48,6 +48,7 @@ public class UserEquipmentService {
             .orElseGet(() -> {
                 UserEquipment defaultEq = new UserEquipment();
                 defaultEq.setUserId(userId);
+                defaultEq.setSprite_img_source("sprite_1_1_1_1_1.png");
                 return defaultEq; 
             });
 
@@ -77,6 +78,7 @@ public class UserEquipmentService {
         return UserEquipmentDto.builder()
                 .userId(userId)
                 .spriteNr(currentEquipment.getSpriteNr())
+                .spriteImgSource(currentEquipment.getSprite_img_source())
                 .helm(mapEquipmentToDetailsDto(equipmentMap.get(currentEquipment.getHelmId())))
                 .armor(mapEquipmentToDetailsDto(equipmentMap.get(currentEquipment.getArmorId())))
                 .pants(mapEquipmentToDetailsDto(equipmentMap.get(currentEquipment.getPantsId())))
@@ -98,7 +100,7 @@ public class UserEquipmentService {
         UserEquipment userEquipment = new UserEquipment();
         userEquipment.setUserId(userId);
         userEquipment.setSpriteNr(1);
-        userEquipment.setSprite_img_source("sprite_1_1.png");
+        userEquipment.setSprite_img_source("sprite_1_1_1_1_1.png");
         
         Map<EquipmentType, Long> itemIdsByType = baseItems.stream()
             .collect(Collectors.toMap(Equipment::getType, Equipment::getId));
@@ -133,7 +135,6 @@ public class UserEquipmentService {
                 .orElseThrow(() -> new RuntimeException("Użytkownik nie posiada przedmiotu o ID: " + equipmentId));
         
         Equipment equipmentToEquip = ownedItem.getEquipment();
-
         UserEquipment userEquipment = userEquipmentRepository.findById(userId)
                 .orElseGet(() -> {
                     UserEquipment newEq = new UserEquipment();
@@ -143,85 +144,35 @@ public class UserEquipmentService {
 
         EquipmentType type = equipmentToEquip.getType();
         switch (type) {
-            case HELM:
-                userEquipment.setHelmId(equipmentId);
-                break;
-            case ARMOR:
-                userEquipment.setArmorId(equipmentId);
-                break;
-            case PANTS:
-                userEquipment.setPantsId(equipmentId);
-                break;
-            case SHOES:
-                userEquipment.setShoesId(equipmentId);
-                break;
-            case WEAPON:
-                userEquipment.setWeaponId(equipmentId);
-                break;
-            default:
-                throw new IllegalArgumentException("Nieznany typ ekwipunku: " + equipmentToEquip.getType());
+            case HELM: userEquipment.setHelmId(equipmentId); break;
+            case ARMOR: userEquipment.setArmorId(equipmentId); break;
+            case PANTS: userEquipment.setPantsId(equipmentId); break;
+            case SHOES: userEquipment.setShoesId(equipmentId); break;
+            case WEAPON: userEquipment.setWeaponId(equipmentId); break;
+            default: throw new IllegalArgumentException("Nieznany typ ekwipunku: " + type);
         }
 
-        if (type == EquipmentType.ARMOR || type == EquipmentType.PANTS) {
         updateSpriteInfo(userEquipment);
-        }
 
         userEquipmentRepository.save(userEquipment);
-        
-        return getUserEquipment(userId);
-
-    }
-    
-    @Transactional
-    public UserEquipmentDto unequipItem(Long userId, EquipmentType slotType) {
-        UserEquipment userEquipment = userEquipmentRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Nie znaleziono ekwipunku użytkownika o ID: " + userId));
-
-        switch (slotType) {
-            case HELM:
-                userEquipment.setHelmId(null);
-                break;
-            case ARMOR:
-                userEquipment.setArmorId(null);
-                break;
-            case PANTS:
-                userEquipment.setPantsId(null);
-                break;
-            case SHOES:
-                userEquipment.setShoesId(null);
-                break;
-            case WEAPON:
-                userEquipment.setWeaponId(null);
-                break;
-            default:
-                throw new IllegalArgumentException("Nieznany typ slotu: " + slotType);
-        }
-
-        if (slotType == EquipmentType.ARMOR || slotType == EquipmentType.PANTS) {
-        updateSpriteInfo(userEquipment);
-        }
-        
-        userEquipmentRepository.save(userEquipment);
-        
         return getUserEquipment(userId);
     }
 
     private void updateSpriteInfo(UserEquipment userEquipment) {
-    Long armorId = userEquipment.getArmorId();
-    Long pantsId = userEquipment.getPantsId();
+        int hNum = getItemNumberOrDefault(userEquipment.getHelmId());
+        int aNum = getItemNumberOrDefault(userEquipment.getArmorId());
+        int pNum = getItemNumberOrDefault(userEquipment.getPantsId());
+        int sNum = getItemNumberOrDefault(userEquipment.getShoesId());
+        int wNum = getItemNumberOrDefault(userEquipment.getWeaponId());
 
-    Equipment armor = (armorId != null) 
-        ? equipmentRepository.findById(armorId).orElse(null) 
-        : null;
-    
-    Equipment pants = (pantsId != null) 
-        ? equipmentRepository.findById(pantsId).orElse(null) 
-        : null;
+        String newSpriteSource = String.format("sprite_%d_%d_%d_%d_%d.png", hNum, aNum, pNum, sNum, wNum);
+        userEquipment.setSprite_img_source(newSpriteSource);
+    }
 
-    int armorNum = (armor != null) ? armor.getItemNumber() : 1;
-    int pantsNum = (pants != null) ? pants.getItemNumber() : 1;
-    
-    String newSpriteSource = String.format("sprite_%d_%d.png", armorNum, pantsNum);
-    userEquipment.setSprite_img_source(newSpriteSource);
-}
+    private int getItemNumberOrDefault(Long equipmentId) {
+        if (equipmentId == null) return 1;
+        return equipmentRepository.findById(equipmentId)
+                .map(Equipment::getItemNumber)
+                .orElse(1);
+    }
 }
