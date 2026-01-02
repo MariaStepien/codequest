@@ -38,6 +38,12 @@ public class LessonController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/course/{courseId}/next-order")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Integer> getNextOrderIndex(@PathVariable Long courseId) {
+        return ResponseEntity.ok(lessonService.getNextOrderIndex(courseId));
+    }
+
     @PostMapping(value = "/create", consumes = {"multipart/form-data"})
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<LessonDto> createLesson(

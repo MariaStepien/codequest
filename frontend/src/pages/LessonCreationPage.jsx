@@ -31,6 +31,21 @@ export default function LessonCreationPage() {
     const jwtToken = localStorage.getItem('token');
     const storedRole = localStorage.getItem('role');
 
+    const fetchNextOrderIndex = async (courseId) => {
+        if (!courseId) return;
+        try {
+            const response = await fetch(`/api/lessons/course/${courseId}/next-order`, {
+                headers: { 'Authorization': `Bearer ${jwtToken}` }
+            });
+            if (response.ok) {
+                const nextIndex = await response.json();
+                setLessonData(prev => ({ ...prev, orderIndex: nextIndex }));
+            }
+        } catch (err) {
+            console.error("Błąd pobierania indeksu:", err);
+        }
+    };
+
     useEffect(() => {
         
         if (!jwtToken || storedRole !== 'ADMIN') {
@@ -76,13 +91,12 @@ export default function LessonCreationPage() {
                 }
                 const data = await response.json();
                 
-                if (data.length === 0) {
-                     setError("Brak dostępnych kursów. Utwórz najpierw kurs.");
-                } else {
+                if (data.length > 0) {
                     setCourses(data);
-                    setLessonData(prev => ({ ...prev, courseId: data[0].id }));
+                    const firstCourseId = data[0].id;
+                    setLessonData(prev => ({ ...prev, courseId: firstCourseId }));
+                    fetchNextOrderIndex(firstCourseId); // Get suggestion for first course
                 }
-
             } catch (err) {
                 setError(err.message);
             }
@@ -108,6 +122,10 @@ export default function LessonCreationPage() {
         const finalValue = name === 'orderIndex' ? parseInt(value, 10) : value;
 
         setLessonData({ ...lessonData, [name]: finalValue });
+
+        if (name === 'courseId') {
+            fetchNextOrderIndex(value);
+        }
     };
 
     const handleTasksChange = useCallback((newTasks) => {

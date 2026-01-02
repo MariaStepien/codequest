@@ -69,6 +69,12 @@ public class LessonService {
         return lessonOptional.map(this::mapToDtoWithTasks);
     }
 
+    public Integer getNextOrderIndex(Long courseId) {
+        return lessonRepository.findTopByCourseIdOrderByOrderIndexDesc(courseId)
+                .map(lesson -> lesson.getOrderIndex() + 1)
+                .orElse(1);
+    }
+
     public LessonDto createLesson(LessonCreationDto creationDto, MultipartFile file) throws IOException {
         Lesson lesson = new Lesson();
         lesson.setCourseId(creationDto.getCourseId());

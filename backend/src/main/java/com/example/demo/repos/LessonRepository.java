@@ -16,5 +16,7 @@ import com.example.demo.domain.Lesson;
 public interface LessonRepository extends JpaRepository<Lesson, Long> {
     Optional<Lesson> findByCourseIdAndOrderIndex(Long courseId, Integer orderIndex);
     List<Lesson> findByCourseIdOrderByOrderIndex(Long courseId);
+    Optional<Lesson> findTopByCourseIdOrderByOrderIndexDesc(Long courseId);
+    boolean existsByCourseIdAndOrderIndex(Long courseId, Integer orderIndex);
 
 }
