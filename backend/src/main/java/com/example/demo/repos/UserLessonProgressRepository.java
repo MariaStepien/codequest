@@ -11,4 +11,5 @@ import com.example.demo.domain.UserLessonProgress;
 public interface UserLessonProgressRepository extends JpaRepository<UserLessonProgress, Long> {
     
     Optional<UserLessonProgress> findByUserIdAndLessonId(Long userId, Long lessonId);
+    void deleteByLessonId(Long lessonId);
 }

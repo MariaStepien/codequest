@@ -18,6 +18,7 @@ import com.example.demo.dto.LessonCreationDto;
 import com.example.demo.dto.LessonDto;
 import com.example.demo.dto.TaskDto;
 import com.example.demo.repos.LessonRepository;
+import com.example.demo.repos.UserLessonProgressRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class LessonService {
 
     private final LessonRepository lessonRepository;
+    private final UserLessonProgressRepository userLessonProgressRepository;
     private final ObjectMapper objectMapper; 
     private final String UPLOAD_DIR = "uploads/backgrounds";
 
@@ -115,6 +117,16 @@ public class LessonService {
         return lessons.stream()
                 .map(this::mapToSimpleDto)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteLesson(Long lessonId) {
+        userLessonProgressRepository.deleteByLessonId(lessonId);
+        
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new RuntimeException("Lesson not found with ID: " + lessonId));
+        
+        lessonRepository.delete(lesson);
     }
 
     @Transactional

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminSidebar from '../components/AdminSidebar';
-import { BookOpenText, ListOrdered, X, Edit, Loader2 } from 'lucide-react';
+import { BookOpenText, ListOrdered, X, Edit, Loader2, Trash2 } from 'lucide-react';
 
-const LessonListItem = ({ lesson, navigate }) => {
+const LessonListItem = ({ lesson, navigate, onDelete, isPublished }) => {
   const handleEditLesson = () => {
     navigate(`/admin/edit-lesson/${lesson.id}`);
   };
@@ -28,6 +28,17 @@ const LessonListItem = ({ lesson, navigate }) => {
           <Edit className="w-4 h-4" />
           <span>Edytuj</span>
         </button>
+
+        {!isPublished && (
+          <button 
+            onClick={() => onDelete(lesson.id, lesson.title)}
+            className="flex items-center space-x-1 px-3 py-1 text-sm font-medium rounded-full bg-red-50 text-red-600 hover:bg-red-100 transition duration-150"
+            title="Usuń lekcję"
+          >
+            <Trash2 className="w-4 h-4" />
+            <span>Usuń</span>
+          </button>
+        )}
       </div>
     </div>
   );
@@ -38,13 +49,49 @@ export default function AdminLessonsPage() {
   const navigate = useNavigate();
   const [lessons, setLessons] = useState([]);
   const [courseTitle, setCourseTitle] = useState('...'); 
+  const [isPublished, setIsPublished] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   
   const currentPage = 'admin-courses';
-
   const jwtToken = localStorage.getItem('token');
   const storedRole = localStorage.getItem('role');
+
+  const fetchLessonsAndCourseData = async () => {
+    setError(null);
+    setIsLoading(true);
+    
+    try {
+      const courseResponse = await fetch(`/api/courses/${courseId}`, {
+        headers: { 'Authorization': `Bearer ${jwtToken}` }
+      });
+      
+      if (courseResponse.ok) {
+        const courseData = await courseResponse.json();
+        setCourseTitle(courseData.title);
+        setIsPublished(courseData.isPublished || false);
+      } else {
+        setCourseTitle('Nieznany Kurs');
+      }
+
+      const lessonsResponse = await fetch(`/api/lessons/course/${courseId}`, {
+        headers: { 'Authorization': `Bearer ${jwtToken}` }
+      });
+
+      if (lessonsResponse.ok) {
+        const lessonsData = await lessonsResponse.json();
+        setLessons(lessonsData);
+      } else {
+        setError(`Nie udało się pobrać listy lekcji dla kursu ID ${courseId}.`);
+      }
+
+    } catch (err) {
+      console.error("Błąd podczas ładowania danych:", err);
+      setError('Wystąpił nieoczekiwany błąd podczas komunikacji z serwerem.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!jwtToken || storedRole !== 'ADMIN') {
@@ -53,43 +100,34 @@ export default function AdminLessonsPage() {
         return;
     }
 
-    const fetchLessonsAndCourseTitle = async () => {
-      setError(null);
-      setIsLoading(true);
-      
-      try {
-        const courseResponse = await fetch(`/api/courses/${courseId}`, {
-          headers: { 'Authorization': `Bearer ${jwtToken}` }
-        });
-        
-        if (courseResponse.ok) {
-          const courseData = await courseResponse.json();
-          setCourseTitle(courseData.title);
-        } else {
-          setCourseTitle('Nieznany Kurs');
-        }
-
-        const lessonsResponse = await fetch(`/api/lessons/course/${courseId}`, {
-          headers: { 'Authorization': `Bearer ${jwtToken}` }
-        });
-
-        if (lessonsResponse.ok) {
-          const lessonsData = await lessonsResponse.json();
-          setLessons(lessonsData);
-        } else {
-          setError(`Nie udało się pobrać listy lekcji dla kursu ID ${courseId}.`);
-        }
-
-      } catch (err) {
-        console.error("Błąd podczas ładowania danych:", err);
-        setError('Wystąpił nieoczekiwany błąd podczas komunikacji z serwerem.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchLessonsAndCourseTitle();
+    fetchLessonsAndCourseData();
   }, [courseId, jwtToken, storedRole, navigate]);
+
+  const handleDeleteLesson = async (lessonId, lessonTitle) => {
+    const confirmed = window.confirm(
+      `Czy na pewno chcesz usunąć lekcję "${lessonTitle}"? Spowoduje to również trwałe usunięcie wszystkich rekordów postępów użytkowników powiązanych z tą lekcją.`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch(`/api/lessons/${lessonId}`, {
+        method: 'DELETE',
+        headers: { 
+          'Authorization': `Bearer ${jwtToken}` 
+        }
+      });
+
+      if (response.ok) {
+        setLessons(prev => prev.filter(lesson => lesson.id !== lessonId));
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        alert(errorData.message || "Wystąpił błąd podczas usuwania lekcji.");
+      }
+    } catch (err) {
+      alert("Wystąpił nieoczekiwany błąd podczas próby usunięcia lekcji.");
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -100,9 +138,11 @@ export default function AdminLessonsPage() {
             <BookOpenText className="w-8 h-8 text-indigo-600" />
             <span>Lista Lekcji dla Kursu: {courseTitle}</span>
           </h1>
-          <p className="text-gray-500 mt-1">
-            Zarządzanie lekcjami w kursie. ID kursu: {courseId}
-          </p>
+          <div className="flex items-center justify-between mt-1">
+            <p className="text-gray-500">
+              Zarządzanie lekcjami w kursie. ID kursu: {courseId}
+            </p>
+          </div>
         </header>
 
         <div className="flex-1 bg-white shadow-xl rounded-xl overflow-hidden">
@@ -133,6 +173,8 @@ export default function AdminLessonsPage() {
                     key={lesson.id} 
                     lesson={lesson} 
                     navigate={navigate} 
+                    onDelete={handleDeleteLesson}
+                    isPublished={isPublished}
                 />
               ))}
             </div>
