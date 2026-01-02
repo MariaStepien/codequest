@@ -123,6 +123,9 @@ export default function EditCoursePage() {
       }
 
       setSuccessMessage('Kurs został pomyślnie zaktualizowany!');
+      setTimeout(() => {
+        navigate('/admin/courses');
+      }, 1500);
 
     } catch (err) {
       setError(err.message);
@@ -173,7 +176,7 @@ export default function EditCoursePage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Ikona trofeum</label>
-              <div className="flex items-center space-x-6">
+              <div className="flex justify-center items-center space-x-6">
                 <div className="flex-shrink-0">
                   {previewUrl ? (
                     <img src={previewUrl} className="h-24 w-24 object-contain rounded-lg border" alt="Preview" />

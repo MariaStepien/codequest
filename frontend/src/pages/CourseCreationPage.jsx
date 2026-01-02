@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Upload, X, CheckCircle, Image as ImageIcon } from 'lucide-react';
 import AdminSidebar from '../components/AdminSidebar';
+import { useNavigate } from 'react-router-dom';
 
 const initialCourseData = {
   title: '',
@@ -19,6 +20,7 @@ export default function CourseCreationPage() {
   const [isDataLoading, setIsDataLoading] = useState(true);
 
   const jwtToken = localStorage.getItem('token');
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!jwtToken) {
@@ -125,9 +127,9 @@ export default function CourseCreationPage() {
       }
 
       setSuccessMessage(`Kurs "${createdCourse.title}" został utworzony pomyślnie.`);
-      setFormData(initialCourseData);
-      setSelectedFile(null);
-      setPreviewUrl(null);
+      setTimeout(() => {
+        navigate('/admin/courses');
+      }, 1500);
       
     } catch (err) {
       setError(err.message); 
