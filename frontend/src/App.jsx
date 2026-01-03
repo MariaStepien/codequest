@@ -25,6 +25,7 @@ import AddSpritePage from './pages/AddSpritePage'
 import AddEnemyPage from './pages/AddEnemyPage'
 import EnemyListPage from './pages/EnemyListPage'
 import EditEnemyPage from './pages/EditEnemyPage'
+import ForumPage from './pages/ForumPage'
 
 function App() {
   return (
@@ -87,6 +88,8 @@ function App() {
       <Route path='/admin/enemies' element={<EnemyListPage />} />
 
       <Route path='/admin/edit-enemy/:id' element={<EditEnemyPage />} />
+
+      <Route path='/forum' element={<ForumPage />} />
 
       {/* Error screen */}
       <Route path="*" element={<h1>404 Not Found</h1>} />
