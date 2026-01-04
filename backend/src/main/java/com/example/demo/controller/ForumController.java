@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -55,5 +56,15 @@ public class ForumController {
     public ResponseEntity<Void> deleteComment(@PathVariable Long id, @RequestParam Long userId, @RequestParam boolean isAdmin) {
         forumService.deleteComment(id, userId, isAdmin);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/posts/{id}")
+    public ResponseEntity<Post> updatePost(@PathVariable Long id, @RequestParam Long userId, @RequestBody Post post) {
+        return ResponseEntity.ok(forumService.updatePost(id, userId, post));
+    }
+
+    @PutMapping("/comments/{id}")
+    public ResponseEntity<Comment> updateComment(@PathVariable Long id, @RequestParam Long userId, @RequestBody Comment comment) {
+        return ResponseEntity.ok(forumService.updateComment(id, userId, comment));
     }
 }

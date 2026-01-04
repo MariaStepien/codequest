@@ -39,6 +39,12 @@ public class Post {
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column
+    private LocalDateTime updatedAt = LocalDateTime.now();
+
+    @Column
+    private Boolean edited;
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Comment> comments = new ArrayList<>();
 }
