@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { MessageSquare, Trash2, ArrowLeft, Send, Plus, X } from 'lucide-react';
 import Header from '../components/Header';
+import ConfirmationModal from '../components/ConfirmationModal';
+import Toast from '../components/Toast';
 
 export default function ForumPage() {
   const [posts, setPosts] = useState([]);
@@ -9,8 +11,8 @@ export default function ForumPage() {
   const [newPostContent, setNewPostContent] = useState('');
   const [newComment, setNewComment] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
-
-  const jwtToken = localStorage.getItem('token');
+  const [modal, setModal] = useState({show: false, type: null, id: null});
+  const [toast, setToast] = useState({show: false, message: '', isError: false});
 
   const [userData, setUserData] = useState({
       id: null,
@@ -18,7 +20,12 @@ export default function ForumPage() {
       role: 'USER'
     });
 
-  const isAdmin = userData.role === 'ADMIN' ? true : false;
+  const isAdmin = userData.role === 'ADMIN';
+
+  const triggerToast = (msg, err = false) => {
+    setToast({ show: true, message: msg, isError: err });
+    setTimeout(() => setToast({ show: false, message: '', isError: false }), 3000);
+  };
 
   useEffect(() => {
     fetchUserData();
@@ -46,6 +53,18 @@ export default function ForumPage() {
     setPosts(data);
   };
 
+  const fetchPostDetails = async (postId) => {
+    try {
+        const res = await fetch(`http://localhost:8080/api/forum/posts/${postId}`);
+        if (res.ok) {
+            const data = await res.json();
+            setSelectedPost(data);
+        }
+    } catch (error) {
+        console.error("Error refreshing post:", error);
+    }
+  };
+
   const handleCreatePost = async (e) => {
     e.preventDefault();
     
@@ -54,50 +73,86 @@ export default function ForumPage() {
         content: newPostContent
     };
 
-    await fetch(`http://localhost:8080/api/forum/posts?authorId=${userData.id}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(postData)
-    });
+    try {
+        const res = await fetch(`http://localhost:8080/api/forum/posts?authorId=${userData.id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(postData)
+        });
 
-    setNewPostTitle('');
-    setNewPostContent('');
-    setShowCreateForm(false);
-    fetchPosts();
-  };
-
-  const handleDeletePost = async (id) => {
-    await fetch(`http://localhost:8080/api/forum/posts/${id}?userId=${userData.id}&isAdmin=${isAdmin}`, { method: 'DELETE' });
-    fetchPosts();
-    setSelectedPost(null);
+        if (res.ok) {
+            setNewPostTitle('');
+            setNewPostContent('');
+            setShowCreateForm(false);
+            triggerToast("Opublikowano post!");
+            fetchPosts();
+        } else {
+            triggerToast("Nie udało się opublikować posta.", true);
+        }
+    } catch (error) {
+        triggerToast("Błąd połączenia z serwerem.", true);
+    }
   };
 
   const handleAddComment = async (e) => {
     e.preventDefault();
+    if (!newComment.trim()) return;
 
     try {
-      const response = await fetch(`http://localhost:8080/api/forum/posts/${selectedPost.id}/comments?authorId=${userData.id}`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${jwtToken}` },
-        body: JSON.stringify({ content: newComment })
-      });
-
-      if (response.ok) {
-        setNewComment('');
-        const updatedPostRes = await fetch(`http://localhost:8080/api/forum/posts/${selectedPost.id}`, {
-          headers: { 'Authorization': `Bearer ${jwtToken}` },
+        const res = await fetch(`http://localhost:8080/api/forum/posts/${selectedPost.id}/comments?authorId=${userData.id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: newComment })
         });
-        setSelectedPost(await updatedPostRes.json());
-      } else if (response.status === 403) {
-        console.error("Bląd 403");
-      }
+
+        if (res.ok) {
+            setNewComment('');
+            triggerToast("Dodano komentarz!");
+            await fetchPostDetails(selectedPost.id);
+        } else {
+            triggerToast("Nie udało się dodać komentarza.", true);
+        }
     } catch (error) {
-      console.error("Network error:", error);
+        triggerToast("Błąd serwer.", true);
     }
   };
 
+  const handleConfirmedDelete = async () => {
+    const { type, id } = modal;
+    const label = type === 'post' ? 'post' : 'komentarz';
+    
+    try {
+        const res = await fetch(`http://localhost:8080/api/forum/${type}s/${id}?userId=${userData.id}&isAdmin=${isAdmin}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        });
+
+        if (res.ok) {
+            triggerToast(`Pomyślnie usunięto ${label}.`);
+            if (type === 'post') {
+                setSelectedPost(null);
+                fetchPosts();
+            } else {
+                await fetchPostDetails(selectedPost.id);
+            }
+        } else {
+            triggerToast(`Nie udało się usunąć ${label}.`, true);
+        }
+    } catch (e) {
+        triggerToast("Błąd połączenia z serwerem.", true);
+    }
+    setModal({ show: false, type: null, id: null });
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 relative">
+      <Toast {...toast} />
+      <ConfirmationModal 
+            show={modal.show}
+            message={`Czy na pewno chcesz usunąć ten ${modal.type === 'post' ? 'post' : 'komentarz'}?`}
+            onConfirm={handleConfirmedDelete}
+            onCancel={() => setModal({ show: false, type: null, id: null })}
+        />
       <Header userLogin={userData.userLogin} currentPage="forum" />
       
       <main className="max-w-4xl mx-auto py-8 px-4">
@@ -111,12 +166,15 @@ export default function ForumPage() {
               <div className="flex justify-between items-start">
                 <h1 className="text-3xl font-bold text-gray-900">{selectedPost.title}</h1>
                 {(isAdmin || selectedPost.author?.id === userData.id) && (
-                  <button onClick={() => handleDeletePost(selectedPost.id)} className="text-red-500 hover:bg-red-50 p-2 rounded-lg">
+                  <button 
+                    onClick={() => setModal({ show: true, type: 'post', id: selectedPost.id })} 
+                    className="text-red-500 hover:bg-red-50 p-2 rounded-lg"
+                  >
                     <Trash2 className="w-5 h-5" />
                   </button>
                 )}
               </div>
-              <p className="text-gray-500 text-sm mb-4">Przez {selectedPost.author.userLogin} • {new Date(selectedPost.createdAt).toLocaleString()}</p>
+              <p className="text-gray-500 text-sm mb-4">Przez {selectedPost.author?.userLogin} • {new Date(selectedPost.createdAt).toLocaleString()}</p>
               <div className="text-gray-800 leading-relaxed whitespace-pre-wrap">{selectedPost.content}</div>
             </div>
 
@@ -145,11 +203,10 @@ export default function ForumPage() {
                     <p className="text-gray-700 mt-1">{comment.content}</p>
                   </div>
                   {(isAdmin || comment.author?.id === userData.id) && (
-                    <button onClick={async () => {
-                        await fetch(`http://localhost:8080/api/forum/comments/${comment.id}?userId=${userData.id}&isAdmin=${isAdmin}`, { method: 'DELETE' });
-                        const res = await fetch(`http://localhost:8080/api/forum/posts/${selectedPost.id}`);
-                        setSelectedPost(await res.json());
-                    }} className="text-red-400 hover:text-red-600">
+                    <button 
+                        onClick={() => setModal({ show: true, type: 'comment', id: comment.id })}
+                        className="text-red-400 hover:text-red-600"
+                    >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   )}
