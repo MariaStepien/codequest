@@ -1,7 +1,7 @@
 package com.example.demo.service;
 
-import java.util.List;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -103,5 +103,24 @@ public class ForumService {
         comment.setUpdatedAt(LocalDateTime.now());
 
         return commentRepository.save(comment);
+    }
+
+    @Transactional
+    public Comment addReply(Long authorId, Long postId, Long parentCommentId, Comment reply) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        User author = userRepository.findById(authorId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        commentRepository.findById(parentCommentId)
+                .orElseThrow(() -> new RuntimeException("Parent comment not found"));
+
+        reply.setPost(post);
+        reply.setAuthor(author);
+        reply.setIsReply(true);
+        reply.setParentCommentId(parentCommentId);
+        reply.setEdited(false);
+        
+        return commentRepository.save(reply);
     }
 }

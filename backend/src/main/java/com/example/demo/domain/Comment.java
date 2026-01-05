@@ -40,6 +40,12 @@ public class Comment {
     @Column
     private Boolean edited;
 
+    @Column
+    private Boolean isReply;
+
+    @Column
+    private Long parentCommentId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     @JsonIgnore

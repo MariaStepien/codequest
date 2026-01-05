@@ -67,4 +67,13 @@ public class ForumController {
     public ResponseEntity<Comment> updateComment(@PathVariable Long id, @RequestParam Long userId, @RequestBody Comment comment) {
         return ResponseEntity.ok(forumService.updateComment(id, userId, comment));
     }
+
+    @PostMapping("/posts/{postId}/comments/{parentCommentId}/replies")
+    public ResponseEntity<Comment> addReply(
+            @RequestParam Long authorId, 
+            @PathVariable Long postId, 
+            @PathVariable Long parentCommentId, 
+            @RequestBody Comment reply) {
+        return ResponseEntity.ok(forumService.addReply(authorId, postId, parentCommentId, reply));
+    }
 }

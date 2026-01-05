@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { MessageSquare, Trash2, ArrowLeft, Send, Plus, Edit2, Check, X } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { MessageSquare, Trash2, ArrowLeft, Send, Plus, Edit2, Check, X, Reply } from 'lucide-react';
 import Header from '../components/Header';
 import ConfirmationModal from '../components/ConfirmationModal';
 import Toast from '../components/Toast';
@@ -15,6 +15,9 @@ export default function ForumPage() {
   const [editingPost, setEditingPost] = useState(null);
   const [editingComment, setEditingComment] = useState(null);
   const [editValue, setEditValue] = useState({ title: '', content: '' });
+
+  const [replyingTo, setReplyingTo] = useState(null);
+  const [replyValue, setReplyValue] = useState('');
 
   const [modal, setModal] = useState({show: false, type: null, id: null});
   const [toast, setToast] = useState({show: false, message: '', isError: false});
@@ -69,6 +72,30 @@ export default function ForumPage() {
         console.error("Error refreshing post:", error);
     }
   };
+
+  const commentTree = useMemo(() => {
+    if (!selectedPost || !selectedPost.comments) return [];
+    
+    const map = {};
+    const roots = [];
+
+    selectedPost.comments.forEach(comment => {
+      map[comment.id] = { ...comment, replies: [] };
+    });
+
+    selectedPost.comments.forEach(comment => {
+      if (comment.parentCommentId) {
+        const parent = map[comment.parentCommentId];
+        if (parent) {
+          parent.replies.push(map[comment.id]);
+        }
+      } else {
+        roots.push(map[comment.id]);
+      }
+    });
+
+    return roots;
+  }, [selectedPost]);
 
   const handleCreatePost = async (e) => {
     e.preventDefault();
@@ -156,6 +183,30 @@ export default function ForumPage() {
     }
   };
 
+  const handleAddReply = async (e, parentCommentId) => {
+    e.preventDefault();
+    if (!replyValue.trim()) return;
+
+    try {
+        const res = await fetch(`http://localhost:8080/api/forum/posts/${selectedPost.id}/comments/${parentCommentId}/replies?authorId=${userData.id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: replyValue })
+        });
+
+        if (res.ok) {
+            setReplyValue('');
+            setReplyingTo(null);
+            triggerToast("Dodano odpowiedź!");
+            await fetchPostDetails(selectedPost.id);
+        } else {
+            triggerToast("Nie udało się dodać odpowiedzi.", true);
+        }
+    } catch (error) {
+        triggerToast("Błąd serwera.", true);
+    }
+  };
+
   const handleConfirmedDelete = async () => {
     const { type, id } = modal;
     const label = type === 'post' ? 'post' : 'komentarz';
@@ -193,6 +244,75 @@ export default function ForumPage() {
     setEditingComment(comment.id);
   };
 
+  const renderComments = (comments, level = 0) => {
+    return comments.map(comment => (
+      <div key={comment.id} className={`${level > 0 ? 'ml-8 mt-4' : 'mt-6'}`}>
+        <div className="bg-white p-4 rounded-lg shadow-sm border-l-4 border-indigo-200 flex justify-between items-start text-left">
+          <div className="flex-1">
+            <p className="font-semibold text-sm text-indigo-600">
+              {comment.author?.userLogin || 'Unknown'} • {new Date(comment.createdAt).toLocaleString()}
+              {comment.edited && <span className="text-xs font-normal text-gray-400 ml-2 italic">(edytowany)</span>}
+            </p>
+            {editingComment === comment.id ? (
+              <div className="mt-2 flex gap-2">
+                <input 
+                  className="text-black flex-1 border rounded px-2 py-1 text-sm outline-none"
+                  value={editValue.content}
+                  onChange={(e) => setEditValue({...editValue, content: e.target.value})}
+                />
+                <button onClick={() => handleUpdateComment(comment.id)} className="text-green-600"><Check className="w-4 h-4"/></button>
+                <button onClick={() => setEditingComment(null)} className="text-gray-400"><X className="w-4 h-4"/></button>
+              </div>
+            ) : (
+              <p className="text-gray-700 mt-1 whitespace-pre-wrap">{comment.content}</p>
+            )}
+            
+            {!editingComment && (
+              <button 
+                onClick={() => { setReplyingTo(replyingTo === comment.id ? null : comment.id); setReplyValue(''); }}
+                className="mt-2 text-xs text-indigo-500 hover:text-indigo-700 flex items-center gap-1"
+              >
+                <Reply className="w-3 h-3" /> Odpowiedz
+              </button>
+            )}
+
+            {replyingTo === comment.id && (
+              <form onSubmit={(e) => handleAddReply(e, comment.id)} className="mt-3 flex gap-2">
+                <input 
+                  className="text-black flex-1 border rounded-lg px-3 py-1 text-sm focus:ring-1 focus:ring-indigo-500 outline-none"
+                  placeholder="Napisz odpowiedź..."
+                  value={replyValue}
+                  onChange={(e) => setReplyValue(e.target.value)}
+                  autoFocus
+                  required
+                />
+                <button type="submit" className="bg-indigo-600 text-white p-1.5 rounded-lg hover:bg-indigo-700">
+                  <Send className="w-4 h-4" />
+                </button>
+              </form>
+            )}
+          </div>
+          <div className="flex gap-2 ml-4 shrink-0">
+            {comment.author?.id === userData.id && !editingComment && (
+              <button onClick={() => startEditingComment(comment)} className="text-gray-400 hover:text-indigo-600">
+                <Edit2 className="w-4 h-4" />
+              </button>
+            )}
+            {(isAdmin || comment.author?.id === userData.id) && (
+              <button 
+                  onClick={() => setModal({ show: true, type: 'comment', id: comment.id })}
+                  className="text-red-400 hover:text-red-600"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        </div>
+        {comment.replies && comment.replies.length > 0 && renderComments(comment.replies, level + 1)}
+      </div>
+    ));
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 relative">
       <Toast {...toast} />
@@ -204,14 +324,14 @@ export default function ForumPage() {
         />
       <Header userLogin={userData.userLogin} currentPage="forum" />
       
-      <main className="max-w-4xl mx-auto py-8 px-4">
+      <main className="max-w-4xl mx-auto py-8 px-4 text-left">
         {selectedPost ? (
           <div className="space-y-6">
-            <button onClick={() => { setSelectedPost(null); setEditingPost(null); }} className="flex items-center text-indigo-600 hover:underline">
+            <button onClick={() => { setSelectedPost(null); setEditingPost(null); setReplyingTo(null); }} className="flex items-center text-indigo-600 hover:underline">
               <ArrowLeft className="w-4 h-4 mr-1" /> Powrót do listy
             </button>
             
-            <div className="bg-white p-6 rounded-xl shadow-md">
+            <div className="bg-white p-6 rounded-xl shadow-md text-left">
               {editingPost === selectedPost.id ? (
                 <form onSubmit={handleUpdatePost} className="space-y-3">
                   <input 
@@ -233,12 +353,11 @@ export default function ForumPage() {
                 </form>
               ) : (
                 <>
-                  <div className="flex justify-between items-start">
-                    <h1 className="text-3xl font-bold text-gray-900">
+                  <div className="flex justify-between items-start mb-1">
+                    <h1 className="text-3xl font-bold text-gray-900 leading-tight">
                       {selectedPost.title}
-                      {selectedPost.edited && <span className="text-xs font-normal text-gray-400 ml-2">(edytowany)</span>}
                     </h1>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 shrink-0 ml-4">
                       {selectedPost.author?.id === userData.id && (
                         <button onClick={startEditingPost} className="text-gray-400 hover:text-indigo-600 p-2">
                           <Edit2 className="w-5 h-5" />
@@ -254,13 +373,16 @@ export default function ForumPage() {
                       )}
                     </div>
                   </div>
-                  <p className="text-gray-500 text-sm mb-4">Przez {selectedPost.author?.userLogin} • {new Date(selectedPost.createdAt).toLocaleString()}</p>
-                  <div className="text-gray-800 leading-relaxed whitespace-pre-wrap">{selectedPost.content}</div>
+                  <p className="text-gray-500 text-sm mb-4">
+                    Przez {selectedPost.author?.userLogin} • {new Date(selectedPost.createdAt).toLocaleString()}
+                    {selectedPost.edited && <span className="text-xs italic text-gray-400 ml-2">(edytowany)</span>}
+                  </p>
+                  <div className="text-gray-800 leading-relaxed whitespace-pre-wrap text-left">{selectedPost.content}</div>
                 </>
               )}
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 text-left">
               <h3 className="text-xl font-bold flex items-center">
                 <MessageSquare className="w-5 h-4 mr-2" /> Komentarze
               </h3>
@@ -278,44 +400,9 @@ export default function ForumPage() {
                 </button>
               </form>
 
-              {selectedPost.comments.map(comment => (
-                <div key={comment.id} className="bg-white p-4 rounded-lg shadow-sm border-l-4 border-indigo-200 flex justify-between items-start">
-                  <div className="flex-1">
-                    <p className="font-semibold text-sm text-indigo-600">
-                      {comment.author?.userLogin || 'Unknown'}
-                      {comment.edited && <span className="text-xs font-normal text-gray-400 ml-2">(edytowany)</span>}
-                    </p>
-                    {editingComment === comment.id ? (
-                      <div className="mt-2 flex gap-2">
-                        <input 
-                          className="text-black flex-1 border rounded px-2 py-1 text-sm outline-none"
-                          value={editValue.content}
-                          onChange={(e) => setEditValue({...editValue, content: e.target.value})}
-                        />
-                        <button onClick={() => handleUpdateComment(comment.id)} className="text-green-600"><Check className="w-4 h-4"/></button>
-                        <button onClick={() => setEditingComment(null)} className="text-gray-400"><X className="w-4 h-4"/></button>
-                      </div>
-                    ) : (
-                      <p className="text-gray-700 mt-1">{comment.content}</p>
-                    )}
-                  </div>
-                  <div className="flex gap-2 ml-4">
-                    {comment.author?.id === userData.id && !editingComment && (
-                      <button onClick={() => startEditingComment(comment)} className="text-gray-400 hover:text-indigo-600">
-                        <Edit2 className="w-4 h-4" />
-                      </button>
-                    )}
-                    {(isAdmin || comment.author?.id === userData.id) && (
-                      <button 
-                          onClick={() => setModal({ show: true, type: 'comment', id: comment.id })}
-                          className="text-red-400 hover:text-red-600"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
+              <div className="space-y-2">
+                {renderComments(commentTree)}
+              </div>
             </div>
           </div>
         ) : (
@@ -331,7 +418,7 @@ export default function ForumPage() {
             </div>
 
             {showCreateForm && (
-              <div className="bg-white p-6 rounded-xl shadow-md border-t-4 border-indigo-500">
+              <div className="bg-white p-6 rounded-xl shadow-md border-t-4 border-indigo-500 text-left">
                 <h2 className="text-xl font-bold mb-4">Nowy wpis</h2>
                 <form onSubmit={handleCreatePost} className="space-y-3">
                   <input 
@@ -361,15 +448,17 @@ export default function ForumPage() {
                 <div 
                   key={post.id} 
                   onClick={() => setSelectedPost(post)}
-                  className="bg-white p-5 rounded-xl shadow hover:shadow-md transition cursor-pointer border border-gray-100"
+                  className="bg-white p-5 rounded-xl shadow hover:shadow-md transition cursor-pointer border border-gray-100 text-left"
                 >
                   <h3 className="text-xl font-bold text-gray-900 mb-1">
                     {post.title}
-                    {post.edited && <span className="text-xs font-normal text-gray-400 ml-2">(edytowany)</span>}
                   </h3>
                   <p className="text-gray-600 line-clamp-2 mb-3">{post.content}</p>
                   <div className="flex justify-between items-center text-xs text-gray-400">
-                    <span>Autor: {post.author?.userLogin || 'Unknown'}</span>
+                    <span>
+                      Autor: {post.author?.userLogin || 'Unknown'} • {new Date(post.createdAt).toLocaleString()}
+                      {post.edited && <span className="italic ml-2">(edytowany)</span>}
+                    </span>
                     <span className="flex items-center">
                       <MessageSquare className="w-3 h-3 mr-1" /> {post.comments?.length || 0}
                     </span>
