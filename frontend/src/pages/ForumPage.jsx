@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
-import { MessageSquare, Trash2, ArrowLeft, Send, Plus, Edit2, Check, X, Reply } from 'lucide-react';
+import { MessageSquare, Trash2, ArrowLeft, Send, Plus, Edit2, Check, X, Reply, Flag } from 'lucide-react';
 import Header from '../components/Header';
 import ConfirmationModal from '../components/ConfirmationModal';
 import Toast from '../components/Toast';
+import ReportModal from '../components/ReportModal';
 
 export default function ForumPage() {
   const [posts, setPosts] = useState([]);
@@ -20,6 +21,7 @@ export default function ForumPage() {
   const [replyValue, setReplyValue] = useState('');
 
   const [modal, setModal] = useState({show: false, type: null, id: null});
+  const [reportData, setReportData] = useState({ show: false, targetType: '', targetId: null });
   const [toast, setToast] = useState({show: false, message: '', isError: false});
 
   const [userData, setUserData] = useState({
@@ -75,7 +77,6 @@ export default function ForumPage() {
 
   const commentTree = useMemo(() => {
     if (!selectedPost || !selectedPost.comments) return [];
-    
     const map = {};
     const roots = [];
 
@@ -100,7 +101,6 @@ export default function ForumPage() {
   const handleCreatePost = async (e) => {
     e.preventDefault();
     const postData = { title: newPostTitle, content: newPostContent };
-
     try {
         const res = await fetch(`http://localhost:8080/api/forum/posts?authorId=${userData.id}`, {
             method: 'POST',
@@ -207,6 +207,24 @@ export default function ForumPage() {
     }
   };
 
+  const handleSendReport = async (data) => {
+    try {
+      const res = await fetch(`http://localhost:8080/api/reports?reporterId=${userData.id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      if (res.ok) {
+        triggerToast("Zgłoszenie zostało wysłane.");
+      } else {
+        triggerToast("Błąd podczas wysyłania zgłoszenia.", true);
+      }
+    } catch (error) {
+      triggerToast("Błąd połączenia z serwerem.", true);
+    }
+  };
+
   const handleConfirmedDelete = async () => {
     const { type, id } = modal;
     const label = type === 'post' ? 'post' : 'komentarz';
@@ -293,6 +311,13 @@ export default function ForumPage() {
             )}
           </div>
           <div className="flex gap-2 ml-4 shrink-0">
+            <button 
+              onClick={() => setReportData({ show: true, targetType: 'COMMENT', targetId: comment.id })}
+              className="text-gray-400 hover:text-orange-500"
+              title="Zgłoś komentarz"
+            >
+              <Flag className="w-4 h-4" />
+            </button>
             {comment.author?.id === userData.id && !editingComment && (
               <button onClick={() => startEditingComment(comment)} className="text-gray-400 hover:text-indigo-600">
                 <Edit2 className="w-4 h-4" />
@@ -322,6 +347,11 @@ export default function ForumPage() {
             onConfirm={handleConfirmedDelete}
             onCancel={() => setModal({ show: false, type: null, id: null })}
         />
+      <ReportModal 
+        {...reportData}
+        onClose={() => setReportData({ show: false, targetType: '', targetId: null })}
+        onReport={handleSendReport}
+      />
       <Header userLogin={userData.userLogin} currentPage="forum" />
       
       <main className="max-w-4xl mx-auto py-8 px-4 text-left">
@@ -358,6 +388,13 @@ export default function ForumPage() {
                       {selectedPost.title}
                     </h1>
                     <div className="flex gap-2 shrink-0 ml-4">
+                      <button 
+                        onClick={() => setReportData({ show: true, targetType: 'POST', targetId: selectedPost.id })}
+                        className="text-gray-400 hover:text-orange-500 p-2"
+                        title="Zgłoś post"
+                      >
+                        <Flag className="w-5 h-5" />
+                      </button>
                       {selectedPost.author?.id === userData.id && (
                         <button onClick={startEditingPost} className="text-gray-400 hover:text-indigo-600 p-2">
                           <Edit2 className="w-5 h-5" />

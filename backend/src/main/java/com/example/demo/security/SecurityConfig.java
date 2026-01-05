@@ -95,6 +95,8 @@ public class SecurityConfig {
 
                 registry.requestMatchers("/api/forum/**").permitAll();
 
+                registry.requestMatchers("/api/reports/**").permitAll();
+
                 // All other requests still require authentication
                 registry.anyRequest().authenticated();
             })
