@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Edit, X, CheckCircle, Image as ImageIcon } from 'lucide-react';
 import AdminSidebar from '../components/AdminSidebar';
+import Toast from '../components/Toast';
 
 export default function EditCoursePage() {
   const { id } = useParams(); 
@@ -28,9 +29,16 @@ export default function EditCoursePage() {
   const API_BASE_URL = 'http://localhost:8080/api/courses';
   const IMAGE_BASE_URL = 'http://localhost:8080/api/uploads';
 
+  const [toast, setToast] = useState({ show: false, message: '', isError: false });
+
+  const showToast = (message, isError = false) => {
+    setToast({ show: true, message, isError });
+    setTimeout(() => setToast(prev => ({ ...prev, show: false })), 3000);
+  };
+
   useEffect(() => {
     if (!jwtToken || localStorage.getItem('role') !== 'ADMIN') {
-      setError("Autoryzacja nieudana.");
+      showToast("Autoryzacja nieudana.", true);
       setTimeout(() => window.location.replace('/'), 1500);
       return;
     }
@@ -59,7 +67,7 @@ export default function EditCoursePage() {
         });
 
       } catch (err) {
-        setError(err.message);
+        showToast(err.message, true)
       } finally {
         setIsLoading(false);
       }
@@ -100,7 +108,9 @@ export default function EditCoursePage() {
         body: JSON.stringify(formData),
       });
 
-      if (!response.ok) throw new Error('Nie udało się zaktualizować danych kursu.');
+      const data = await response.json();
+
+      if (!response.ok) throw new Error(data.message || 'Nie udało się zaktualizować danych kursu.');
 
       if (selectedFile) {
         const fileData = new FormData();
@@ -128,7 +138,7 @@ export default function EditCoursePage() {
       }, 1500);
 
     } catch (err) {
-      setError(err.message);
+      showToast(err.message, true);
     } finally {
       setIsSaving(false);
     }
@@ -138,6 +148,11 @@ export default function EditCoursePage() {
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
+      <Toast 
+        show={toast.show} 
+        message={toast.message} 
+        isError={toast.isError} 
+      />
       <AdminSidebar userLogin={userLogin} currentPage="admin-courses" />
       <main className="md:ml-64"> 
         <div className="max-w-4xl mx-auto py-12 px-4">

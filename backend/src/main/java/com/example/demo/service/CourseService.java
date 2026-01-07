@@ -46,6 +46,9 @@ public class CourseService {
     }
 
     public CourseDTO createCourse(CourseDTO courseDTO) {
+        if (courseRepository.existsByTitle(courseDTO.getTitle())) {
+            throw new RuntimeException("Kurs o takim tytule już istnieje.");
+        }
         Course course = new Course();
         course.setTitle(courseDTO.getTitle());
         course.setTotalLessons(courseDTO.getTotalLessons());
@@ -63,6 +66,10 @@ public class CourseService {
     @Transactional
     public Optional<CourseDTO> updateCourse(Long id, CourseDTO courseDTO) {
         return courseRepository.findById(id).map(existingCourse -> {
+
+            if (courseRepository.existsByTitleAndIdNot(courseDTO.getTitle(), id)) {
+                throw new RuntimeException("Inny kurs posiada już taki tytuł.");
+            }
             
             existingCourse.setTitle(courseDTO.getTitle());
             existingCourse.setTotalLessons(courseDTO.getTotalLessons());

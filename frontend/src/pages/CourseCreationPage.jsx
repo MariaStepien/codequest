@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Upload, X, CheckCircle, Image as ImageIcon } from 'lucide-react';
 import AdminSidebar from '../components/AdminSidebar';
 import { useNavigate } from 'react-router-dom';
+import Toast from '../components/Toast';
 
 const initialCourseData = {
   title: '',
@@ -21,6 +22,13 @@ export default function CourseCreationPage() {
 
   const jwtToken = localStorage.getItem('token');
   const navigate = useNavigate();
+
+  const [toast, setToast] = useState({ show: false, message: '', isError: false });
+
+  const showToast = (message, isError = false) => {
+    setToast({ show: true, message, isError });
+    setTimeout(() => setToast(prev => ({ ...prev, show: false })), 3000);
+  };
 
   useEffect(() => {
     if (!jwtToken) {
@@ -87,7 +95,7 @@ export default function CourseCreationPage() {
     setSuccessMessage('');
     
     if (!jwtToken || localStorage.getItem('role') !== 'ADMIN') {
-      setError("Autoryzacja nieudana.");
+      showToast("Autoryzacja nieudana.", true);
       setIsLoading(false);
       return;
     }
@@ -101,13 +109,13 @@ export default function CourseCreationPage() {
         },
         body: JSON.stringify(formData),
       });
+      const data = await response.json();
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: 'Błąd serwera.' }));
-        throw new Error(errorData.message || 'Nie udało się utworzyć kursu.');
+        throw new Error(data.message || 'Nie udało się utworzyć kursu.');
       }
 
-      const createdCourse = await response.json();
+      const createdCourse = data;
 
       if (selectedFile) {
         const fileData = new FormData();
@@ -126,13 +134,13 @@ export default function CourseCreationPage() {
         }
       }
 
-      setSuccessMessage(`Kurs "${createdCourse.title}" został utworzony pomyślnie.`);
+      showToast("Kurs został utworzony pomyślnie!", false);
       setTimeout(() => {
         navigate('/admin/courses');
       }, 1500);
       
     } catch (err) {
-      setError(err.message); 
+      showToast(err.message, true);
     } finally {
       setIsLoading(false);
     }
@@ -148,6 +156,11 @@ export default function CourseCreationPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
+      <Toast 
+        show={toast.show} 
+        message={toast.message} 
+        isError={toast.isError} 
+      />
       <AdminSidebar userLogin={userData.userLogin || "Admin"} currentPage="add-course" />
       <main className="md:ml-64"> 
         <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
