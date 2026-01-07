@@ -134,8 +134,22 @@ public class LessonService {
         Lesson lesson = lessonRepository.findById(lessonId)
             .orElseThrow(() -> new RuntimeException("Lesson not found with ID: " + lessonId));
 
+        Integer oldOrderIndex = lesson.getOrderIndex();
+        Integer newOrderIndex = updateDto.getOrderIndex();
+        Long courseId = updateDto.getCourseId() != null ? updateDto.getCourseId() : lesson.getCourseId();
+
+        if (!oldOrderIndex.equals(newOrderIndex)) {
+            Optional<Lesson> lessonToSwap = lessonRepository.findByCourseIdAndOrderIndex(courseId, newOrderIndex);
+            
+            if (lessonToSwap.isPresent()) {
+                Lesson otherLesson = lessonToSwap.get();
+                otherLesson.setOrderIndex(oldOrderIndex);
+                lessonRepository.save(otherLesson);
+            }
+        }
+
         lesson.setTitle(updateDto.getTitle());
-        lesson.setOrderIndex(updateDto.getOrderIndex());
+        lesson.setOrderIndex(newOrderIndex);
         lesson.setHasEnemy(updateDto.isHasEnemy());
         if (updateDto.isHasEnemy()) {
             lesson.setEnemyId(updateDto.getEnemyId());

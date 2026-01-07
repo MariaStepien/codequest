@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AdminSidebar from '../components/AdminSidebar'; 
 import { Upload, X, CheckCircle, ImageIcon } from 'lucide-react';
 import TaskEditor from '../components/TaskEditor';
+import Toast from '../components/Toast';
 
 const initialLessonData = {
     courseId: '',
@@ -27,9 +28,12 @@ export default function LessonCreationPage() {
     const [selectedEnemyId, setSelectedEnemyId] = useState('');
 
     const [bgFile, setBgFile] = useState(null);
+    const [maxAllowedIndex, setMaxAllowedIndex] = useState(null);
 
     const jwtToken = localStorage.getItem('token');
     const storedRole = localStorage.getItem('role');
+
+    const [toast, setToast] = useState({ show: false, message: '', type: '' });
 
     const fetchNextOrderIndex = async (courseId) => {
         if (!courseId) return;
@@ -40,10 +44,16 @@ export default function LessonCreationPage() {
             if (response.ok) {
                 const nextIndex = await response.json();
                 setLessonData(prev => ({ ...prev, orderIndex: nextIndex }));
+                setMaxAllowedIndex(nextIndex);
             }
         } catch (err) {
             console.error("Błąd pobierania indeksu:", err);
         }
+    };
+
+    const showToast = (message, isError = false) => {
+        setToast({ show: true, message, isError });
+        setTimeout(() => setToast({ ...toast, show: false }), 3000);
     };
 
     useEffect(() => {
@@ -95,7 +105,7 @@ export default function LessonCreationPage() {
                     setCourses(data);
                     const firstCourseId = data[0].id;
                     setLessonData(prev => ({ ...prev, courseId: firstCourseId }));
-                    fetchNextOrderIndex(firstCourseId); // Get suggestion for first course
+                    fetchNextOrderIndex(firstCourseId);
                 }
             } catch (err) {
                 setError(err.message);
@@ -139,7 +149,7 @@ export default function LessonCreationPage() {
         setIsLoading(true);
 
         if (tasks.length === 0) {
-            setError("Lekcja musi zawierać co najmniej jedno zadanie.");
+            showToast("Lekcja musi zawierać co najmniej jedno zadanie.", true);
             setIsLoading(false);
             return;
         }
@@ -180,8 +190,11 @@ export default function LessonCreationPage() {
             setSuccessMessage(`Pomyślnie utworzono lekcję: ${createdLesson.title} (ID: ${createdLesson.id}).`);
             
             setLessonData(initialLessonData);
-            setLessonData(prev => ({ ...prev, courseId: courses[0]?.id || '' }));
+            const defaultCourseId = courses[0]?.id || '';
+            setLessonData(prev => ({ ...prev, courseId: defaultCourseId }));
+            if (defaultCourseId) fetchNextOrderIndex(defaultCourseId);
             setTasks([]);
+            setBgFile(null);
 
         } catch (err) {
             setError(err.message);
@@ -270,20 +283,20 @@ export default function LessonCreationPage() {
 
                         <div>
                             <label htmlFor="orderIndex" className="block text-sm font-bold text-gray-700 mb-1">
-                                Indeks Kolejności (Order Index)
+                                Indeks Kolejności (Automatyczny)
                             </label>
                             <input
                                 type="number"
                                 name="orderIndex"
                                 id="orderIndex"
                                 value={lessonData.orderIndex}
-                                onChange={handleChange}
-                                required
-                                min="1"
-                                disabled={isLoading}
-                                className="text-black mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-3 border focus:ring-indigo-500 focus:border-indigo-500"
-                                placeholder="Np. 1, 2, 3..."
+                                readOnly
+                                className="text-gray-500 mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-3 border bg-gray-100 focus:ring-0"
+                                placeholder="Pobieranie indeksu..."
                             />
+                            <p className="mt-1 text-xs text-indigo-600 font-medium">
+                                Indeks jest przypisywany automatycznie, aby zachować ciągłość lekcji.
+                            </p>
                         </div>
                         <div className="bg-white p-6 rounded-xl border border-gray-200 mb-6">
                             <label className="text-lg font-bold text-gray-700 block mb-4">Tło lekcji (opcjonalnie)</label>
@@ -400,6 +413,11 @@ export default function LessonCreationPage() {
                     </form>
                 </div>
             </main>
+            <Toast 
+                show={toast.show} 
+                message={toast.message} 
+                isError={toast.isError} 
+            />
         </div>
     );
 }
