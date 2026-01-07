@@ -54,6 +54,8 @@ function App() {
 
       <Route path="/course/:courseId/level/:levelNumber" element={<LevelTemplate />} />
 
+      <Route path= "/admin/preview-lesson/:courseId/level/:levelNumber" element={<LevelTemplate isAdminPreview={true} nextLevelPath="/admin/courses" />} />
+
       <Route path='/admin-dashboard' element={<AdminDashboardPage/>} />
 
       <Route path='/admin/create-course' element={<CourseCreationPage/>} />

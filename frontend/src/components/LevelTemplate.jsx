@@ -46,7 +46,7 @@ const calculatePoints = (timeTakenSeconds) => {
     return Math.max(MIN_POINTS, calculatedPoints);
 };
 
-export default function LevelTemplate({ nextLevelPath }) {
+export default function LevelTemplate({ nextLevelPath, isAdminPreview = false }) {
     const { courseId, levelNumber: routeLevelNumber } = useParams();
     const orderIndex = routeLevelNumber ? parseInt(routeLevelNumber, 10) : null;
     
@@ -169,24 +169,33 @@ export default function LevelTemplate({ nextLevelPath }) {
     };
 
     const handleNextTask = async () => {
-        if (isCurrentTaskComplete) {
-            if (currentTaskIndex < tasks.length - 1) {
-                setCurrentTaskIndex(prevIndex => prevIndex + 1);
-                setIsCurrentTaskComplete(false);
-                setFeedbackMessage('');
-            } else {
-                const courseIdNum = parseInt(courseId, 10);
-                const lessonIdNum = lessonData?.id; 
-                const starsEarned = calculateStars(health);
-                const pointsEarned = calculatePoints(elapsedTime);
+        const canProceed = isCurrentTaskComplete || isAdminPreview;
+            if (canProceed) {
+                if (currentTaskIndex < tasks.length - 1) {
+                    setCurrentTaskIndex(prevIndex => prevIndex + 1);
+                    setIsCurrentTaskComplete(false);
+                    setFeedbackMessage('');
+                } else {
+                    const courseIdNum = parseInt(courseId, 10);
+                    const lessonIdNum = lessonData?.id; 
+                    const starsEarned = calculateStars(health);
+                    const pointsEarned = calculatePoints(elapsedTime);
 
-                if (courseIdNum && lessonIdNum) {
-                    await recordLessonProgress(lessonIdNum, courseIdNum, elapsedTime, starsEarned, pointsEarned);
-                    await updateUserProgress(courseIdNum, orderIndex);
+                    if (!isAdminPreview && courseIdNum && lessonIdNum) {
+                        await recordLessonProgress(lessonIdNum, courseIdNum, elapsedTime, starsEarned, pointsEarned);
+                        await updateUserProgress(courseIdNum, orderIndex);
+                    }
+                    setCurrentTaskIndex(tasks.length);
+                    setIsCurrentTaskComplete(false);
                 }
-                setCurrentTaskIndex(tasks.length);
-                setIsCurrentTaskComplete(false);
             }
+    };
+
+    const handlePreviousTask = () => {
+        if (currentTaskIndex > 0) {
+            setCurrentTaskIndex(prevIndex => prevIndex - 1);
+            setIsCurrentTaskComplete(false);
+            setFeedbackMessage('');
         }
     };
 
@@ -225,82 +234,112 @@ export default function LevelTemplate({ nextLevelPath }) {
 
     return (
         <div className="flex items-center justify-center p-4" style={backgroundStyle}>
-            {!isLevelComplete && (
-                <button onClick={() => setShowExitConfirmation(true)} className="fixed top-4 left-4 p-3 rounded-full bg-red-500 text-white text-xl hover:bg-red-600 transition shadow-lg z-50">
-                    &times;
-                </button>
+            {isAdminPreview && (
+                <div className="fixed top-0 left-0 right-0 bg-amber-500 text-white text-center py-1.5 text-sm font-bold z-[100] shadow-md uppercase tracking-wider">
+                    Tryb Podglądu Administratora - Nawigacja Odblokowana
+                </div>
             )}
-            
-            <div className="flex-shrink-0 mb-20">
-                {lessonData?.hasEnemy ? (
-                    <PlayerSprite/>
-                ) : (
-                    <div className="w-32 h-40"></div>
+            <div className="flex items-center justify-center p-4" style={backgroundStyle}>
+                {!isLevelComplete && (
+                    <button onClick={() => setShowExitConfirmation(true)} className="fixed top-4 left-4 p-3 rounded-full bg-red-500 text-white text-xl hover:bg-red-600 transition shadow-lg z-50">
+                        &times;
+                    </button>
                 )}
-            </div>
-            
+                
+                <div className="flex-shrink-0 mb-20">
+                    {lessonData?.hasEnemy ? (
+                        <PlayerSprite/>
+                    ) : (
+                        <div className="w-32 h-40"></div>
+                    )}
+                </div>
+                
 
-            <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-2xl p-8 w-full max-w-3xl border-t-8 border-indigo-500">
-                <header className="mb-6 border-b pb-4">
-                    <div className="flex justify-between items-start">
-                        <div>
-                            <h2 className="text-3xl font-bold text-gray-800">{lessonData?.title || `Poziom ${orderIndex}`}</h2>
-                            {!isLevelComplete && <p className="text-sm text-indigo-500 font-semibold mt-2">{currentTaskIndex + 1} z {tasks.length}</p>}
-                        </div>
-                        {!isLevelComplete && <div className="text-xl font-bold text-gray-700 self-center mr-4">⏱️ {formatTime(elapsedTime)}</div>}
-                        {!isLevelComplete && (
-                            <div className="w-1/3 min-w-[120px] ml-4">
-                                <p className="text-sm font-semibold text-red-600 mb-1">Życie: {Math.max(0, Math.round(health))}%</p>
-                                <div className="h-4 bg-gray-200 rounded-full overflow-hidden border border-gray-300">
-                                    <div className="h-full bg-red-500 transition-all duration-500" style={{ width: `${(health / INITIAL_HEALTH) * 100}%` }}></div>
+                <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-2xl p-8 w-full max-w-3xl border-t-8 border-indigo-500">
+                    <header className="mb-6 border-b pb-4">
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <h2 className="text-3xl font-bold text-gray-800">{lessonData?.title || `Poziom ${orderIndex}`}</h2>
+                                {!isLevelComplete && <p className="text-sm text-indigo-500 font-semibold mt-2">{currentTaskIndex + 1} z {tasks.length}</p>}
+                            </div>
+                            {!isLevelComplete && <div className="text-xl font-bold text-gray-700 self-center mr-4">⏱️ {formatTime(elapsedTime)}</div>}
+                            {!isLevelComplete && (
+                                <div className="w-1/3 min-w-[120px] ml-4">
+                                    <p className="text-sm font-semibold text-red-600 mb-1">Życie: {Math.max(0, Math.round(health))}%</p>
+                                    <div className="h-4 bg-gray-200 rounded-full overflow-hidden border border-gray-300">
+                                        <div className="h-full bg-red-500 transition-all duration-500" style={{ width: `${(health / INITIAL_HEALTH) * 100}%` }}></div>
+                                    </div>
                                 </div>
+                            )}
+                        </div>
+                    </header>
+
+                    <div className="min-h-[250px] flex flex-col justify-center">
+                        {!isLevelComplete ? (
+                            CurrentTaskComponent ? (
+                                <CurrentTaskComponent key={currentTaskIndex} {...currentTaskObject} onTaskComplete={handleTaskCompletion} />
+                            ) : <p className="text-red-500 font-bold">Błąd typu zadania</p>
+                        ) : (
+                            <div className="text-center py-10">
+                                <p className="text-3xl font-extrabold text-green-700 mb-4">👑 Poziom ukończony! 👑</p>
+                                <button onClick={() => navigate(isAdminPreview ? '/admin/courses' : (nextLevelPath || '/dashboard'))} className="px-8 py-4 rounded-full bg-indigo-600 text-white font-bold text-lg hover:bg-indigo-700 transition shadow-lg">
+                                    {isAdminPreview ? 'Powróć do panelu' : 'Powróć do mapy'}
+                                </button>
                             </div>
                         )}
                     </div>
-                </header>
 
-                <div className="min-h-[250px] flex flex-col justify-center">
-                    {!isLevelComplete ? (
-                        CurrentTaskComponent ? (
-                            <CurrentTaskComponent key={currentTaskIndex} {...currentTaskObject} onTaskComplete={handleTaskCompletion} />
-                        ) : <p className="text-red-500 font-bold">Błąd typu zadania</p>
-                    ) : (
-                        <div className="text-center py-10">
-                            <p className="text-3xl font-extrabold text-green-700 mb-4">👑 Poziom ukończony! 👑</p>
-                            <button onClick={() => navigate(nextLevelPath || '/dashboard')} className="px-8 py-4 rounded-full bg-indigo-600 text-white font-bold text-lg hover:bg-indigo-700 transition shadow-lg">Powróć do mapy</button>
+                    {!isLevelComplete && (
+                        <div className="mt-8 pt-4 border-t flex justify-between items-center">
+                            <div className="flex gap-2">
+                                {isAdminPreview && (
+                                    <button 
+                                        onClick={handlePreviousTask}
+                                        disabled={currentTaskIndex === 0}
+                                        className={`px-4 py-2 rounded-lg font-semibold transition ${currentTaskIndex === 0 ? 'bg-gray-200 text-gray-400' : 'bg-gray-600 text-white hover:bg-gray-700'}`}
+                                    >
+                                        Poprzednie
+                                    </button>
+                                )}
+                            </div>
+
+                            <div className="flex items-center">
+                                {feedbackMessage && <p className={`mr-4 self-center font-medium ${isCurrentTaskComplete ? 'text-green-600' : 'text-red-600'}`}>{feedbackMessage}</p>}
+                                
+                                <div className="flex gap-2">
+                                    <button 
+                                        onClick={handleNextTask} 
+                                        disabled={!isCurrentTaskComplete && !isAdminPreview} 
+                                        className={`px-8 py-3 rounded-full text-white font-semibold transition shadow-md ${isCurrentTaskComplete || isAdminPreview ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-400 cursor-not-allowed'}`}
+                                    >
+                                        {currentTaskIndex < tasks.length - 1 ? 'Następne zadanie' : 'Ukończ poziom'}
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     )}
                 </div>
 
-                {!isLevelComplete && (
-                    <div className="mt-8 pt-4 border-t flex justify-end">
-                        {feedbackMessage && <p className={`mr-4 self-center font-medium ${isCurrentTaskComplete ? 'text-green-600' : 'text-red-600'}`}>{feedbackMessage}</p>}
-                        <button onClick={handleNextTask} disabled={!isCurrentTaskComplete} className={`px-8 py-3 rounded-full text-white font-semibold transition shadow-md ${isCurrentTaskComplete ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-400 cursor-not-allowed'}`}>
-                            {currentTaskIndex < tasks.length - 1 ? 'Następne zadanie' : 'Ukończ poziom'}
-                        </button>
-                    </div>
-                )}
-            </div>
+                <div className="flex-shrink-0 mb-20">
+                    {lessonData?.hasEnemy && lessonData?.enemyId ? (
+                        <EnemySprite enemyId={lessonData.enemyId} />
+                    ) : (
+                        <div className="w-32 h-40"></div>
+                    )}
+                </div>
 
-            <div className="flex-shrink-0 mb-20">
-                {lessonData?.hasEnemy && lessonData?.enemyId ? (
-                    <EnemySprite enemyId={lessonData.enemyId} />
-                ) : (
-                    <div className="w-32 h-40"></div>
-                )}
-            </div>
-
-            {showExitConfirmation && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-20 backdrop-blur-sm">
-                    <div className="bg-white p-8 rounded-xl shadow-2xl max-w-sm w-full text-center">
-                        <h3 className="text-xl font-bold text-gray-800 mb-4">Czy na pewno chcesz opuścić ten poziom?</h3>
-                        <div className="flex justify-center space-x-4">
-                            <button onClick={() => navigate('/dashboard')} className="px-6 py-2 rounded-md bg-red-600 text-white font-semibold hover:bg-red-700">Tak</button>
-                            <button onClick={() => setShowExitConfirmation(false)} className="px-6 py-2 rounded-md bg-gray-300 text-gray-800 font-semibold hover:bg-gray-400">Nie</button>
+                {showExitConfirmation && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-grey bg-opacity-20 backdrop-blur-sm">
+                        <div className="bg-white p-8 rounded-xl shadow-2xl max-w-sm w-full text-center">
+                            <h3 className="text-xl font-bold text-gray-800 mb-4">Czy na pewno chcesz opuścić ten poziom?</h3>
+                            <div className="flex justify-center space-x-4">
+                                <button onClick={() => navigate('/dashboard')} className="px-6 py-2 rounded-md bg-red-600 text-white font-semibold hover:bg-red-700">Tak</button>
+                                <button onClick={() => setShowExitConfirmation(false)} className="px-6 py-2 rounded-md bg-gray-300 text-gray-800 font-semibold hover:bg-gray-400">Nie</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 }

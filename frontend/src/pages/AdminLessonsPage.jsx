@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminSidebar from '../components/AdminSidebar';
-import { BookOpenText, ListOrdered, X, Edit, Loader2, Trash2 } from 'lucide-react';
+import { BookOpenText, ListOrdered, X, Edit, Loader2, Trash2, Eye } from 'lucide-react';
 
-const LessonListItem = ({ lesson, navigate, onDelete, isPublished }) => {
+const LessonListItem = ({ lesson, navigate, onDelete, isPublished, courseId }) => {
   const handleEditLesson = () => {
     navigate(`/admin/edit-lesson/${lesson.id}`);
+  };
+
+  const handlePreviewLesson = () => {
+    navigate(`/admin/preview-lesson/${courseId}/level/${lesson.orderIndex}`);
   };
 
   return (
@@ -20,6 +24,13 @@ const LessonListItem = ({ lesson, navigate, onDelete, isPublished }) => {
         </span>
       </div>
       <div className="flex items-center space-x-3">
+        <button 
+          onClick={handlePreviewLesson}
+          className="flex items-center space-x-1 px-3 py-1 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-full transition"
+        >
+          <Eye className="w-4 h-4" />
+          <span>Podgląd</span>
+        </button>
         <button 
           onClick={handleEditLesson}
           className="flex items-center space-x-1 px-3 py-1 text-sm font-medium rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition duration-150"
@@ -175,6 +186,7 @@ export default function AdminLessonsPage() {
                     navigate={navigate} 
                     onDelete={handleDeleteLesson}
                     isPublished={isPublished}
+                    courseId = {courseId}
                 />
               ))}
             </div>
