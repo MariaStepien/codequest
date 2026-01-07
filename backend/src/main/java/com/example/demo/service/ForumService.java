@@ -61,6 +61,12 @@ public class ForumService {
         return commentRepository.save(comment);
     }
 
+    @Transactional(readOnly= true)
+    public Comment getCommentById(Long id) {
+        return commentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+    }
+
     public void deleteComment(Long commentId, Long userId, boolean isAdmin) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("Comment not found"));

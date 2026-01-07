@@ -1,5 +1,12 @@
 package com.example.demo.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.example.demo.domain.Report;
 import com.example.demo.domain.ReportStatus;
 import com.example.demo.domain.User;
@@ -7,14 +14,6 @@ import com.example.demo.repos.ReportRepository;
 import com.example.demo.repos.UserRepository;
 
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static com.example.demo.domain.ReportStatus.PENDING;
 
 @Service
 @RequiredArgsConstructor
@@ -33,8 +32,17 @@ public class ReportService {
         return reportRepository.save(report);
     }
 
-    public List<Report> getPendingReports() {
-        return reportRepository.findByStatus(PENDING);
+    public List<Report> getFilteredReports(String status, String sortDirection) {
+        Sort sort = sortDirection.equalsIgnoreCase("ASC") 
+                    ? Sort.by("createdAt").ascending() 
+                    : Sort.by("createdAt").descending();
+
+        if (status == null || status.equals("ALL")) {
+            return reportRepository.findAll(sort);
+        } else {
+            ReportStatus reportStatus = ReportStatus.valueOf(status);
+            return reportRepository.findByStatus(reportStatus, sort);
+        }
     }
 
     @Transactional
@@ -45,5 +53,11 @@ public class ReportService {
         report.setStatus(status);
         report.setResolvedAt(LocalDateTime.now());
         reportRepository.save(report);
+    }
+
+    public Report getById(Long reportId) {
+        Report report = reportRepository.findById(reportId).orElseThrow();
+
+        return report;
     }
 }
