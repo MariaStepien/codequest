@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { AlertCircle, CheckCircle, XCircle, Filter, Calendar, Flag, MessageSquare, FileText, Eye, X, Trash2 } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { CheckCircle, XCircle, Filter, Calendar, Flag, MessageSquare, FileText, Eye, X, Trash2, BookOpen } from 'lucide-react';
 import AdminSidebar from '../components/AdminSidebar';
 import Toast from '../components/Toast';
 import ConfirmationModal from '../components/ConfirmationModal';
+import { useNavigate } from 'react-router-dom';
 
 export default function ReportListPage() {
+  const navigate = useNavigate();
   const [reports, setReports] = useState([]);
   const [filterStatus, setFilterStatus] = useState('ALL');
   const [sortDate, setSortDate] = useState('DESC');
@@ -28,12 +30,13 @@ export default function ReportListPage() {
     'PENDING': 'Oczekujące',
     'RESOLVED': 'Rozwiązane',
     'DISMISSED': 'Odrzucone',
-    'ALL': 'Wszystkie statusy'
+    'ALL': 'Wszystkie'
   };
 
   const targetTypeLabels = {
     'POST': 'Post',
-    'COMMENT': 'Komentarz'
+    'COMMENT': 'Komentarz', 
+    'LESSON': 'Lekcja'
   };
 
   const triggerToast = (msg, err = false) => {
@@ -142,6 +145,20 @@ export default function ReportListPage() {
   const fetchReportedContent = async (report) => {
     setLoadingContent(true);
     try {
+      const token = localStorage.getItem('token');
+      if (report.targetType === 'LESSON') {
+        const lessonRes = await fetch(`http://localhost:8080/api/lessons/${report.targetId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (lessonRes.ok) {
+          const lessonData = await lessonRes.json();
+          navigate(`/admin/preview-lesson/${lessonData.courseId}/level/${lessonData.orderIndex}`);
+          return;
+        } else {
+          throw new Error("Nie udało się pobrać danych lekcji");
+        }
+      }
       const res = await fetch(`http://localhost:8080/api/reports/${report.id}/content`);
       if (res.ok) {
         const data = await res.json();
@@ -252,9 +269,16 @@ export default function ReportListPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        report.targetType === 'POST' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'
+                        report.targetType === 'POST' 
+                          ? 'bg-blue-100 text-blue-800' 
+                          : report.targetType === 'LESSON'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-purple-100 text-purple-800'
                       }`}>
-                        {report.targetType === 'POST' ? <FileText className="w-3 h-3" /> : <MessageSquare className="w-3 h-3" />}
+                        {report.targetType === 'POST' && <FileText className="w-3 h-3" />}
+                        {report.targetType === 'LESSON' && <BookOpen className="w-3 h-3" />}
+                        {report.targetType === 'COMMENT' && <MessageSquare className="w-3 h-3" />}
+                        
                         {targetTypeLabels[report.targetType] || report.targetType}
                       </span>
                     </td>

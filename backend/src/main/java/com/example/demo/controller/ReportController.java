@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.domain.Report;
 import com.example.demo.domain.ReportStatus;
 import com.example.demo.repos.CommentRepository;
+import com.example.demo.repos.LessonRepository;
 import com.example.demo.repos.PostRepository;
 import com.example.demo.service.ReportService;
 
@@ -30,6 +31,7 @@ public class ReportController {
     private final ReportService reportService;
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
+    private final LessonRepository lessonRepository;
 
     @PostMapping
     public ResponseEntity<Report> createReport(@RequestBody Report report, @RequestParam Long reporterId) {
@@ -58,6 +60,8 @@ public class ReportController {
             return ResponseEntity.ok(postRepository.findById(report.getTargetId()));
         } else if ("COMMENT".equals(report.getTargetType())) {
             return ResponseEntity.ok(commentRepository.findById(report.getTargetId()));
+        } else if ("LESSON".equals(report.getTargetType())) {
+            return ResponseEntity.ok(lessonRepository.findById(report.getTargetId()));
         }
         return ResponseEntity.badRequest().build();
     }

@@ -6,8 +6,18 @@ const CATEGORIES = [
   "Mowa nienawiści",
   "Nękanie",
   "Nieodpowiednie treści",
+  "Błąd w zadaniu",
   "Inne"
 ];
+
+const getTargetLabel = (type) => {
+  switch (type) {
+    case 'POST': return 'post';
+    case 'COMMENT': return 'komentarz';
+    case 'LESSON': return 'lekcję';
+    default: return 'treść';
+  }
+};
 
 export default function ReportModal({ show, onClose, onReport, targetType, targetId }) {
   const [category, setCategory] = useState(CATEGORIES[0]);
@@ -32,7 +42,7 @@ export default function ReportModal({ show, onClose, onReport, targetType, targe
       <div className="bg-white rounded-xl shadow-xl max-w-md w-full overflow-hidden">
         <div className="flex justify-between items-center p-4 border-b">
           <h3 className="text-lg font-bold flex items-center text-red-600">
-            <AlertTriangle className="w-5 h-5 mr-2" /> Zgłoś {targetType === 'POST' ? 'post' : 'komentarz'}
+            <AlertTriangle className="w-5 h-5 mr-2" /> Zgłoś {getTargetLabel(targetType)}
           </h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X className="w-6 h-6" />

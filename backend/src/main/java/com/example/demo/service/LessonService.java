@@ -183,7 +183,8 @@ public class LessonService {
         LessonDto lessonDto = new LessonDto();
         lessonDto.setId(lesson.getId());
         lessonDto.setTitle(lesson.getTitle());
-        lessonDto.setOrderIndex(lesson.getOrderIndex()); 
+        lessonDto.setOrderIndex(lesson.getOrderIndex());
+        lessonDto.setCourseId(lesson.getCourseId());
         lessonDto.setTasks(List.of()); 
         lessonDto.setHasEnemy(lesson.isHasEnemy());
         if (lesson.isHasEnemy()){
@@ -199,7 +200,8 @@ public class LessonService {
         LessonDto lessonDto = new LessonDto();
         lessonDto.setId(lesson.getId());
         lessonDto.setTitle(lesson.getTitle());
-        lessonDto.setOrderIndex(lesson.getOrderIndex()); 
+        lessonDto.setOrderIndex(lesson.getOrderIndex());
+        lessonDto.setCourseId(lesson.getCourseId());
         lessonDto.setHasEnemy(lesson.isHasEnemy());
         if (lesson.isHasEnemy()){
             lessonDto.setEnemyId(lesson.getEnemyId());

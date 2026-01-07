@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Flag, Clock } from 'lucide-react';
 
 import FillInTheBlank from './FillInTheBlank';
 import MatchingPairs from './MatchingPairs';
@@ -10,6 +11,8 @@ import TextBox from './TextBox';
 import CodeFix from './CodeFix';
 import PlayerSprite from './PlayerSprite';
 import EnemySprite from './EnemySprite';
+import ReportModal from './ReportModal';
+import Toast from '../components/Toast';
 
 import defaultLevelBackground from '../assets/testbackground.png';
 
@@ -63,6 +66,9 @@ export default function LevelTemplate({ nextLevelPath, isAdminPreview = false })
     const [health, setHealth] = useState(INITIAL_HEALTH);
     const [elapsedTime, setElapsedTime] = useState(0);
 
+    const [reportData, setReportData] = useState({ show: false, targetType: 'LESSON', targetId: null });
+    const [toast, setToast] = useState({ show: false, message: '', isError: false });
+
     const tasks = lessonData?.tasks || [];
     const currentTaskObject = tasks[currentTaskIndex];
     const isLevelComplete = currentTaskIndex >= tasks.length; 
@@ -71,6 +77,11 @@ export default function LevelTemplate({ nextLevelPath, isAdminPreview = false })
     const interactiveTasksCount = tasks.filter(t => t.type !== 'TextBox').length;
     const healthLossPerFail = interactiveTasksCount > 0 ? INITIAL_HEALTH / interactiveTasksCount : 0;
     
+    const triggerToast = (msg, err = false) => {
+        setToast({ show: true, message: msg, isError: err });
+        setTimeout(() => setToast({ show: false, message: '', isError: false }), 3000);
+    };
+
     useEffect(() => {
         let interval;
         const isTextBox = currentTaskObject?.type === 'TextBox';
@@ -92,6 +103,30 @@ export default function LevelTemplate({ nextLevelPath, isAdminPreview = false })
         setIsCurrentTaskComplete(false);
         setFeedbackMessage('');
         setElapsedTime(0);
+    };
+
+    const handleSendReport = async (data) => {
+        try {
+            const token = localStorage.getItem('token');
+            const userRes = await fetch('http://localhost:8080/api/user/me', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const userData = await userRes.json();
+
+            const res = await fetch(`http://localhost:8080/api/reports?reporterId=${userData.id}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (res.ok) {
+                triggerToast("Zgłoszenie zostało wysłane.");
+            } else {
+                triggerToast("Błąd podczas wysyłania zgłoszenia.", true);
+            }
+        } catch (error) {
+            triggerToast("Błąd połączenia z serwerem.", true);
+        }
     };
 
     const updateUserProgress = async (courseId, completedLevelOrderIndex) => {
@@ -147,6 +182,7 @@ export default function LevelTemplate({ nextLevelPath, isAdminPreview = false })
                 const response = await fetch(`/api/lessons/course/${courseId}/order/${orderIndex}`);
                 const data = await response.json();
                 setLessonData(data);
+                setReportData(prev => ({ ...prev, targetId: data.id }));
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -233,36 +269,58 @@ export default function LevelTemplate({ nextLevelPath, isAdminPreview = false })
     const CurrentTaskComponent = currentTaskObject ? TaskComponentMap[currentTaskObject.type] : null;
 
     return (
-        <div className="flex items-center justify-center p-4" style={backgroundStyle}>
+        <div className="flex flex-col items-center justify-center p-4 gap-6" style={backgroundStyle}>
+            <Toast {...toast} />
+            <ReportModal 
+                {...reportData}
+                onClose={() => setReportData(prev => ({ ...prev, show: false }))}
+                onReport={handleSendReport}
+            />
             {isAdminPreview && (
                 <div className="fixed top-0 left-0 right-0 bg-amber-500 text-white text-center py-1.5 text-sm font-bold z-[100] shadow-md uppercase tracking-wider">
                     Tryb Podglądu Administratora - Nawigacja Odblokowana
                 </div>
             )}
-            <div className="flex items-center justify-center p-4" style={backgroundStyle}>
-                {!isLevelComplete && (
-                    <button onClick={() => setShowExitConfirmation(true)} className="fixed top-4 left-4 p-3 rounded-full bg-red-500 text-white text-xl hover:bg-red-600 transition shadow-lg z-50">
-                        &times;
-                    </button>
-                )}
-                
-                <div className="flex-shrink-0 mb-20">
-                    {lessonData?.hasEnemy ? (
-                        <PlayerSprite/>
-                    ) : (
-                        <div className="w-32 h-40"></div>
-                    )}
-                </div>
-                
 
-                <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-2xl p-8 w-full max-w-3xl border-t-8 border-indigo-500">
+            {!isLevelComplete && (
+                <button onClick={() => setShowExitConfirmation(true)} className="fixed top-4 left-4 p-3 rounded-full bg-red-500 text-white text-xl hover:bg-red-600 transition shadow-lg z-50">
+                    &times;
+                </button>
+            )}
+
+            {!isLevelComplete && (
+                <div className="bg-white/80 backdrop-blur-md px-6 py-2 rounded-full shadow-lg border border-indigo-100 flex items-center gap-3 animate-bounce-subtle">
+                    <Clock className="w-6 h-6 text-indigo-600" />
+                    <span className="text-2xl font-mono font-bold text-gray-800 tracking-wider">
+                        {formatTime(elapsedTime)}
+                    </span>
+                </div>
+            )}
+
+            <div className="flex items-center justify-center w-full max-w-7xl">
+                <div className="flex-shrink-0 hidden lg:block">
+                    {lessonData?.hasEnemy ? <PlayerSprite /> : <div className="w-32"></div>}
+                </div>
+
+                <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-2xl p-8 w-full max-w-3xl border-t-8 border-indigo-500 mx-4">
                     <header className="mb-6 border-b pb-4">
                         <div className="flex justify-between items-start">
-                            <div>
-                                <h2 className="text-3xl font-bold text-gray-800">{lessonData?.title || `Poziom ${orderIndex}`}</h2>
-                                {!isLevelComplete && <p className="text-sm text-indigo-500 font-semibold mt-2">{currentTaskIndex + 1} z {tasks.length}</p>}
+                            <div className="flex items-start gap-4">
+                                <div>
+                                    <h2 className="text-3xl font-bold text-gray-800">{lessonData?.title || `Poziom ${orderIndex}`}</h2>
+                                    {!isLevelComplete && <p className="text-sm text-indigo-500 font-semibold mt-2">{currentTaskIndex + 1} z {tasks.length}</p>}
+                                </div>
+                                {!isLevelComplete && (
+                                    <button 
+                                        onClick={() => setReportData(prev => ({ ...prev, show: true }))}
+                                        className="text-gray-400 hover:text-orange-500 p-1 mt-1 transition"
+                                        title="Zgłoś błąd w lekcji"
+                                    >
+                                        <Flag className="w-5 h-5" />
+                                    </button>
+                                )}
                             </div>
-                            {!isLevelComplete && <div className="text-xl font-bold text-gray-700 self-center mr-4">⏱️ {formatTime(elapsedTime)}</div>}
+                            
                             {!isLevelComplete && (
                                 <div className="w-1/3 min-w-[120px] ml-4">
                                     <p className="text-sm font-semibold text-red-600 mb-1">Życie: {Math.max(0, Math.round(health))}%</p>
@@ -320,26 +378,22 @@ export default function LevelTemplate({ nextLevelPath, isAdminPreview = false })
                     )}
                 </div>
 
-                <div className="flex-shrink-0 mb-20">
-                    {lessonData?.hasEnemy && lessonData?.enemyId ? (
-                        <EnemySprite enemyId={lessonData.enemyId} />
-                    ) : (
-                        <div className="w-32 h-40"></div>
-                    )}
+                <div className="flex-shrink-0 hidden lg:block">
+                    {lessonData?.hasEnemy && lessonData?.enemyId ? <EnemySprite enemyId={lessonData.enemyId} /> : <div className="w-32"></div>}
                 </div>
+            </div>
 
-                {showExitConfirmation && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-grey bg-opacity-20 backdrop-blur-sm">
-                        <div className="bg-white p-8 rounded-xl shadow-2xl max-w-sm w-full text-center">
-                            <h3 className="text-xl font-bold text-gray-800 mb-4">Czy na pewno chcesz opuścić ten poziom?</h3>
-                            <div className="flex justify-center space-x-4">
-                                <button onClick={() => navigate('/dashboard')} className="px-6 py-2 rounded-md bg-red-600 text-white font-semibold hover:bg-red-700">Tak</button>
-                                <button onClick={() => setShowExitConfirmation(false)} className="px-6 py-2 rounded-md bg-gray-300 text-gray-800 font-semibold hover:bg-gray-400">Nie</button>
-                            </div>
+            {showExitConfirmation && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
+                    <div className="bg-white p-8 rounded-xl shadow-2xl max-w-sm w-full text-center">
+                        <h3 className="text-xl font-bold text-gray-800 mb-4">Czy na pewno chcesz opuścić ten poziom?</h3>
+                        <div className="flex justify-center space-x-4">
+                            <button onClick={() => navigate('/dashboard')} className="px-6 py-2 rounded-md bg-red-600 text-white font-semibold hover:bg-red-700">Tak</button>
+                            <button onClick={() => setShowExitConfirmation(false)} className="px-6 py-2 rounded-md bg-gray-300 text-gray-800 font-semibold hover:bg-gray-400">Nie</button>
                         </div>
                     </div>
-                )}
-            </div>
+                </div>
+            )}
         </div>
     );
 }
