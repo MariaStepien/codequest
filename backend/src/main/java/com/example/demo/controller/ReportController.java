@@ -41,8 +41,9 @@ public class ReportController {
     @GetMapping
     public ResponseEntity<List<Report>> getReports(
             @RequestParam(required = false, defaultValue = "ALL") String status,
+            @RequestParam(required = false, defaultValue= "ALL") String targetType,
             @RequestParam(required = false, defaultValue = "DESC") String sort) {
-        return ResponseEntity.ok(reportService.getFilteredReports(status, sort));
+        return ResponseEntity.ok(reportService.getFilteredReports(status,targetType, sort));
     }
 
     @PatchMapping("/{id}/status")

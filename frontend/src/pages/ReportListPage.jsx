@@ -9,6 +9,7 @@ export default function ReportListPage() {
   const navigate = useNavigate();
   const [reports, setReports] = useState([]);
   const [filterStatus, setFilterStatus] = useState('ALL');
+  const [filterTargetType, setFilterTargetType] = useState('ALL');
   const [sortDate, setSortDate] = useState('DESC');
   const [toast, setToast] = useState({ show: false, message: '', isError: false });
   const [adminData, setAdminData] = useState({ userLogin: "Admin", id: null });
@@ -33,11 +34,12 @@ export default function ReportListPage() {
     'ALL': 'Wszystkie'
   };
 
-  const targetTypeLabels = {
-    'POST': 'Post',
-    'COMMENT': 'Komentarz', 
-    'LESSON': 'Lekcja'
-  };
+  const targetTypeOptions = [
+    { value: 'ALL', label: 'Wszystkie typy' },
+    { value: 'POST', label: 'Posty' },
+    { value: 'COMMENT', label: 'Komentarze' },
+    { value: 'LESSON', label: 'Lekcje' }
+  ];
 
   const triggerToast = (msg, err = false) => {
     setToast({ show: true, message: msg, isError: err });
@@ -61,7 +63,7 @@ export default function ReportListPage() {
 
   const fetchReports = useCallback(async () => {
     try {
-      const url = `http://localhost:8080/api/reports?status=${filterStatus}&sort=${sortDate}`;
+      const url = `http://localhost:8080/api/reports?status=${filterStatus}&targetType=${filterTargetType}&sort=${sortDate}`;
       const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
@@ -70,7 +72,7 @@ export default function ReportListPage() {
     } catch (error) {
       triggerToast("Błąd podczas pobierania zgłoszeń.", true);
     }
-  }, [filterStatus, sortDate]);
+  }, [filterStatus, filterTargetType, sortDate]);
 
   useEffect(() => {
     fetchAdminData();
@@ -226,17 +228,32 @@ export default function ReportListPage() {
                   <option value="DISMISSED">{statusLabels.DISMISSED}</option>
                 </select>
               </div>
-
-              <div className="flex items-center bg-white px-3 py-2 rounded-lg shadow-sm border border-gray-200">
-                <Calendar className="w-4 h-4 text-gray-400 mr-2" />
-                <select 
-                  className="bg-transparent text-sm outline-none font-medium text-gray-700"
-                  value={sortDate}
-                  onChange={(e) => setSortDate(e.target.value)}
-                >
-                  <option value="DESC">Najnowsze</option>
-                  <option value="ASC">Najstarsze</option>
-                </select>
+              <div className="flex flex-wrap gap-3">
+                <div className="flex items-center bg-white px-3 py-2 rounded-lg shadow-sm border border-gray-200">
+                  <Filter className="w-4 h-4 text-gray-400 mr-2" />
+                  <select 
+                    className="bg-transparent text-sm outline-none font-medium text-gray-700"
+                    value={filterTargetType}
+                    onChange={(e) => setFilterTargetType(e.target.value)}
+                  >
+                    {targetTypeOptions.map(tar => (
+                      <option key={tar.value} value={tar.value}>
+                        {tar.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex items-center bg-white px-3 py-2 rounded-lg shadow-sm border border-gray-200">
+                  <Calendar className="w-4 h-4 text-gray-400 mr-2" />
+                  <select 
+                    className="bg-transparent text-sm outline-none font-medium text-gray-700"
+                    value={sortDate}
+                    onChange={(e) => setSortDate(e.target.value)}
+                  >
+                    <option value="DESC">Najnowsze</option>
+                    <option value="ASC">Najstarsze</option>
+                  </select>
+                </div>
               </div>
             </div>
           </div>
@@ -279,7 +296,7 @@ export default function ReportListPage() {
                         {report.targetType === 'LESSON' && <BookOpen className="w-3 h-3" />}
                         {report.targetType === 'COMMENT' && <MessageSquare className="w-3 h-3" />}
                         
-                        {targetTypeLabels[report.targetType] || report.targetType}
+                        {targetTypeOptions.find(opt => opt.value === report.targetType)?.label || report.targetType}
                       </span>
                     </td>
                     <td className="px-6 py-4">
@@ -343,12 +360,18 @@ export default function ReportListPage() {
           <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50">
               <div className="flex items-center gap-2">
-                {selectedReportContent.contentType === 'POST' ? 
-                  <FileText className="w-5 h-5 text-indigo-600" /> : 
+                {selectedReportContent.contentType === 'POST' && (
+                  <FileText className="w-5 h-5 text-indigo-600" />
+                )}
+                {selectedReportContent.contentType === 'LESSON' && (
+                  <BookOpen className="w-5 h-5 text-green-600" />
+                )}
+                {selectedReportContent.contentType === 'COMMENT' && (
                   <MessageSquare className="w-5 h-5 text-purple-600" />
-                }
+                )}
+
                 <h2 className="font-bold text-gray-900">
-                  Podgląd: {targetTypeLabels[selectedReportContent.contentType]}
+                  Podgląd: {targetTypeOptions.find(opt => opt.value === selectedReportContent.contentType)?.label || selectedReportContent.contentType}
                 </h2>
               </div>
               <button 

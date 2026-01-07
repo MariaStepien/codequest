@@ -12,7 +12,8 @@ import com.example.demo.domain.ReportStatus;
 @Repository
 public interface ReportRepository extends JpaRepository<Report, Long> {
     List<Report> findByStatus(ReportStatus status, Sort sort);
-
+    List<Report> findByTargetType(String targetType, Sort sort);
+    List<Report> findByStatusAndTargetType(ReportStatus status, String targetType, Sort sort);
     List<Report> findAll(Sort sort);
 
 }

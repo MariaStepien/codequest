@@ -32,16 +32,22 @@ public class ReportService {
         return reportRepository.save(report);
     }
 
-    public List<Report> getFilteredReports(String status, String sortDirection) {
+    public List<Report> getFilteredReports(String status, String targetType, String sortDirection) {
         Sort sort = sortDirection.equalsIgnoreCase("ASC") 
                     ? Sort.by("createdAt").ascending() 
                     : Sort.by("createdAt").descending();
 
-        if (status == null || status.equals("ALL")) {
+        boolean statusAll = (status == null || status.equals("ALL"));
+        boolean targetTypeAll = (targetType == null || targetType.equals("ALL"));
+
+        if (statusAll && targetTypeAll) {
             return reportRepository.findAll(sort);
+        } else if (!statusAll && targetTypeAll) {
+            return reportRepository.findByStatus(ReportStatus.valueOf(status), sort);
+        } else if (statusAll && !targetTypeAll) {
+            return reportRepository.findByTargetType(targetType, sort);
         } else {
-            ReportStatus reportStatus = ReportStatus.valueOf(status);
-            return reportRepository.findByStatus(reportStatus, sort);
+            return reportRepository.findByStatusAndTargetType(ReportStatus.valueOf(status), targetType, sort);
         }
     }
 
