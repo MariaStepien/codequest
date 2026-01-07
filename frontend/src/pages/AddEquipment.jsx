@@ -27,8 +27,24 @@ export default function AddEquipmentPage() {
         if (response.ok) setUserData(await response.json());
       } catch (err) { console.error(err); }
     };
+
+    const fetchNextNumber = async () => {
+      try {
+        const response = await fetch(`http://localhost:8080/api/equipment/next-number/${formData.type}`, {
+          headers: { 'Authorization': `Bearer ${jwtToken}` }
+        });
+        if (response.ok) {
+          const nextNumber = await response.json();
+          setFormData(prev => ({ ...prev, itemNumber: nextNumber }));
+        }
+      } catch (err) {
+        console.error("Błąd pobierania numeru:", err);
+      }
+    };
+
     fetchUser();
-  }, [jwtToken]);
+    fetchNextNumber();
+  }, [formData.type, jwtToken]);
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
@@ -151,14 +167,12 @@ export default function AddEquipmentPage() {
 
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-gray-700">Numer przedmiotu (ID wizualne)</label>
-                <input 
-                  type="number" 
-                  name="itemNumber" 
-                  value={formData.itemNumber} 
-                  onChange={handleChange} 
-                  min="1"
-                  required 
-                  className="text-black w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                <input
+                  type="number"
+                  name="itemNumber"
+                  value={formData.itemNumber}
+                  readOnly
+                  className="text-black w-full p-3 bg-gray-100 border border-gray-300 rounded-xl cursor-not-allowed"
                 />
               </div>
             </div>

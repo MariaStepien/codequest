@@ -22,8 +22,29 @@ export default function EditEquipmentPage() {
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
     const [userData, setUserData] = useState(null);
+    const [maxAllowedNumber, setMaxAllowedNumber] = useState(null);
 
     const jwtToken = localStorage.getItem('token');
+
+    const fetchMaxNumber = async (type) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/equipment/next-number/${type}`, {
+                headers: { 'Authorization': `Bearer ${jwtToken}` }
+            });
+            if (response.ok) {
+                const nextAvailable = await response.json();
+                setMaxAllowedNumber(nextAvailable);
+            }
+        } catch (err) {
+            console.error("Błąd pobierania limitu numeracji:", err);
+        }
+    };
+
+    useEffect(() => {
+        if (formData.type) {
+            fetchMaxNumber(formData.type);
+        }
+    }, [formData.type, jwtToken]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -63,6 +84,17 @@ export default function EditEquipmentPage() {
             setSelectedFile(file);
             setPreviewUrl(URL.createObjectURL(file));
         }
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        
+        setFormData(prev => ({
+            ...prev,
+            [name]: name === 'cost' || name === 'itemNumber' 
+                ? (parseInt(value) || 0) 
+                : value
+        }));
     };
 
     const handleSubmit = async (e) => {
@@ -170,14 +202,25 @@ export default function EditEquipmentPage() {
                                     />
                                 </div>
 
-                                <div className="col-span-2">
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">Numer przedmiotu (używany w sprite)</label>
-                                    <input 
-                                        type="number" required
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                                        Numer przedmiotu (kolejność)
+                                    </label>
+                                    <input
+                                        type="number"
+                                        name="itemNumber"
                                         value={formData.itemNumber}
-                                        onChange={(e) => setFormData({...formData, itemNumber: parseInt(e.target.value)})}
-                                        className="text-black w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 transition"
+                                        onChange={handleChange}
+                                        min="1"
+                                        max={maxAllowedNumber || ""}
+                                        className="text-black w-full p-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 transition"
+                                        required
                                     />
+                                    {maxAllowedNumber && (
+                                        <p className="text-xs text-gray-500 mt-1">
+                                            Zmiana zakresu nie zmienia nazwy pliku
+                                        </p>
+                                    )}
                                 </div>
                             </div>
 

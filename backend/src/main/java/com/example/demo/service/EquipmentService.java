@@ -29,21 +29,25 @@ public class EquipmentService {
     public Equipment saveEquipment(Equipment equipment, MultipartFile file) throws IOException {
         equipment.setId(null);
 
+        Integer maxNumber = equipmentRepository.findMaxItemNumberByType(equipment.getType());
+        int nextNumber = (maxNumber == null) ? 1 : maxNumber + 1;
+        equipment.setItemNumber(nextNumber);
+
         String originalFilename = file.getOriginalFilename();
         String extension = "";
         if (originalFilename != null && originalFilename.contains(".")) {
             extension = originalFilename.substring(originalFilename.lastIndexOf("."));
         }
+        
         String typeFolder = equipment.getType().name().toLowerCase();
-        String fileName = equipment.getType().name().toLowerCase() + "_" + equipment.getItemNumber() + extension;
+        String fileName = typeFolder + "_" + equipment.getItemNumber() + extension;
         Path uploadPath = Paths.get(UPLOAD_DIR, typeFolder).toAbsolutePath().normalize();
 
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
-        
+
         Path targetLocation = uploadPath.resolve(fileName);
-        
         Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
         String relativePath = UPLOAD_DIR + "/" + typeFolder + "/" + fileName;
@@ -69,13 +73,27 @@ public class EquipmentService {
 
     @Transactional
     public Equipment updateEquipment(Long id, Equipment equipmentDetails, MultipartFile file) throws IOException {
-        Equipment equipment = equipmentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Equipment not found with id: " + id));
+        Equipment currentEquipment = equipmentRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Equipment not found with id: " + id));
 
-        equipment.setName(equipmentDetails.getName());
-        equipment.setType(equipmentDetails.getType());
-        equipment.setCost(equipmentDetails.getCost());
-        equipment.setItemNumber(equipmentDetails.getItemNumber());
+            int oldNumber = currentEquipment.getItemNumber();
+            int newNumber = equipmentDetails.getItemNumber();
+            Equipment.EquipmentType currentType = equipmentDetails.getType();
+
+            if (oldNumber != newNumber) {
+                Optional<Equipment> equipmentToSwap = equipmentRepository.findByTypeAndItemNumber(currentType, newNumber);
+                
+                if (equipmentToSwap.isPresent()) {
+                    Equipment otherItem = equipmentToSwap.get();
+                    otherItem.setItemNumber(oldNumber);
+                    equipmentRepository.save(otherItem);
+                }
+            }
+
+            currentEquipment.setName(equipmentDetails.getName());
+            currentEquipment.setType(currentType);
+            currentEquipment.setCost(equipmentDetails.getCost());
+            currentEquipment.setItemNumber(newNumber);
 
         if (file != null && !file.isEmpty()) {
             String originalFilename = file.getOriginalFilename();
@@ -84,8 +102,8 @@ public class EquipmentService {
                 extension = originalFilename.substring(originalFilename.lastIndexOf("."));
             }
             
-            String typeFolder = equipment.getType().name().toLowerCase();
-            String fileName = typeFolder + "_" + equipment.getItemNumber() + extension;
+            String typeFolder = currentEquipment.getType().name().toLowerCase();
+            String fileName = typeFolder + "_" + currentEquipment.getItemNumber() + extension;
             Path uploadPath = Paths.get(UPLOAD_DIR, typeFolder).toAbsolutePath().normalize();
 
             if (!Files.exists(uploadPath)) {
@@ -96,9 +114,14 @@ public class EquipmentService {
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
             String relativePath = UPLOAD_DIR + "/" + typeFolder + "/" + fileName;
-            equipment.setImgSource(relativePath);
+            currentEquipment.setImgSource(relativePath);
         }
 
-        return equipmentRepository.save(equipment);
+        return equipmentRepository.save(currentEquipment);
+    }
+
+    public Integer getMaxItemNumberByType(EquipmentType type) {
+        Integer maxNumber = equipmentRepository.findMaxItemNumberByType(type);
+        return (maxNumber == null) ? 0 : maxNumber;
     }
 }

@@ -110,4 +110,15 @@ public class EquipmentController {
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    @GetMapping("/next-number/{type}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Integer> getNextItemNumber(@PathVariable String type) {
+        try {
+            EquipmentType equipmentType = EquipmentType.valueOf(type.toUpperCase());
+            int maxNumber = equipmentService.getMaxItemNumberByType(equipmentType);
+            return ResponseEntity.ok(maxNumber + 1);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }
