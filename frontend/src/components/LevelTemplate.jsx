@@ -73,6 +73,7 @@ export default function LevelTemplate({ nextLevelPath, isAdminPreview = false })
     const currentTaskObject = tasks[currentTaskIndex];
     const isLevelComplete = currentTaskIndex >= tasks.length; 
     const isGameOver = health <= 0;
+    const [userHearts, setUserHearts] = useState(null);
 
     const interactiveTasksCount = tasks.filter(t => t.type !== 'TextBox').length;
     const healthLossPerFail = interactiveTasksCount > 0 ? INITIAL_HEALTH / interactiveTasksCount : 0;
@@ -81,6 +82,44 @@ export default function LevelTemplate({ nextLevelPath, isAdminPreview = false })
         setToast({ show: true, message: msg, isError: err });
         setTimeout(() => setToast({ show: false, message: '', isError: false }), 3000);
     };
+
+    const handleHeartLoss = async () => {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        try {
+            const userRes = await fetch('http://localhost:8080/api/user/me', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const userData = await userRes.json();
+
+            const consumeRes = await fetch(`http://localhost:8080/api/user/consume-heart`, {
+                method: 'POST',
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ userId: userData.id }) 
+            });
+
+            const result = await consumeRes.json();
+            
+            if (consumeRes.ok) {
+                setUserHearts(result.hearts);
+            } else {
+                setUserHearts(0);
+                triggerToast(result.error || "Brak serc!", true);
+            }
+        } catch (error) {
+            console.error("Failed to consume heart:", error);
+        }
+    };
+
+    useEffect(() => {
+        if (isGameOver && !isAdminPreview) {
+            handleHeartLoss();
+        }
+    }, [isGameOver]);
 
     useEffect(() => {
         let interval;
@@ -255,12 +294,38 @@ export default function LevelTemplate({ nextLevelPath, isAdminPreview = false })
     if (error) return <div className="text-center py-20 text-xl font-bold text-red-600">Błąd: {error}</div>;
     
     if (isGameOver) {
+        const hasNoHearts = userHearts === 0;
+
         return (
             <div className="flex items-center justify-center p-4" style={backgroundStyle}>
                 <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-2xl p-10 w-full max-w-lg border-t-8 border-red-600 text-center">
                     <p className="text-5xl font-extrabold text-red-700 mb-4">Misja nieudana</p>
-                    <p className="text-xl text-gray-600 mb-8">Wykorzystałeś całe swoje życie.</p>
-                    <button onClick={handleRetryLevel} className="px-8 py-4 rounded-full bg-indigo-600 text-white font-bold text-lg hover:bg-indigo-700 transition shadow-lg">Ponów poziom</button>
+                    
+                    {hasNoHearts ? (
+                        <>
+                            <p className="text-xl text-gray-600 mb-8">
+                                Straciłeś ostatnie serce! Musisz poczekać na regenerację, aby spróbować ponownie.
+                            </p>
+                            <button 
+                                onClick={() => navigate('/dashboard')} 
+                                className="px-8 py-4 rounded-full bg-gray-600 text-white font-bold text-lg hover:bg-gray-700 transition shadow-lg"
+                            >
+                                Powrót do menu
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <p className="text-xl text-gray-600 mb-8">
+                                Wykorzystałeś całe swoje życie w tym poziomie. Pozostałe serca: {userHearts}
+                            </p>
+                            <button 
+                                onClick={handleRetryLevel} 
+                                className="px-8 py-4 rounded-full bg-indigo-600 text-white font-bold text-lg hover:bg-indigo-700 transition shadow-lg"
+                            >
+                                Ponów poziom
+                            </button>
+                        </>
+                    )}
                 </div>
             </div>
         );

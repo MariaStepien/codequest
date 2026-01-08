@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
+import { Heart } from 'lucide-react';
 
 const StarIcon = ({ isActive }) => (
     <svg 
@@ -14,7 +15,7 @@ const StarIcon = ({ isActive }) => (
     </svg>
 );
 
-export default function LevelDetailsModal({ lessonDetails, progress, onClose, courseId }) {
+export default function LevelDetailsModal({ lessonDetails, progress, onClose, courseId, userHearts }) {
     const navigate = useNavigate();
 
     if (!lessonDetails) {
@@ -30,8 +31,10 @@ export default function LevelDetailsModal({ lessonDetails, progress, onClose, co
     const { title, orderIndex } = lessonDetails;
     const userStars = progress ? progress.starsEarned : 0;
     const userTime = progress ? progress.timeTakenSeconds : null;
+    const hasNoHearts = userHearts !== null && userHearts <= 0;
 
     const handleStartLevel = () => {
+        if (hasNoHearts) return;
         navigate(`/course/${courseId}/level/${orderIndex}`);
         console.log(`Rozpoczynanie poziomu ${orderIndex} (${title}) w kursie ${courseId}`);
         onClose();
@@ -91,13 +94,25 @@ export default function LevelDetailsModal({ lessonDetails, progress, onClose, co
                             })}
                         </ul>
                     </div>
+                    {hasNoHearts && (
+                        <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3 text-red-700">
+                            <Heart className="w-5 h-5 fill-red-500" />
+                            <p className="text-sm font-bold">
+                                Nie masz serc! Poczekaj na regenerację, aby rozpocząć poziom.
+                            </p>
+                        </div>
+                    )}
                 </div>
 
                 <button
                     onClick={handleStartLevel}
-                    className="w-full py-3 bg-blue-500 text-white font-bold rounded-lg shadow-md hover:bg-blue-600 transition duration-150 active:scale-[.99]"
+                    disabled={hasNoHearts}
+                    className={`w-full py-3 font-bold rounded-lg shadow-md transition duration-150 
+                        ${hasNoHearts 
+                            ? 'bg-gray-400 cursor-not-allowed' 
+                            : 'bg-blue-500 text-white hover:bg-blue-600 active:scale-[.99]'}`}
                 >
-                    Rozpocznij poziom {orderIndex}
+                    {hasNoHearts ? 'Brak serc' : `Rozpocznij poziom ${orderIndex}`}
                 </button>
             </div>
         </div>

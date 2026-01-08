@@ -1,5 +1,7 @@
 package com.example.demo.domain;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -37,4 +39,9 @@ public class User {
 
     @Column(columnDefinition= "integer default 0")
     private int rank;
+
+    @Column(columnDefinition= "integer default 5")
+    private int hearts;
+
+    private LocalDateTime lastHeartRecovery;
 }

@@ -43,6 +43,8 @@ export default function LevelSelectionPage() {
     const [selectedLevelProgress, setSelectedLevelProgress] = useState(null);
     const [isDetailsLoading, setIsDetailsLoading] = useState(false);
 
+    const [userHearts, setUserHearts] = useState(null);
+
     useEffect(() => {
         const jwtToken = localStorage.getItem('token');
     
@@ -78,6 +80,14 @@ export default function LevelSelectionPage() {
                 } else {
                     const completedLevels = await progressResponse.json();
                     setLastCompletedLevel(completedLevels);
+                }
+
+                const userResponse = await fetch('/api/user/me', {
+                    headers: { 'Authorization': `Bearer ${jwtToken}` }
+                });
+                if (userResponse.ok) {
+                    const userData = await userResponse.json();
+                    setUserHearts(userData.hearts);
                 }
             } catch (err) {
                 setError(err.message);
@@ -196,6 +206,7 @@ export default function LevelSelectionPage() {
                             progress={selectedLevelProgress}
                             onClose={handleCloseModal}
                             courseId={courseId}
+                            userHearts={userHearts}
                         />
                     )}
 
