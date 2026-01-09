@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Flag, Clock } from 'lucide-react';
+import { Flag, Clock, ArrowRight } from 'lucide-react';
 
 import FillInTheBlank from './FillInTheBlank';
 import MatchingPairs from './MatchingPairs';
@@ -49,11 +49,12 @@ const calculatePoints = (timeTakenSeconds) => {
     return Math.max(MIN_POINTS, calculatedPoints);
 };
 
-export default function LevelTemplate({ nextLevelPath, isAdminPreview = false }) {
+export default function LevelTemplate({ isAdminPreview = false }) {
     const { courseId, levelNumber: routeLevelNumber } = useParams();
     const orderIndex = routeLevelNumber ? parseInt(routeLevelNumber, 10) : null;
     
     const [lessonData, setLessonData] = useState(null);
+    const [hasNextLevel, setHasNextLevel] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -215,13 +216,18 @@ export default function LevelTemplate({ nextLevelPath, isAdminPreview = false })
             return;
         }
 
-        const fetchLessonData = async () => {
+        const fetchLessonAndNextCheck = async () => {
             setIsLoading(true);
             try {
                 const response = await fetch(`/api/lessons/course/${courseId}/order/${orderIndex}`);
+                if (!response.ok) throw new Error("Nie udało się pobrać lekcji");
                 const data = await response.json();
                 setLessonData(data);
                 setReportData(prev => ({ ...prev, targetId: data.id }));
+
+                const nextResponse = await fetch(`/api/lessons/course/${courseId}/order/${orderIndex + 1}`);
+                setHasNextLevel(nextResponse.ok);
+                
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -229,7 +235,12 @@ export default function LevelTemplate({ nextLevelPath, isAdminPreview = false })
             }
         };
 
-        fetchLessonData();
+        fetchLessonAndNextCheck();
+        setCurrentTaskIndex(0);
+        setHealth(INITIAL_HEALTH);
+        setElapsedTime(0);
+        setIsCurrentTaskComplete(false);
+        setFeedbackMessage('');
     }, [courseId, orderIndex]);
 
     const handleTaskCompletion = (isCorrect) => {
@@ -404,10 +415,23 @@ export default function LevelTemplate({ nextLevelPath, isAdminPreview = false })
                             ) : <p className="text-red-500 font-bold">Błąd typu zadania</p>
                         ) : (
                             <div className="text-center py-10">
-                                <p className="text-3xl font-extrabold text-green-700 mb-4">👑 Poziom ukończony! 👑</p>
-                                <button onClick={() => navigate(isAdminPreview ? '/admin/courses' : (nextLevelPath || '/dashboard'))} className="px-8 py-4 rounded-full bg-indigo-600 text-white font-bold text-lg hover:bg-indigo-700 transition shadow-lg">
-                                    {isAdminPreview ? 'Powróć do panelu' : 'Powróć do mapy'}
-                                </button>
+                                <p className="text-3xl font-extrabold text-green-700 mb-6">👑 Poziom ukończony! 👑</p>
+                                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                                    {hasNextLevel && !isAdminPreview && (
+                                        <button 
+                                            onClick={() => navigate(`/course/${courseId}/level/${orderIndex + 1}`)} 
+                                            className="flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-green-600 text-white font-bold text-lg hover:bg-green-700 transition shadow-lg"
+                                        >
+                                            Następny poziom <ArrowRight className="w-5 h-5" />
+                                        </button>
+                                    )}
+                                    <button 
+                                        onClick={() => navigate(isAdminPreview ? '/admin/courses' : `/course/${courseId}`)} 
+                                        className="px-8 py-4 rounded-full bg-indigo-600 text-white font-bold text-lg hover:bg-indigo-700 transition shadow-lg"
+                                    >
+                                        {isAdminPreview ? 'Powróć do panelu' : 'Powróć do mapy'}
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </div>
@@ -464,5 +488,5 @@ export default function LevelTemplate({ nextLevelPath, isAdminPreview = false })
 }
 
 LevelTemplate.propTypes = {
-    nextLevelPath: PropTypes.string,
+    isAdminPreview: PropTypes.bool,
 };
