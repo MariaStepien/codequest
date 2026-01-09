@@ -114,19 +114,20 @@ export default function FillInTheBlank({ sentence, correctAnswers, onTaskComplet
         </div>
       </div>
       
-      <div className="text-xl text-black mb-8 flex flex-wrap items-center leading-relaxed">
+      <div className="text-xl text-black mb-8 leading-loose">
         {textSegments.map((segment, index) => (
           <React.Fragment key={index}>
-            <span className="p-1 mx-1">{segment}</span> 
+            <span className="inline">{segment}</span> 
             {index < correctAnswers.length && (
               <input
                 type="text"
                 value={userInputs[index]}
                 onChange={(e) => handleInputChange(index, e.target.value)}
                 disabled={disableInteraction}
-                placeholder={`Answer ${index + 1}`}
+                placeholder="..."
                 className={`
-                  mx-2 p-2 
+                  inline-block
+                  mx-2 p-1
                   text-lg text-center font-bold 
                   border-b-2 rounded-md 
                   shadow-inner 

@@ -62,6 +62,7 @@ public class UserService {
         newUser.setCoins(0);
         newUser.setPoints(0);
         newUser.setRank(0);
+        newUser.setHearts(5);
 
         User savedUser = userRepository.save(newUser);
 

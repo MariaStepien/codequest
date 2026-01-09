@@ -31,7 +31,7 @@ export default function EnemySprite({ enemyId }) {
 
     return (
         <div className="flex flex-col items-center">
-            <div className="w-100 h-100 flex items-center justify-center rounded-lg">
+            <div className="w-64 h-64 flex items-center justify-center rounded-lg">
                 <img 
                     src={`http://localhost:8080/api/${enemy.imgSource}`} 
                     alt={enemy.name} 

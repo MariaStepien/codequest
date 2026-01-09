@@ -69,7 +69,7 @@ export default function EditLessonPage() {
 
                     setCurrentBgImage(lesson.backgroundImage);
                     setHasEnemy(lesson.hasEnemy);
-                    setSelectedEnemyId(lesson.selectedEnemyId || '');
+                    setSelectedEnemyId(lesson.enemyId ? String(lesson.enemyId) : '');
                     
                 } else {
                     setError(`Nie udało się pobrać szczegółów lekcji o ID: ${lessonId}.`);

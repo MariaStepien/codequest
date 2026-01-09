@@ -453,7 +453,7 @@ export default function LevelTemplate({ nextLevelPath, isAdminPreview = false })
                     <div className="bg-white p-8 rounded-xl shadow-2xl max-w-sm w-full text-center">
                         <h3 className="text-xl font-bold text-gray-800 mb-4">Czy na pewno chcesz opuścić ten poziom?</h3>
                         <div className="flex justify-center space-x-4">
-                            <button onClick={() => navigate('/dashboard')} className="px-6 py-2 rounded-md bg-red-600 text-white font-semibold hover:bg-red-700">Tak</button>
+                            <button onClick={() => isAdminPreview? navigate('/admin/courses') : navigate('/dashboard')} className="px-6 py-2 rounded-md bg-red-600 text-white font-semibold hover:bg-red-700">Tak</button>
                             <button onClick={() => setShowExitConfirmation(false)} className="px-6 py-2 rounded-md bg-gray-300 text-gray-800 font-semibold hover:bg-gray-400">Nie</button>
                         </div>
                     </div>

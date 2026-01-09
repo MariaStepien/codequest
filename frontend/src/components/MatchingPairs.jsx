@@ -75,6 +75,7 @@ export default function MatchingPairs({ items, onTaskComplete }) {
     };
 
     const isAllPaired = Object.keys(userPairs).length === items.length;
+    const isSuccess = results && Object.values(results).every(v => v);
 
     const getItemStyles = (key, side) => {
         const isSelected = selected.key === key && selected.side === side;
@@ -99,8 +100,8 @@ export default function MatchingPairs({ items, onTaskComplete }) {
             const leftKey = side === 'left' ? key : Object.keys(userPairs).find(k => userPairs[k] === key);
             const isCorrect = results[leftKey];
             return isCorrect 
-                ? 'bg-green-200 border-green-600 text-green-900 opacity-90' 
-                : 'bg-red-200 border-red-600 text-red-900';
+                ? 'bg-green-200 border-green-600 text-green-900 opacity-90 cursor-default' 
+                : 'bg-red-200 border-red-600 text-red-900 cursor-default';
         }
 
         if (isSelected) return 'bg-indigo-600 border-indigo-900 text-white shadow-lg scale-[1.05] z-10';
@@ -127,7 +128,7 @@ export default function MatchingPairs({ items, onTaskComplete }) {
                         <div
                             key={item.key}
                             onClick={() => handleSelect(item.key, 'left')}
-                            className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 font-medium ${getItemStyles(item.key, 'left')}`}
+                            className={`p-4 border-2 rounded-xl transition-all duration-200 font-medium ${getItemStyles(item.key, 'left')} ${results ? 'cursor-default' : 'cursor-pointer'}`}
                         >
                             {item.left}
                         </div>
@@ -140,7 +141,7 @@ export default function MatchingPairs({ items, onTaskComplete }) {
                         <div
                             key={item.key}
                             onClick={() => handleSelect(item.key, 'right')}
-                            className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 font-medium ${getItemStyles(item.key, 'right')}`}
+                            className={`p-4 border-2 rounded-xl transition-all duration-200 font-medium ${getItemStyles(item.key, 'right')} ${results ? 'cursor-default' : 'cursor-pointer'}`}
                         >
                             {item.right}
                         </div>
@@ -150,15 +151,15 @@ export default function MatchingPairs({ items, onTaskComplete }) {
 
             <div className="pt-6 border-t space-y-4">
                 {results && (
-                    <div className={`p-4 rounded-lg text-center font-bold ${Object.values(results).every(v => v) ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
-                        {Object.values(results).every(v => v) 
+                    <div className={`p-4 rounded-lg text-center font-bold ${isSuccess ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+                        {isSuccess 
                             ? 'Brawo! Wszystko poprawnie! 🎉' 
                             : `Wynik: ${Object.values(results).filter(v => v).length} / ${items.length} poprawnych.`}
                     </div>
                 )}
                 
                 <div className="flex gap-4">
-                    {results ? (
+                    {results && !isSuccess ? (
                         <button
                             onClick={handleReset}
                             className="w-full py-4 bg-gray-800 text-white font-bold rounded-xl hover:bg-gray-900 transition shadow-lg"
@@ -168,16 +169,16 @@ export default function MatchingPairs({ items, onTaskComplete }) {
                     ) : (
                         <button
                             onClick={handleSubmit}
-                            disabled={!isAllPaired}
+                            disabled={!isAllPaired || isSuccess}
                             className={`
                                 w-full py-4 font-bold rounded-xl transition shadow-lg
-                                ${!isAllPaired
+                                ${(!isAllPaired || isSuccess)
                                     ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                                     : 'bg-indigo-600 text-white hover:bg-indigo-700'
                                 }
                             `}
                         >
-                            {isAllPaired ? 'Sprawdź odpowiedzi' : 'Połącz wszystkie elementy'}
+                            {isSuccess ? 'Zadanie wykonane' : (isAllPaired ? 'Sprawdź odpowiedzi' : 'Połącz wszystkie elementy')}
                         </button>
                     )}
                 </div>
