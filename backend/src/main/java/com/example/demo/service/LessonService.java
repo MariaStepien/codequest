@@ -13,10 +13,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.demo.domain.Course;
+import com.example.demo.domain.Enemy;
 import com.example.demo.domain.Lesson;
 import com.example.demo.dto.LessonCreationDto;
 import com.example.demo.dto.LessonDto;
 import com.example.demo.dto.TaskDto;
+import com.example.demo.repos.CourseRepository;
+import com.example.demo.repos.EnemyRepository;
 import com.example.demo.repos.LessonRepository;
 import com.example.demo.repos.UserLessonProgressRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -25,25 +29,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 
-/**
- * Service to fetch Lesson data and parse the JSON task structure.
- */
 @Service
 @RequiredArgsConstructor
 public class LessonService {
 
     private final LessonRepository lessonRepository;
     private final UserLessonProgressRepository userLessonProgressRepository;
+    private final CourseRepository courseRepository;
+    private final EnemyRepository enemyRepository;
     private final ObjectMapper objectMapper; 
     private final String UPLOAD_DIR = "uploads/backgrounds";
 
-    /**
-     * Retrieves a lesson by ID, including the parsed list of tasks.
-     * @param lessonId The ID of the lesson to retrieve.
-     * @return An Optional containing the fully processed LessonDto, or empty if not found.
-     */
     public Optional<LessonDto> getLessonWithTasks(Long lessonId) {
-        
         Optional<Lesson> lessonOptional = lessonRepository.findById(lessonId);
 
         if (lessonOptional.isEmpty()) {
@@ -53,15 +50,7 @@ public class LessonService {
         return lessonOptional.map(this::mapToDtoWithTasks);
     }
     
-    /**
-     * Retrieves a lesson by Course ID and Order Index, including the parsed list of tasks.
-     * This is the new method to support level map clicks.
-     * @param courseId The ID of the course.
-     * @param orderIndex The sequential order of the lesson.
-     * @return An Optional containing the fully processed LessonDto, or empty if not found.
-     */
     public Optional<LessonDto> getLessonWithTasksByCourseIdAndOrderIndex(Long courseId, Integer orderIndex) {
-        
         Optional<Lesson> lessonOptional = lessonRepository.findByCourseIdAndOrderIndex(courseId, orderIndex);
 
         if (lessonOptional.isEmpty()) {
@@ -79,12 +68,19 @@ public class LessonService {
 
     public LessonDto createLesson(LessonCreationDto creationDto, MultipartFile file) throws IOException {
         Lesson lesson = new Lesson();
-        lesson.setCourseId(creationDto.getCourseId());
+        
+        Course course = courseRepository.findById(creationDto.getCourseId())
+                .orElseThrow(() -> new RuntimeException("Course not found with ID: " + creationDto.getCourseId()));
+        lesson.setCourse(course);
+
         lesson.setTitle(creationDto.getTitle());
         lesson.setOrderIndex(creationDto.getOrderIndex());
         lesson.setHasEnemy(creationDto.isHasEnemy());
-        if (creationDto.isHasEnemy()) {
-            lesson.setEnemyId(creationDto.getEnemyId());
+        
+        if (creationDto.isHasEnemy() && creationDto.getEnemyId() != null) {
+            Enemy enemy = enemyRepository.findById(creationDto.getEnemyId())
+                    .orElseThrow(() -> new RuntimeException("Enemy not found with ID: " + creationDto.getEnemyId()));
+            lesson.setEnemy(enemy);
         }
         
         try {
@@ -136,7 +132,7 @@ public class LessonService {
 
         Integer oldOrderIndex = lesson.getOrderIndex();
         Integer newOrderIndex = updateDto.getOrderIndex();
-        Long courseId = updateDto.getCourseId() != null ? updateDto.getCourseId() : lesson.getCourseId();
+        Long courseId = updateDto.getCourseId() != null ? updateDto.getCourseId() : lesson.getCourse().getId();
 
         if (!oldOrderIndex.equals(newOrderIndex)) {
             Optional<Lesson> lessonToSwap = lessonRepository.findByCourseIdAndOrderIndex(courseId, newOrderIndex);
@@ -151,12 +147,19 @@ public class LessonService {
         lesson.setTitle(updateDto.getTitle());
         lesson.setOrderIndex(newOrderIndex);
         lesson.setHasEnemy(updateDto.isHasEnemy());
-        if (updateDto.isHasEnemy()) {
-            lesson.setEnemyId(updateDto.getEnemyId());
+        
+        if (updateDto.isHasEnemy() && updateDto.getEnemyId() != null) {
+            Enemy enemy = enemyRepository.findById(updateDto.getEnemyId())
+                    .orElseThrow(() -> new RuntimeException("Enemy not found with ID: " + updateDto.getEnemyId()));
+            lesson.setEnemy(enemy);
+        } else {
+            lesson.setEnemy(null);
         }
         
         if (updateDto.getCourseId() != null) {
-             lesson.setCourseId(updateDto.getCourseId());
+             Course course = courseRepository.findById(updateDto.getCourseId())
+                     .orElseThrow(() -> new RuntimeException("Course not found"));
+             lesson.setCourse(course);
         }
 
         if (file != null && !file.isEmpty()) {
@@ -184,11 +187,11 @@ public class LessonService {
         lessonDto.setId(lesson.getId());
         lessonDto.setTitle(lesson.getTitle());
         lessonDto.setOrderIndex(lesson.getOrderIndex());
-        lessonDto.setCourseId(lesson.getCourseId());
+        lessonDto.setCourseId(lesson.getCourse() != null ? lesson.getCourse().getId() : null);
         lessonDto.setTasks(List.of()); 
         lessonDto.setHasEnemy(lesson.isHasEnemy());
-        if (lesson.isHasEnemy()){
-            lessonDto.setEnemyId(lesson.getEnemyId());
+        if (lesson.getEnemy() != null){
+            lessonDto.setEnemyId(lesson.getEnemy().getId());
         }
         lessonDto.setBackgroundImage(lesson.getBackgroundImage());
 
@@ -201,14 +204,13 @@ public class LessonService {
         lessonDto.setId(lesson.getId());
         lessonDto.setTitle(lesson.getTitle());
         lessonDto.setOrderIndex(lesson.getOrderIndex());
-        lessonDto.setCourseId(lesson.getCourseId());
+        lessonDto.setCourseId(lesson.getCourse() != null ? lesson.getCourse().getId() : null);
         lessonDto.setHasEnemy(lesson.isHasEnemy());
-        if (lesson.isHasEnemy()){
-            lessonDto.setEnemyId(lesson.getEnemyId());
+        if (lesson.getEnemy() != null){
+            lessonDto.setEnemyId(lesson.getEnemy().getId());
         }
         lessonDto.setBackgroundImage(lesson.getBackgroundImage());
 
-        
         try {
             JsonNode rootNode = objectMapper.readTree(lesson.getTasksJson());
             JsonNode tasksNode = rootNode.get("tasks");
@@ -219,12 +221,10 @@ public class LessonService {
                 
                 lessonDto.setTasks(tasks);
             } else {
-                System.err.println("Błąd przetwarzania zadań z JSON dla lekcji o ID " + lesson.getId() + ": 'tasks' jest brakujące lub struktura JSON jest niepoprawna.");
                 lessonDto.setTasks(List.of()); 
             }
             
         } catch (Exception e) {
-            System.err.println("Błąd przetwarzania zadań z JSON dla lekcji o ID " + lesson.getId() + ": " + e.getMessage());
             lessonDto.setTasks(List.of());
         }
 

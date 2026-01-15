@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
@@ -20,27 +22,30 @@ public class UserEquipment {
     private Long userId; 
     
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @MapsId
+    @JoinColumn(name = "user_id")
     private User user;
-    
-    @Column(columnDefinition = "integer default 1")
-    private int spriteNr;
 
-    @Column(columnDefinition = "varchar(255) default 'sprite_1_1.png'")
+    @Column(columnDefinition = "varchar(255) default 'sprite_1_1_1_1_1.png'")
     private String sprite_img_source;
     
-    @Column(nullable = true)
-    private Long helmId; 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "helm_id")
+    private Equipment helm; 
     
-    @Column(nullable = true)
-    private Long armorId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "armor_id")
+    private Equipment armor;
     
-    @Column(nullable = true)
-    private Long pantsId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pants_id")
+    private Equipment pants;
     
-    @Column(nullable = true)
-    private Long shoesId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "shoes_id")
+    private Equipment shoes;
     
-    @Column(nullable = true)
-    private Long weaponId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "weapon_id")
+    private Equipment weapon;
 }

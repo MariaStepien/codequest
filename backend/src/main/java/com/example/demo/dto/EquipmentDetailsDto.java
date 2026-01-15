@@ -1,5 +1,7 @@
 package com.example.demo.dto;
 
+import com.example.demo.domain.Equipment.EquipmentType;
+
 import lombok.Builder;
 import lombok.Value;
 
@@ -8,7 +10,7 @@ import lombok.Value;
 public class EquipmentDetailsDto {
     Long id;
     String name;
-    String type;
+    EquipmentType type;
     String imgSource;
     int itemNumber;
 }

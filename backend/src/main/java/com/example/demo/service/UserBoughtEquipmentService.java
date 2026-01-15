@@ -1,6 +1,8 @@
 package com.example.demo.service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.demo.domain.Equipment;
 import com.example.demo.domain.User;
 import com.example.demo.domain.UserBoughtEquipment;
+import com.example.demo.dto.EquipmentDetailsDto;
 import com.example.demo.repos.EquipmentRepository;
 import com.example.demo.repos.UserBoughtEquipmentRepository;
 import com.example.demo.repos.UserRepository;
@@ -21,6 +24,20 @@ public class UserBoughtEquipmentService {
     private final UserBoughtEquipmentRepository userBoughtEquipmentRepository;
     private final UserRepository userRepository;
     private final EquipmentRepository equipmentRepository;
+
+    @Transactional(readOnly = true)
+    public List<EquipmentDetailsDto> getOwnedEquipmentByUserId(Long userId) {
+        return userBoughtEquipmentRepository.findByUserId(userId)
+                .stream()
+                .map(bought -> EquipmentDetailsDto.builder()
+                        .id(bought.getEquipment().getId())
+                        .name(bought.getEquipment().getName())
+                        .type(bought.getEquipment().getType())
+                        .imgSource(bought.getEquipment().getImgSource())
+                        .itemNumber(bought.getEquipment().getItemNumber())
+                        .build())
+                .collect(Collectors.toList());
+    }
 
     @Transactional
     public UserBoughtEquipment buyEquipment(Long userId, Long equipmentId) {

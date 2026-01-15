@@ -43,8 +43,9 @@ public class Comment {
     @Column
     private Boolean isReply;
 
-    @Column
-    private Long parentCommentId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_comment_id")
+    private Comment parentComment;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")

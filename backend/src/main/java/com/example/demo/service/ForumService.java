@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +28,7 @@ public class ForumService {
         return postRepository.findAllByOrderByCreatedAtDesc();
     }
 
-    @Transactional(readOnly= true)
+    @Transactional(readOnly = true)
     public Post getPostById(Long id) {
         return postRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
@@ -43,7 +44,7 @@ public class ForumService {
 
     public void deletePost(Long postId, Long userId, boolean isAdmin) {
         Post post = postRepository.findById(postId).orElseThrow();
-        if (isAdmin || post.getAuthor().getId().equals(userId)) {
+        if (isAdmin || (post.getAuthor() != null && Objects.equals(post.getAuthor().getId(), userId))) {
             postRepository.delete(post);
         }
     }
@@ -61,17 +62,17 @@ public class ForumService {
         return commentRepository.save(comment);
     }
 
-    @Transactional(readOnly= true)
+    @Transactional(readOnly = true)
     public Comment getCommentById(Long id) {
         return commentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> new RuntimeException("Comment not found"));
     }
 
     public void deleteComment(Long commentId, Long userId, boolean isAdmin) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("Comment not found"));
         
-        if (isAdmin || comment.getAuthor().getId().equals(userId)) {
+        if (isAdmin || (comment.getAuthor() != null && Objects.equals(comment.getAuthor().getId(), userId))) {
             commentRepository.delete(comment);
         } else {
             throw new RuntimeException("Unauthorized to delete this comment");
@@ -83,7 +84,7 @@ public class ForumService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
 
-        if (!post.getAuthor().getId().equals(userId)) {
+        if (post.getAuthor() == null || !Objects.equals(post.getAuthor().getId(), userId)) {
             throw new RuntimeException("Unauthorized to edit this post");
         }
 
@@ -100,7 +101,7 @@ public class ForumService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("Comment not found"));
 
-        if (!comment.getAuthor().getId().equals(userId)) {
+        if (comment.getAuthor() == null || !Objects.equals(comment.getAuthor().getId(), userId)) {
             throw new RuntimeException("Unauthorized to edit this comment");
         }
 
@@ -118,13 +119,13 @@ public class ForumService {
         User author = userRepository.findById(authorId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         
-        commentRepository.findById(parentCommentId)
+        Comment parentComment = commentRepository.findById(parentCommentId)
                 .orElseThrow(() -> new RuntimeException("Parent comment not found"));
 
         reply.setPost(post);
         reply.setAuthor(author);
         reply.setIsReply(true);
-        reply.setParentCommentId(parentCommentId);
+        reply.setParentComment(parentComment);
         reply.setEdited(false);
         
         return commentRepository.save(reply);

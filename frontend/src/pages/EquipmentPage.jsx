@@ -136,17 +136,19 @@ export default function EquipmentPage() {
             const userDetails = await userResponse.json();
 
             if (!equipmentResponse.ok) {
-                setEquipmentData(prev => ({
+                setEquipmentData({
                     ...initialEquipmentState,
                     userLogin: userDetails.userLogin || userLogin,
                     coins: userDetails.coins || 0
-                }));
+                });
             } else {
                 const equipmentDetails = await equipmentResponse.json();
                 setEquipmentData({
+                    ...initialEquipmentState,
                     ...equipmentDetails,
                     userLogin: userDetails.userLogin,
                     coins: userDetails.coins,
+                    ownedEquipment: equipmentDetails.ownedEquipment || []
                 });
             }
 
@@ -189,6 +191,7 @@ export default function EquipmentPage() {
         let url = '';
         let method = 'PUT';
         let successMsg = '';
+        let body = null;
 
         if (!userId || !jwtToken) return;
 
@@ -205,6 +208,7 @@ export default function EquipmentPage() {
             case 'BUY':
                 url = `http://localhost:8080/api/user-bought-equipment/buy/${userId}/${itemId}`;
                 method = 'POST';
+                body = JSON.stringify({}); 
                 successMsg = "Pomyślnie zakupiono przedmiot!";
                 break;
             default:
@@ -214,7 +218,11 @@ export default function EquipmentPage() {
         try {
             const response = await fetch(url, {
                 method: method,
-                headers: { 'Authorization': `Bearer ${jwtToken}` },
+                headers: { 
+                    'Authorization': `Bearer ${jwtToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: body
             });
 
             if (!response.ok) {
@@ -318,7 +326,7 @@ export default function EquipmentPage() {
                                                 key={item.id}
                                                 item={{
                                                     ...item,
-                                                    isOwned: equipmentData.ownedEquipment.some(o => Number(o.id) === currentItemId),
+                                                    isOwned: (equipmentData.ownedEquipment || []).some(o => Number(o.id) === currentItemId),
                                                     isEquipped: isEquipped, 
                                                 }}
                                                 userCoins={equipmentData.coins}
