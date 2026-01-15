@@ -1,5 +1,7 @@
 package com.example.demo.controller;
 
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,52 +16,42 @@ import com.example.demo.dto.RegisterRequest;
 import com.example.demo.service.JwtService;
 import com.example.demo.service.UserService;
 
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
     
     private final UserService userService;
     private final JwtService jwtService;
 
-    public AuthController(UserService userService, JwtService jwtService) {
-        this.userService = userService;
-        this.jwtService = jwtService;
-    }
-
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<LoginResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+        User authenticatedUser = userService.authenticateUser(
+            loginRequest.getUserLogin(), 
+            loginRequest.getPassword()
+        );
         
-        String login = loginRequest.getUserLogin();
-        String password = loginRequest.getPassword();
+        String token = jwtService.generateToken(authenticatedUser.getId());
 
-        try {
-            User authenticatedUser = userService.authenticateUser(login, password);
-            
-            String token = jwtService.generateToken(authenticatedUser.getId());
-
-            LoginResponse response = new LoginResponse(
-                token, 
-                "Autoryzacja udana!", 
-                authenticatedUser.getId(),
-                authenticatedUser.getRole()
-            );
-            return new ResponseEntity<>(response, HttpStatus.OK);
-            
-        } catch (RuntimeException e) {
-            String jsonError = String.format("{\"message\": \"%s\"}", e.getMessage());
-            return new ResponseEntity<>(jsonError, HttpStatus.UNAUTHORIZED); 
-        }
+        LoginResponse response = new LoginResponse(
+            token, 
+            "Autoryzacja udana!", 
+            authenticatedUser.getId(),
+            authenticatedUser.getRole()
+        );
+        
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody RegisterRequest registerRequest) {
-        try {
-            userService.registerNewUser(registerRequest);
-            
-            return new ResponseEntity<>("{\"message\": \"Użytkownik zarejestrowany!\"}", HttpStatus.CREATED);
-        } catch (RuntimeException e) {
-            String jsonError = String.format("{\"message\": \"%s\"}", e.getMessage());
-            return new ResponseEntity<>(jsonError, HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<Map<String, String>> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
+        userService.registerNewUser(registerRequest);
+        return new ResponseEntity<>(
+            Map.of("message", "Użytkownik zarejestrowany!"), 
+            HttpStatus.CREATED
+        );
     }
 }

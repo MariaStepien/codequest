@@ -12,13 +12,18 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import com.example.demo.domain.User;
 import com.example.demo.dto.RankingEntryDto;
 import com.example.demo.dto.RegisterRequest;
+import com.example.demo.dto.UserDto;
 import com.example.demo.repos.UserRepository;
 
+import jakarta.validation.Valid;
+
 @Service
+@Validated
 public class UserService {
     
     private final UserRepository userRepository;
@@ -46,10 +51,10 @@ public class UserService {
      * @return The newly created Users entity.
      */
     @Transactional
-    public User registerNewUser(RegisterRequest request) {
+    public User registerNewUser(@Valid RegisterRequest request) {
         Optional<User> existingUser = userRepository.findByUserLogin(request.getUserLogin());
         if (existingUser.isPresent()) {
-            throw new RuntimeException("Użytkownik już istnieje.");
+            throw new RuntimeException("Wybrana nazwa użytkownika jest już zajęta. Spróbuj innej.");
         }
 
         User newUser = new User();
@@ -98,6 +103,19 @@ public class UserService {
     public User findUserById(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Nie znaleziono użytkownika z ID: " + userId));
+    }
+
+    public UserDto convertToDto(User user) {
+        return UserDto.builder()
+                .id(user.getId())
+                .login(user.getUserLogin())
+                .role(user.getRole())
+                .coins(user.getCoins())
+                .points(user.getPoints())
+                .rank(user.getRank())
+                .hearts(user.getHearts())
+                .lastHeartRecovery(user.getLastHeartRecovery())
+                .build();
     }
 
     public List<RankingEntryDto> getGlobalRanking() {
