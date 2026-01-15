@@ -150,12 +150,6 @@ export default function LoginPage() {
             Zarejestruj się
           </a>
         </p>
-        <p className="text-center text-sm text-gray-600 mt-2">
-            Lub {" "}
-            <a href="/course/1/level/1" className= "text-pink-600 font-medium hover:underline">
-            wypróbuj aplikację bez logowania
-            </a>
-        </p>
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Loader2 } from 'lucide-react';
+import { Navigate, useNavigate } from "react-router-dom";
 
 export default function RegisterPage() {
   const [userLogin, setUserLogin] = useState(""); 
@@ -9,11 +10,25 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(null);
 
+  const navigate = useNavigate();
+
   const handleRegister = async (e) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
     setIsLoading(true);
+
+    if (userLogin.length < 4 || userLogin.length > 20) {
+      setError("Nazwa użytkownika musi zawierać pomiędzy 4 a 20 znakami.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (password < 8) {
+      setError("Hasło musi zawierać conajmniej 8 znaków.");
+      setIsLoading(false);
+      return;
+    }
 
     if (password !== confirmPassword) {
       setError("Hasła się nie zgadzają.");
@@ -40,14 +55,19 @@ export default function RegisterPage() {
       const responseData = await response.json();
 
       if (response.ok) {
-        setSuccess(responseData.message || "Rejestracja pomyślna! Możesz się teraz zalogować.");
-        setUserLogin("");
-        setPassword("");
-        setConfirmPassword("");
+        setSuccess("Rejestracja pomyślna! Przekierowywanie do logowania...");
+        
+        setTimeout(() => {
+          navigate("/");
+        }, 2000);
 
       } else {
-        const errorMessage = responseData.message || "Rejestracja nie powiodła się. Spróbuj inną nazwę użytkownika.";
-        setError(errorMessage);
+        if (typeof responseData === 'object' && !responseData.message) {
+          const firstError = Object.values(responseData)[0];
+          setError(firstError);
+        } else {
+            setError(responseData.message || "Błąd rejestracji");
+        }
       }
     } catch (err) {
       console.error("Błąd sieciowy lub pobierania:", err);

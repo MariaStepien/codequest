@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { LogOut, BarChart3, BookOpenText, User, Backpack, Trophy, Award, MessageSquare, Heart } from 'lucide-react';
 import HeartModal from './HeartModal';
+
 const navLinks = [
   { id: 'dashboard', name: 'Panel', icon: BarChart3, href: '/dashboard' },
   { id: 'courses', name: 'Kursy', icon: BookOpenText, href: '/courses' },
@@ -10,30 +11,30 @@ const navLinks = [
   { id: 'forum', name: 'Forum', icon: MessageSquare, href: '/forum'}
 ];
 
-export default function Header({ userLogin, currentPage }) { 
+export default function Header({ currentPage }) { 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [hearts, setHearts] = useState(5);
   const [fullUser, setFullUser] = useState(null);
   const [isHeartModalOpen, setIsHeartModalOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) return;
+  const fetchUserData = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
 
-      try {
-        const response = await fetch('http://localhost:8080/api/user/me', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (response.ok) {
-          const data = await response.json();
-          setFullUser(data); 
-        }
-      } catch (error) {
-        console.error("Error fetching user data for header:", error);
+    try {
+      const response = await fetch('http://localhost:8080/api/user/me', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setFullUser(data);
       }
-    };
+    } catch (error) {
+      console.error("Błąd pobierania danych użytkownika.");
+      handleLogout();
+    }
+  };
 
+  useEffect(() => {
     fetchUserData();
   }, []);
 
@@ -107,8 +108,8 @@ export default function Header({ userLogin, currentPage }) {
               className="flex items-center space-x-2 p-1.5 rounded-full hover:bg-gray-100 transition duration-150"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
-              <div className="w-8 h-8 flex items-center justify-center text-black font-semibold text-sm">
-                {userLogin}
+              <div className="px-2 flex items-center justify-center text-black font-semibold text-sm">
+                {fullUser ? fullUser.login : "..."}
               </div>
               <User className="w-4 h-4 text-gray-500 hidden sm:block" />
             </button>
@@ -132,14 +133,7 @@ export default function Header({ userLogin, currentPage }) {
         <HeartModal 
           user={fullUser} 
           onClose={() => setIsHeartModalOpen(false)} 
-          onUpdate={() => {
-            const token = localStorage.getItem('token');
-            fetch('http://localhost:8080/api/user/me', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            })
-            .then(res => res.json())
-            .then(data => setFullUser(data));
-          }} 
+          onUpdate={fetchUserData} 
         />
       )}
     </header>

@@ -1,6 +1,5 @@
 import {Routes, Route } from 'react-router-dom'
 import LoginPage from './pages/LoginPage'
-import OptionSelectionPage from './pages/OptionSelectionPage'
 import LevelSelectionPage from './pages/LevelSelectionPage'
 import DashboardPage from './pages/DashboardPage'
 import RegisterPage from './pages/RegisterPage'
@@ -33,9 +32,6 @@ function App() {
     <Routes>
       {/* Login screen */}
       <Route path="/" element={<LoginPage/>} />
-
-      {/* option selection screen */}
-      <Route path="/option-select" element={<OptionSelectionPage/>} />
 
       {/* level selection screen */}
       <Route path="/course/:courseId" element={<LevelSelectionPage/>} />
