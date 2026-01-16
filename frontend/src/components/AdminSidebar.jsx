@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LogOut, LayoutDashboard, BookOpenText, ListPlus, Edit, User, Backpack, ArchiveRestore, PersonStanding, Skull, SkullIcon, MessageSquare, AlertCircle } from 'lucide-react';
+import { LogOut, LayoutDashboard, BookOpenText, ListPlus, Edit, User, Backpack, ArchiveRestore, PersonStanding, Skull, SkullIcon, MessageSquare, AlertCircle, User2 } from 'lucide-react';
 
 const navLinks = [
   { id: 'admin-dashboard', name: 'Panel', icon: LayoutDashboard, href: '/admin-dashboard' },
@@ -12,6 +12,7 @@ const navLinks = [
   { id: 'admin-enemies', name: 'Lista wrogów', icon: SkullIcon, href: '/admin/enemies'},
   { id: 'add-enemy', name: 'Dodaj wroga', icon: Skull, href: '/admin/add-enemy'},
   { id: 'forum', name: 'Forum', icon: MessageSquare, href: '/forum'},
+  { id: 'user-list', name: 'Użytkownicy', icon: User2, href: '/admin/user-list'},
   { id: 'reports', name: 'Zgłoszenia', icon: AlertCircle, href: '/admin/reports'}
 ];
 

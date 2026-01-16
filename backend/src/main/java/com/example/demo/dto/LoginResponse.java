@@ -5,12 +5,14 @@ public class LoginResponse {
     private String message;
     private Long userId;
     private String role;
+    private Boolean isBlocked;
 
-    public LoginResponse(String token, String message, Long userId, String role) {
+    public LoginResponse(String token, String message, Long userId, String role, Boolean isBlocked) {
         this.token = token;
         this.message = message;
         this.userId = userId;
         this.role = role;
+        this.isBlocked = isBlocked;
     }
 
     public String getToken() {
@@ -43,5 +45,13 @@ public class LoginResponse {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public boolean isBlocked() {
+        return isBlocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        isBlocked = blocked;
     }
 }

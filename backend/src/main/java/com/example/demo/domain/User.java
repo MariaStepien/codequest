@@ -44,4 +44,7 @@ public class User {
     private int hearts;
 
     private LocalDateTime lastHeartRecovery;
+
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean isBlocked = false;
 }

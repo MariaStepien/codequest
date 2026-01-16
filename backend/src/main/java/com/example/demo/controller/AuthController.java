@@ -40,7 +40,8 @@ public class AuthController {
             token, 
             "Autoryzacja udana!", 
             authenticatedUser.getId(),
-            authenticatedUser.getRole()
+            authenticatedUser.getRole(),
+            authenticatedUser.isBlocked()
         );
         
         return ResponseEntity.ok(response);

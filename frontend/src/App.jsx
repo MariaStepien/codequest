@@ -26,6 +26,7 @@ import EnemyListPage from './pages/EnemyListPage'
 import EditEnemyPage from './pages/EditEnemyPage'
 import ForumPage from './pages/ForumPage'
 import ReportListPage from './pages/ReportListPage'
+import AdminUserListPage from './pages/AdminUserListPage'
 
 function App() {
   return (
@@ -91,6 +92,8 @@ function App() {
       <Route path='/forum' element={<ForumPage />} />
 
       <Route path='/admin/reports' element={<ReportListPage />} />
+
+      <Route path='/admin/user-list' element={<AdminUserListPage />} />
 
       {/* Error screen */}
       <Route path="*" element={<h1>404 Not Found</h1>} />

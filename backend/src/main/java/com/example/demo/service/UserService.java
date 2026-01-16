@@ -75,6 +75,13 @@ public class UserService {
 
         return savedUser;
     }
+
+    @Transactional
+    public void toggleBlockStatus(Long userId) {
+        User user = findUserById(userId);
+        user.setBlocked(!user.isBlocked());
+        userRepository.save(user);
+    }
     
     /**
      * Authenticates a user based on login and password.
@@ -87,6 +94,9 @@ public class UserService {
         User user = userRepository.findByUserLogin(userLogin)
                 .orElseThrow(() -> new RuntimeException("Niepoprawny login lub hasło."));
 
+        if (user.isBlocked()) {
+            throw new RuntimeException("Twoje konto zostało zablokowane. Skontaktuj się z administratorem.");
+        }
         if (passwordEncoder.matches(password, user.getPassword())) {
             return user;
         } else {
@@ -105,6 +115,13 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Nie znaleziono użytkownika z ID: " + userId));
     }
 
+    public List<UserDto> getAllUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
     public UserDto convertToDto(User user) {
         return UserDto.builder()
                 .id(user.getId())
@@ -115,6 +132,7 @@ public class UserService {
                 .rank(user.getRank())
                 .hearts(user.getHearts())
                 .lastHeartRecovery(user.getLastHeartRecovery())
+                .isBlocked(user.isBlocked())
                 .build();
     }
 

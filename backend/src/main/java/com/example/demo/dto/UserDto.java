@@ -20,4 +20,5 @@ public class UserDto {
     private int rank;
     private int hearts;
     private LocalDateTime lastHeartRecovery;
+    private Boolean isBlocked;
 }
