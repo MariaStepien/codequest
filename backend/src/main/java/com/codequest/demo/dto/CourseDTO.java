@@ -1,0 +1,17 @@
+package com.codequest.demo.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class CourseDTO {
+    private Long id;
+    private String title;
+    private int totalLessons;
+    private int estimatedHours;
+    private Boolean isPublished;
+    private String trophyImgSource;
+}

@@ -1,0 +1,50 @@
+package com.codequest.demo.domain;
+
+import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+
+@Entity
+@Data
+@Table(name="users")
+@NoArgsConstructor
+@AllArgsConstructor
+public class User {
+    
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
+    private Long id;
+
+    private String userLogin;
+
+    private String password;
+
+    @Column(columnDefinition = "varchar(255) default 'USER'")
+    private String role;
+
+    @Column(columnDefinition= "integer default 0")
+    private int coins;
+
+    @Column(columnDefinition= "integer default 0")
+    private int points;
+
+    @Column(columnDefinition= "integer default 0")
+    private int rank;
+
+    @Column(columnDefinition= "integer default 5")
+    private int hearts;
+
+    private LocalDateTime lastHeartRecovery;
+
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean isBlocked = false;
+}
