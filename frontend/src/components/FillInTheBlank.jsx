@@ -98,10 +98,10 @@ export default function FillInTheBlank({ sentence, correctAnswers, onTaskComplet
   return (
     <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
       <h3 className="text-xl font-bold mb-4 text-gray-700">Uzupełnij puste pola</h3>
-      <p className="mb-4 text-gray-600">Dokończ zdanie wstawiając odpowiednie słowa do tekstu.</p>
+      <p className="mb-4 text-gray-600">Dokończ zdanie wpisując odpowiednie słowa w luki.</p>
       
       <div className="mb-6 p-4 bg-indigo-50 rounded-lg border border-indigo-200">
-        <p className="font-semibold text-indigo-800 mb-2">Dostępne słowa:</p>
+        <p className="font-semibold text-indigo-800 mb-2">Dostępne słowa do wpisania:</p>
         <div className="flex flex-wrap gap-2">
             {shuffledWords.map((word, index) => (
                 <span 

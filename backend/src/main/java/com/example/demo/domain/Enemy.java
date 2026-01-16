@@ -2,6 +2,8 @@ package com.example.demo.domain;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -27,5 +29,6 @@ public class Enemy {
     private String imgSource;
 
     @OneToMany(mappedBy = "enemy")
+    @JsonIgnore
     private List<Lesson> lessons;
 }
