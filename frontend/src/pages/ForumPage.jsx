@@ -30,8 +30,6 @@ export default function ForumPage() {
       role: 'USER'
     });
 
-  const isAdmin = userData.role === 'ADMIN';
-
   const triggerToast = (msg, err = false) => {
     setToast({ show: true, message: msg, isError: err });
     setTimeout(() => setToast({ show: false, message: '', isError: false }), 3000);
@@ -85,8 +83,10 @@ export default function ForumPage() {
     });
 
     selectedPost.comments.forEach(comment => {
-      if (comment.parentCommentId) {
-        const parent = map[comment.parentCommentId];
+      const parentId = comment.parentComment?.id || comment.parentCommentId;
+      
+      if (parentId) {
+        const parent = map[parentId];
         if (parent) {
           parent.replies.push(map[comment.id]);
         }
@@ -230,11 +230,6 @@ export default function ForumPage() {
     const label = type === 'post' ? 'post' : 'komentarz';
     
     try {
-        const res = await fetch(`http://localhost:8080/api/forum/${type}s/${id}?userId=${userData.id}&isAdmin=${isAdmin}`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-        });
-
         if (res.ok) {
             triggerToast(`Pomyślnie usunięto ${label}.`);
             if (type === 'post') {
@@ -323,7 +318,7 @@ export default function ForumPage() {
                 <Edit2 className="w-4 h-4" />
               </button>
             )}
-            {(isAdmin || comment.author?.id === userData.id) && (
+            {( comment.author?.id === userData.id) && (
               <button 
                   onClick={() => setModal({ show: true, type: 'comment', id: comment.id })}
                   className="text-red-400 hover:text-red-600"
@@ -400,7 +395,7 @@ export default function ForumPage() {
                           <Edit2 className="w-5 h-5" />
                         </button>
                       )}
-                      {(isAdmin || selectedPost.author?.id === userData.id) && (
+                      {( selectedPost.author?.id === userData.id) && (
                         <button 
                           onClick={() => setModal({ show: true, type: 'post', id: selectedPost.id })} 
                           className="text-red-400 hover:text-red-600 p-2"

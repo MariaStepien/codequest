@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { CheckCircle, XCircle, Filter, Calendar, Flag, MessageSquare, FileText, Eye, X, Trash2, BookOpen } from 'lucide-react';
+import { CheckCircle, XCircle, Filter, Calendar, Flag, MessageSquare, FileText, Eye, X, Trash2, BookOpen, Ban } from 'lucide-react';
 import AdminSidebar from '../components/AdminSidebar';
 import Toast from '../components/Toast';
 import ConfirmationModal from '../components/ConfirmationModal';
@@ -118,6 +118,30 @@ export default function ReportListPage() {
       }
     } catch (error) {
       triggerToast("Błąd podczas aktualizacji statusu.", true);
+    }
+  };
+
+  const handleBlockUser = async (userId, currentIsBlocked) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:8080/api/user/${userId}/toggle-block`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (response.ok) {
+        const newStatus = !currentIsBlocked;
+        triggerToast(newStatus ? "Użytkownik zablokowany" : "Użytkownik odblokowany");
+
+        setSelectedReportContent(prev => ({
+          ...prev,
+          author: { ...prev.author, isBlocked: newStatus }
+        }));
+      } else {
+        throw new Error();
+      }
+    } catch (error) {
+      triggerToast("Operacja nie powiodła się", true);
     }
   };
 
@@ -395,6 +419,26 @@ export default function ReportListPage() {
                     </p>
                     </div>
                 </div>
+                <button 
+                  onClick={() => handleBlockUser(selectedReportContent.author.id, selectedReportContent.author.isBlocked)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold transition-colors ${
+                    selectedReportContent.author.isBlocked 
+                      ? 'bg-green-600 text-white hover:bg-green-700' 
+                      : 'bg-black text-white hover:bg-gray-800'
+                  }`}
+                >
+                  {selectedReportContent.author.isBlocked ? (
+                    <>
+                      <CheckCircle className="w-4 h-4" />
+                      Odblokuj autora
+                    </>
+                  ) : (
+                    <>
+                      <Ban className="w-4 h-4" />
+                      Zablokuj autora
+                    </>
+                  )}
+                </button>
                 <button 
                   onClick={openDeleteConfirmModal}
                   className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-xl font-bold hover:bg-red-100 transition-colors"

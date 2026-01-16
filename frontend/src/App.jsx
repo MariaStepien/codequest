@@ -27,6 +27,7 @@ import EditEnemyPage from './pages/EditEnemyPage'
 import ForumPage from './pages/ForumPage'
 import ReportListPage from './pages/ReportListPage'
 import AdminUserListPage from './pages/AdminUserListPage'
+import AdminForumPage from './pages/AdminForumPage'
 
 function App() {
   return (
@@ -88,6 +89,8 @@ function App() {
       <Route path='/admin/enemies' element={<EnemyListPage />} />
 
       <Route path='/admin/edit-enemy/:id' element={<EditEnemyPage />} />
+
+      <Route path='/admin/forum' element={<AdminForumPage />} />
 
       <Route path='/forum' element={<ForumPage />} />
 

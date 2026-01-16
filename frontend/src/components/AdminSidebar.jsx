@@ -11,7 +11,7 @@ const navLinks = [
   { id: 'add-sprite', name: 'Dodaj sprite', icon: PersonStanding, href: '/admin/add-sprite'},
   { id: 'admin-enemies', name: 'Lista wrogów', icon: SkullIcon, href: '/admin/enemies'},
   { id: 'add-enemy', name: 'Dodaj wroga', icon: Skull, href: '/admin/add-enemy'},
-  { id: 'forum', name: 'Forum', icon: MessageSquare, href: '/forum'},
+  { id: 'forum', name: 'Forum', icon: MessageSquare, href: '/admin/forum'},
   { id: 'user-list', name: 'Użytkownicy', icon: User2, href: '/admin/user-list'},
   { id: 'reports', name: 'Zgłoszenia', icon: AlertCircle, href: '/admin/reports'}
 ];
