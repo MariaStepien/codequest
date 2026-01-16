@@ -8,10 +8,10 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 @SpringBootApplication
 @EnableScheduling
 @EnableMethodSecurity(prePostEnabled=true)
-public class DemoApplication {
+public class CodequestApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(DemoApplication.class, args);
+		SpringApplication.run(CodequestApplication.class, args);
 	}
 
 }
