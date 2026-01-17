@@ -66,4 +66,14 @@ public class ReportController {
         }
         return ResponseEntity.badRequest().build();
     }
+
+    @GetMapping("/stats/daily-count")
+    public ResponseEntity<Long> getDailyCount() {
+        return ResponseEntity.ok(reportService.getDailyReportCount());
+    }
+
+    @GetMapping("/stats/pending-count")
+    public ResponseEntity<Long> getPendingCount() {
+        return ResponseEntity.ok(reportService.getPendingReportCount());
+    }
 }

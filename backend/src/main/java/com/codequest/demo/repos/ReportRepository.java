@@ -1,5 +1,6 @@
 package com.codequest.demo.repos;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Sort;
@@ -15,5 +16,6 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     List<Report> findByTargetType(String targetType, Sort sort);
     List<Report> findByStatusAndTargetType(ReportStatus status, String targetType, Sort sort);
     List<Report> findAll(Sort sort);
-
+    long countByCreatedAtAfter(LocalDateTime dateTime);
+    long countByStatus(ReportStatus status);
 }

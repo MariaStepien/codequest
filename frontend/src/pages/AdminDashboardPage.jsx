@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import AdminSidebar from '../components/AdminSidebar';
 
-const AdminDashboardContentArea = ({ userLogin }) => {
+const AdminDashboardContentArea = ({ userLogin, dailyReports, pendingReports }) => {
 
   return (
       <div className="space-y-10">
@@ -11,6 +11,17 @@ const AdminDashboardContentArea = ({ userLogin }) => {
               </h2>
               <p className="text-gray-500">Panel Administracyjny - Szybki Przegląd</p>
           </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="p-6 bg-white rounded-xl shadow-md border-t-4 border-red-500">
+              <h3 className="text-gray-500 text-sm font-medium uppercase tracking-wider">Dzisiejsze Zgłoszenia</h3>
+              <p className="text-4xl font-black text-gray-900 mt-2">{dailyReports}</p>
+            </div>
+            <div className="p-6 bg-white rounded-xl shadow-md border-t-4 border-orange-500">
+              <h3 className="text-gray-500 text-sm font-medium uppercase tracking-wider">Nierozwiązane zgłoszenia</h3>
+              <p className="text-4xl font-black text-gray-900 mt-2">{pendingReports}</p>
+          </div>
+          </div>   
         </div>
   );
 };
@@ -19,6 +30,8 @@ const AdminDashboardContentArea = ({ userLogin }) => {
 export default function AdminDashboardPage() { 
   const [currentPage, setCurrentPage] = useState('admin-dashboard');
   const [userData, setUserData] = useState(null); 
+  const [dailyReports, setDailyReports] = useState(0);
+  const [pendingReports, setPendingReports] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -37,46 +50,42 @@ export default function AdminDashboardPage() {
         return;
     }
 
-    const fetchAdminData = async () => {
-      try {
-        const response = await fetch('http://localhost:8080/api/user/me', {
-          method: 'GET',
-          headers: {
+    const fetchData = async () => {
+        try {
+          const headers = {
             'Authorization': `Bearer ${jwtToken}`,
             'Content-Type': 'application/json'
-          }
-        });
+          };
 
-        if (!response.ok) {
-          if (response.status === 401 || response.status === 403) {
-            console.error("Autoryzacja nie udana lub sesja wygasła. Wylogowanie użytkownika...");
-            localStorage.removeItem('token');
-            localStorage.removeItem('userId');
-            localStorage.removeItem('role'); 
-            window.location.replace('/');
-            return;
+          const [userRes, reportRes, pendingRes] = await Promise.all([
+            fetch('http://localhost:8080/api/user/me', { headers }),
+            fetch('http://localhost:8080/api/reports/stats/daily-count', { headers }),
+            fetch('http://localhost:8080/api/reports/stats/pending-count', { headers })
+          ]);
+
+          if (userRes.ok && reportRes.ok && pendingRes.ok) {
+            const userData = await userRes.json();
+            const reportCount = await reportRes.json();
+            const pendingCount = await pendingRes.json();
+            setUserData(userData);
+            setDailyReports(reportCount);
+            setPendingReports(pendingCount);
           }
-          
-          throw new Error('Nie udało się pobrać danych użytkownika.');
+          setIsLoading(false);
+        } catch (error) {
+          console.error("Błąd pobrania danych:", error);
+          setError("Błąd ładowania danych.");
         }
+      };
 
-        const data = await response.json();
-        setUserData(data); 
-        setIsLoading(false);
-
-      } catch (error) {
-        console.error("Błąd pobrania danych użytkownika:", error);
-      }
-    };
-
-    fetchAdminData();
-  }, []);
+      fetchData();
+    }, []);
 
   const renderContent = () => {
     if (isLoading) return <div className="text-center py-10 text-xl font-medium">Loading Admin Dashboard...</div>;
     if (error) return <div className="text-center py-10 text-xl font-medium text-red-600">Error: {error}</div>;
 
-    return <AdminDashboardContentArea userLogin={userLogin} />;
+    return <AdminDashboardContentArea userLogin={userLogin} dailyReports={dailyReports} pendingReports={pendingReports} />;
   };
 
 

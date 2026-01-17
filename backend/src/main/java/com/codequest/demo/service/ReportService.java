@@ -66,4 +66,13 @@ public class ReportService {
 
         return report;
     }
+
+    public long getDailyReportCount() {
+        LocalDateTime startOfDay = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        return reportRepository.countByCreatedAtAfter(startOfDay);
+    }
+
+    public long getPendingReportCount() {
+        return reportRepository.countByStatus(ReportStatus.PENDING);
+    }
 }
