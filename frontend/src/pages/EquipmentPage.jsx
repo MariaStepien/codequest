@@ -176,7 +176,8 @@ export default function EquipmentPage() {
             if (!response.ok) throw new Error("Nie udało się pobrać przedmiotów.");
 
             const data = await response.json();
-            setTabItems(data);
+            const sortedData = [...data].sort((a, b) => a.itemNumber - b.itemNumber);
+            setTabItems(sortedData);
 
         } catch (error) {
             console.error(error);

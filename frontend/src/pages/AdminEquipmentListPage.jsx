@@ -15,7 +15,7 @@ const EQUIPMENT_SLOTS = [
 
 export default function AdminEquipmentListPage() {
     const [items, setItems] = useState([]);
-    const [activeCategory, setActiveCategory] = useState('ARMOR');
+    const [activeCategory, setActiveCategory] = useState('HELM');
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [userData, setUserData] = useState(null);
@@ -30,7 +30,9 @@ export default function AdminEquipmentListPage() {
                 headers: { 'Authorization': `Bearer ${jwtToken}` }
             });
             if (response.ok) {
-                setItems(await response.json());
+                const data = await response.json();
+                const sortedData = [...data].sort((a, b) => a.itemNumber - b.itemNumber);
+                setItems(sortedData);
             } else if (response.status === 404) {
                 setItems([]);
             } else {
