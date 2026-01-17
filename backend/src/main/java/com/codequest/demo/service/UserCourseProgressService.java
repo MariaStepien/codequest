@@ -77,6 +77,7 @@ public class UserCourseProgressService {
             progress.setUser(user); 
             progress.setCourse(course); 
             progress.setCompletedLessons(newCompletedLessons);
+            progress.setIsFinished(false);
             progress.setDateCreated(OffsetDateTime.now());
             progress.setLastUpdated(OffsetDateTime.now());
         }

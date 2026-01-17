@@ -10,5 +10,5 @@ public class CourseProgressByUserDetailsDto {
     private String userLogin;
     private int completedLessons;
     private int totalLessons;
-    private boolean isCourseCompleted;
+    private Boolean isCourseCompleted;
 }

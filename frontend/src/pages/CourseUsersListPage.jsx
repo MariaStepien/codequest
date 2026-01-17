@@ -32,11 +32,11 @@ const CourseProgressTable = ({ usersProgress }) => {
               <td className="px-6 py-4 whitespace-nowrap text-center">
                 {user.isCourseCompleted ? (
                   <span className="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                    <CheckCircle className="w-4 h-4 mr-1" /> Ukończony
+                    <CheckCircle className="w-4 h-4 mr-1" /> Ukończono
                   </span>
                 ) : (
-                  <span className="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-red-100 text-red-800">
-                    <X className="w-4 h-4 mr-1" /> W Trakcie
+                  <span className="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                    <Loader2 className="w-4 h-4 mr-1" /> W trakcie
                   </span>
                 )}
               </td>
