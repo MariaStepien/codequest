@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { LogOut, LayoutDashboard, BookOpenText, ListPlus, Edit, User, Backpack, ArchiveRestore, PersonStanding, Skull, SkullIcon, MessageSquare, AlertCircle, User2 } from 'lucide-react';
 
 const navLinks = [
@@ -16,8 +16,31 @@ const navLinks = [
   { id: 'reports', name: 'Zgłoszenia', icon: AlertCircle, href: '/admin/reports'}
 ];
 
-export default function AdminSidebar({ userLogin, currentPage }) { 
+export default function AdminSidebar({ currentPage }) { 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [fullUser, setFullUser] = useState(null);
+
+  const fetchUserData = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+      const response = await fetch('http://localhost:8080/api/user/me', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setFullUser(data);
+      }
+    } catch (error) {
+      console.error("Błąd pobierania danych użytkownika.");
+      handleLogout();
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -65,7 +88,9 @@ export default function AdminSidebar({ userLogin, currentPage }) {
           >
             <div className="flex items-center space-x-3">
                 <User className="w-5 h-5 text-gray-500" />
-                <span className="font-semibold text-gray-800 text-sm truncate">{userLogin}</span>
+                <span className="font-semibold text-gray-800 text-sm truncate">
+                  {fullUser ? fullUser.login : "..."}
+                </span>
             </div>
           </button>
 
