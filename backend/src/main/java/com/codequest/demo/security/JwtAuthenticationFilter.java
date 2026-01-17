@@ -16,7 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.codequest.demo.service.JwtService;
 import com.codequest.demo.service.UserService;
 
-import jakarta.servlet.FilterChain; // <--- NEW IMPORT
+import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

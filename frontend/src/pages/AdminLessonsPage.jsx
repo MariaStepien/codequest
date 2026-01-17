@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminSidebar from '../components/AdminSidebar';
 import { BookOpenText, ListOrdered, X, Edit, Loader2, Trash2, Eye } from 'lucide-react';
+import ConfirmationModal from '../components/ConfirmationModal';
+import Toast from '../components/Toast';
 
 const LessonListItem = ({ lesson, navigate, onDelete, isPublished, courseId }) => {
   const handleEditLesson = () => {
@@ -63,10 +65,18 @@ export default function AdminLessonsPage() {
   const [isPublished, setIsPublished] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const [modalConfig, setModalConfig] = useState({ show: false, lessonId: null, title: '' });
+  const [toastConfig, setToastConfig] = useState({ show: false, message: '', isError: false });
   
   const currentPage = 'admin-courses';
   const jwtToken = localStorage.getItem('token');
   const storedRole = localStorage.getItem('role');
+
+  const showToast = (message, isError = false) => {
+    setToastConfig({ show: true, message, isError });
+    setTimeout(() => setToastConfig(prev => ({ ...prev, show: false })), 3000);
+  };
 
   const fetchLessonsAndCourseData = async () => {
     setError(null);
@@ -114,12 +124,13 @@ export default function AdminLessonsPage() {
     fetchLessonsAndCourseData();
   }, [courseId, jwtToken, storedRole, navigate]);
 
-  const handleDeleteLesson = async (lessonId, lessonTitle) => {
-    const confirmed = window.confirm(
-      `Czy na pewno chcesz usunąć lekcję "${lessonTitle}"? Spowoduje to również trwałe usunięcie wszystkich rekordów postępów użytkowników powiązanych z tą lekcją.`
-    );
+  const openDeleteModal = (lessonId, title) => {
+    setModalConfig({ show: true, lessonId, title });
+  };
 
-    if (!confirmed) return;
+  const handleDeleteConfirm = async () => {
+    const { lessonId } = modalConfig;
+    setModalConfig({ show: false, lessonId: null, title: '' });
 
     try {
       const response = await fetch(`/api/lessons/${lessonId}`, {
@@ -131,12 +142,13 @@ export default function AdminLessonsPage() {
 
       if (response.ok) {
         setLessons(prev => prev.filter(lesson => lesson.id !== lessonId));
+        showToast("Lekcja została pomyślnie usunięta");
       } else {
         const errorData = await response.json().catch(() => ({}));
-        alert(errorData.message || "Wystąpił błąd podczas usuwania lekcji.");
+        showToast(errorData.message || "Wystąpił błąd podczas usuwania lekcji.", true);
       }
     } catch (err) {
-      alert("Wystąpił nieoczekiwany błąd podczas próby usunięcia lekcji.");
+      showToast("Wystąpił nieoczekiwany błąd podczas próby usunięcia lekcji.", true);
     }
   };
 
@@ -184,7 +196,7 @@ export default function AdminLessonsPage() {
                     key={lesson.id} 
                     lesson={lesson} 
                     navigate={navigate} 
-                    onDelete={handleDeleteLesson}
+                    onDelete={openDeleteModal}
                     isPublished={isPublished}
                     courseId = {courseId}
                 />
@@ -203,6 +215,21 @@ export default function AdminLessonsPage() {
           </div>
         </div>
       </div>
+
+      <ConfirmationModal 
+        show={modalConfig.show}
+        title="Usuwanie lekcji"
+        message={`Czy na pewno chcesz usunąć lekcję "${modalConfig.title}"? Spowoduje to również trwałe usunięcie wszystkich rekordów postępów użytkowników powiązanych z tą lekcją.`}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setModalConfig({ show: false, lessonId: null, title: '' })}
+        confirmText="Usuń"
+      />
+
+      <Toast 
+        show={toastConfig.show}
+        message={toastConfig.message}
+        isError={toastConfig.isError}
+      />
     </div>
   );
 }

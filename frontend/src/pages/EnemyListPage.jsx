@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import {Search, Edit, Skull, Trash2} from 'lucide-react';
 import AdminSidebar from '../components/AdminSidebar';
 import { useNavigate } from 'react-router-dom';
+import ConfirmationModal from '../components/ConfirmationModal';
+import Toast from '../components/Toast';
 
 const API_BASE_URL = 'http://localhost:8080/api';
 
@@ -12,7 +14,15 @@ export default function EnemyListPage() {
     const [userData, setUserData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
+    const [modalConfig, setModalConfig] = useState({ show: false, enemyId: null, name: '' });
+    const [toastConfig, setToastConfig] = useState({ show: false, message: '', isError: false });
+
     const jwtToken = localStorage.getItem('token');
+
+    const showToast = (message, isError = false) => {
+        setToastConfig({ show: true, message, isError });
+        setTimeout(() => setToastConfig(prev => ({ ...prev, show: false })), 3000);
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -42,22 +52,29 @@ export default function EnemyListPage() {
         enemy.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const handleDelete = async (id, name) => {
-        if (window.confirm(`Czy na pewno chcesz usunąć przeciwnika: ${name}?`)) {
-            try {
-                const res = await fetch(`${API_BASE_URL}/enemies/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${jwtToken}` }
-                });
+    const openDeleteModal = (id, name) => {
+        setModalConfig({ show: true, enemyId: id, name });
+    };
 
-                if (res.ok) {
-                    setEnemies(enemies.filter(e => e.id !== id));
-                } else {
-                    alert("Błąd podczas usuwania przeciwnika.");
-                }
-            } catch (err) {
-                console.error(err);
+    const handleDeleteConfirm = async () => {
+        const { enemyId } = modalConfig;
+        setModalConfig({ show: false, enemyId: null, name: '' });
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/enemies/${enemyId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${jwtToken}` }
+            });
+
+            if (res.ok) {
+                setEnemies(enemies.filter(e => e.id !== enemyId));
+                showToast("Przeciwnik został usunięty");
+            } else {
+                showToast("Błąd podczas usuwania przeciwnika.", true);
             }
+        } catch (err) {
+            console.error(err);
+            showToast("Wystąpił błąd połączenia.", true);
         }
     };
 
@@ -123,7 +140,7 @@ export default function EnemyListPage() {
                                                         <Edit className="w-5 h-5" />
                                                     </button>
                                                     <button 
-                                                        onClick={() => handleDelete(enemy.id, enemy.name)}
+                                                        onClick={() => openDeleteModal(enemy.id, enemy.name)}
                                                         className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
                                                         title="Usuń"
                                                     >
@@ -134,7 +151,7 @@ export default function EnemyListPage() {
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan="4" className="px-6 py-10 text-center text-gray-400">
+                                            <td colSpan="5" className="px-6 py-10 text-center text-gray-400">
                                                 Nie znaleziono żadnych przeciwników.
                                             </td>
                                         </tr>
@@ -145,6 +162,21 @@ export default function EnemyListPage() {
                     )}
                 </div>
             </main>
+
+            <ConfirmationModal 
+                show={modalConfig.show}
+                title="Usuwanie przeciwnika"
+                message={`Czy na pewno chcesz usunąć przeciwnika: ${modalConfig.name}?`}
+                onConfirm={handleDeleteConfirm}
+                onCancel={() => setModalConfig({ show: false, enemyId: null, name: '' })}
+                confirmText="Usuń"
+            />
+
+            <Toast 
+                show={toastConfig.show}
+                message={toastConfig.message}
+                isError={toastConfig.isError}
+            />
         </div>
     );
 }

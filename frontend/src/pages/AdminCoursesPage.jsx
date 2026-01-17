@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { BookOpenText, EyeOff, CheckCircle, X, List, Trash2, Loader2, Users, Edit } from 'lucide-react';
 import AdminSidebar from '../components/AdminSidebar';
 import { useNavigate } from 'react-router-dom';
+import ConfirmationModal from '../components/ConfirmationModal';
+import Toast from '../components/Toast';
 
 const CourseListItem = ({ course, navigate, onDelete }) => {
   const isPublished = course.isPublished;
@@ -65,9 +67,17 @@ export default function AdminCoursesPage() {
   const [activeTab, setActiveTab] = useState('published');
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const [modalConfig, setModalConfig] = useState({ show: false, courseId: null, title: '' });
+  const [toastConfig, setToastConfig] = useState({ show: false, message: '', isError: false });
   
   const navigate = useNavigate();
   const jwtToken = localStorage.getItem('token');
+
+  const showToast = (message, isError = false) => {
+    setToastConfig({ show: true, message, isError });
+    setTimeout(() => setToastConfig(prev => ({ ...prev, show: false })), 3000);
+  };
 
   const fetchCourses = async () => {
     setIsLoading(true);
@@ -95,16 +105,13 @@ export default function AdminCoursesPage() {
     fetchCourses();
   }, []);
 
-  const handleDeleteCourse = async (courseId, title) => {
-    const confirmationMsg = `Czy na pewno chcesz usunąć kurs "${title}"?\n\n` +
-                          `UWAGA: Ta operacja jest nieodwracalna. Zostaną usunięte:\n` +
-                          `- Wszystkie lekcje przypisane do kursu\n` +
-                          `- Wszystkie postępy i wyniki użytkowników\n` +
-                          `- Grafika trofeum z serwera`;
+  const openDeleteModal = (courseId, title) => {
+    setModalConfig({ show: true, courseId, title });
+  };
 
-    if (!window.confirm(confirmationMsg)) {
-      return;
-    }
+  const handleDeleteConfirm = async () => {
+    const { courseId } = modalConfig;
+    setModalConfig({ show: false, courseId: null, title: '' });
 
     try {
       const response = await fetch(`/api/courses/${courseId}`, {
@@ -114,12 +121,13 @@ export default function AdminCoursesPage() {
 
       if (response.ok) {
         setUnpublishedCourses(prev => prev.filter(c => c.id !== courseId));
+        showToast("Kurs został pomyślnie usunięty");
       } else {
         const msg = await response.text();
-        alert(msg || "Nie udało się usunąć kursu.");
+        showToast(msg || "Nie udało się usunąć kursu.", true);
       }
     } catch (err) {
-      alert("Wystąpił błąd podczas usuwania.");
+      showToast("Wystąpił błąd podczas usuwania.", true);
     }
   };
 
@@ -184,7 +192,7 @@ export default function AdminCoursesPage() {
                     key={course.id} 
                     course={course} 
                     navigate={navigate} 
-                    onDelete={handleDeleteCourse}
+                    onDelete={openDeleteModal}
                   />
                 ))}
               </div>
@@ -192,6 +200,21 @@ export default function AdminCoursesPage() {
           </div>
         </div>
       </div>
+
+      <ConfirmationModal 
+        show={modalConfig.show}
+        title="Usuwanie kursu"
+        message={`Czy na pewno chcesz usunąć kurs "${modalConfig.title}"?\n\nUWAGA: Ta operacja jest nieodwracalna. Zostaną usunięte wszystkie lekcje, postępy użytkowników oraz grafika trofeum.`}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setModalConfig({ show: false, courseId: null, title: '' })}
+        confirmText="Usuń"
+      />
+
+      <Toast 
+        show={toastConfig.show}
+        message={toastConfig.message}
+        isError={toastConfig.isError}
+      />
     </div>
   );
 }
