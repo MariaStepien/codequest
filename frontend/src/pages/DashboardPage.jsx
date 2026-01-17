@@ -4,7 +4,7 @@ import Header from '../components/Header';
 import CoursesPage from './CoursesPage';
 
 const initialUserData = {
-  userLogin: "Guest",
+  login: "...",
   progress: 0,
   currentCourse: "N/A",
   currentLesson: "N/A",
@@ -36,7 +36,7 @@ const DashboardContentArea = ({ userData }) => {
       <div className="space-y-8">
           <div className="p-6 bg-white rounded-xl shadow-lg border-l-4 border-indigo-500">
               <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                  Witaj {userData.userLogin}
+                  Witaj {userData.login}!
               </h2>
           </div>
 
@@ -134,8 +134,6 @@ export default function DashboardPage() {
                         latestActivity: activityData,
                     }));
                 }
-            } else {
-                console.error("Nie udało się pobrać ostatniej aktywności. Status:", response.status);
             }
         } catch (err) {
             console.error("Błąd podczas pobierania ostatniej aktywności:", err);
@@ -161,26 +159,21 @@ export default function DashboardPage() {
         
         setUserData(prevData => ({
             ...prevData,
-            userLogin: userDetails.userLogin,
-            progress: 70,
-            currentCourse: "Python for Beginners",
-            currentLesson: "Lesson 5: Loops and Iteration",
+            login: userDetails.login,
+            points: userDetails.points,
+            coins: userDetails.coins,
+            rank: userDetails.rank,
             courses: [
               { id: 1, title: "Python for Beginners", progress: 70, color: "blue", lessons: 20, hours: 15, status: 'In Progress' },
               { id: 2, title: "Modern JavaScript", progress: 45, color: "yellow", lessons: 30, hours: 25, status: 'In Progress' },
               { id: 4, title: "Introduction to HTML & CSS", progress: 100, color: "green", lessons: 10, hours: 5, status: 'Completed' },
-            ],
-            points: userDetails.points,
-            coins: userDetails.coins,
-            rank: userDetails.rank
+            ]
         }));
 
         await fetchLatestActivity();
         
       } catch (err) {
-        console.error("Błąd podczas pobierania danych użytkownika:", err);
         setError(err.message);
-        
         if (err.message.includes('Sesja wygasła')) {
             setTimeout(() => {
                 window.location.replace('/'); 
@@ -225,7 +218,6 @@ export default function DashboardPage() {
 
 
       <Header
-        userLogin={userData.userLogin} 
         currentPage={currentPage}
       />
       

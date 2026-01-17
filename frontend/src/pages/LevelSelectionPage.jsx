@@ -2,29 +2,25 @@ import { useMemo, useState, useEffect, useCallback } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import LevelButton from '../components/LevelButton';
 import LevelDetailsModal from '../components/LevelDetailsModal'; 
+import Header from '../components/Header';
+import { Flag, PlayCircle } from 'lucide-react';
 
 const SPACING_Y = 120; 
-const INITIAL_OFFSET_Y = 60; 
+const INITIAL_OFFSET_Y = 100; 
 
-// Path Styling Constants
-const ACTIVE_PATH_COLOR = '#60a5fa'; // Tailwind blue-400
-const DISABLED_PATH_COLOR = '#9ca3af'; // Tailwind gray-400
+const ACTIVE_PATH_COLOR = '#60a5fa'; 
+const DISABLED_PATH_COLOR = '#9ca3af'; 
 const PATH_STROKE_WIDTH = 10;
-const BUTTON_CENTER_OFFSET_PX = 32; // Half the size of LevelButton (used for Y-coordinates)
+const BUTTON_CENTER_OFFSET_PX = 32; 
 
-{/*Generates positions for levels in a straight vertical line.*/}
 const generateHorizontalPositions = (totalLevels) => {
     const positions = {};
-    
     let finalY = INITIAL_OFFSET_Y;
 
     for (let i = 1; i <= totalLevels; i++) {
         const y = INITIAL_OFFSET_Y + (i - 1) * SPACING_Y;
         positions[i] = { y: y, x: 50}; 
-
-        if (i === totalLevels) {
-            finalY = y;
-        }
+        if (i === totalLevels) finalY = y;
     }
     return {
         positions,
@@ -42,42 +38,28 @@ export default function LevelSelectionPage() {
     const [selectedLevelDetails, setSelectedLevelDetails] = useState(null);
     const [selectedLevelProgress, setSelectedLevelProgress] = useState(null);
     const [isDetailsLoading, setIsDetailsLoading] = useState(false);
-
     const [userHearts, setUserHearts] = useState(null);
 
     useEffect(() => {
         const jwtToken = localStorage.getItem('token');
-    
         if (!jwtToken) {
             setLoading(false);
-            setError("Użytkownik niezalogowany. Przekierowanie do logowania...");
-            
-            setTimeout(() => {
-                window.location.replace('/'); 
-            }, 1500); 
+            setError("Użytkownik niezalogowany.");
+            setTimeout(() => window.location.replace('/'), 1500); 
             return;
         }
 
         const fetchDetails = async () => {
             try {
                 const response = await fetch(`/api/courses/${courseId}`); 
-                if (!response.ok) {
-                    throw new Error(`Nieznaleziono kursu (ID: ${courseId})`);
-                }
+                if (!response.ok) throw new Error(`Nieznaleziono kursu`);
                 const data = await response.json();
                 setCourseDetails(data);
 
                 const progressResponse = await fetch(`/api/courses/completed-levels/${courseId}`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${jwtToken}`, 
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Authorization': `Bearer ${jwtToken}` },
                 });
-                if (!progressResponse.ok) {
-                    console.error(`Nie udało się pobrać postępu użytkownika dla kursu ${courseId}. Status: ${progressResponse.status}`);
-                    setLastCompletedLevel(0);
-                } else {
+                if (progressResponse.ok) {
                     const completedLevels = await progressResponse.json();
                     setLastCompletedLevel(completedLevels);
                 }
@@ -95,7 +77,6 @@ export default function LevelSelectionPage() {
                 setLoading(false);
             }
         };
-
         fetchDetails();
     }, [courseId]);
 
@@ -119,40 +100,23 @@ export default function LevelSelectionPage() {
         setIsDetailsLoading(true);
         setSelectedLevelDetails(null);
         setSelectedLevelProgress(null);
-        setError(null);
-
         const jwtToken = localStorage.getItem('token');
-        if (!jwtToken) {
-            setIsDetailsLoading(false);
-            return;
-        }
         
         try {
             const lessonResponse = await fetch(`/api/lessons/course/${courseId}/order/${levelNumber}`);
-            if (!lessonResponse.ok) {
-                throw new Error(`Nie znaleziono detali dla poziomu ${levelNumber}`);
-            }
+            if (!lessonResponse.ok) throw new Error(`Błąd detali`);
             const lessonDetails = await lessonResponse.json();
             setSelectedLevelDetails(lessonDetails);
 
             const progressResponse = await fetch(`/api/lesson-progress/lesson/${lessonDetails.id}`, {
-                method: 'GET',
                 headers: { 'Authorization': `Bearer ${jwtToken}` },
             });
-
             if (progressResponse.ok) {
                 const progressData = await progressResponse.json();
                 setSelectedLevelProgress(progressData);
-            } else if (progressResponse.status === 404) {
-                setSelectedLevelProgress(null); 
-            } else {
-                console.error(`Błąd podczas pobierania postępu dla lekcji ${lessonDetails.id}. Status: ${progressResponse.status}`);
-                setSelectedLevelProgress(null);
             }
-            
         } catch (err) {
-            console.error("Błąd ładowania detali poziomu:", err.message);
-            setError("Błąd ładowania detali poziomu.");
+            console.error(err);
         } finally {
             setIsDetailsLoading(false);
         }
@@ -164,75 +128,61 @@ export default function LevelSelectionPage() {
             fetchLevelDetails(levelNumber);
         }
     };
-    
-    const handleCloseModal = () => {
-        setSelectedLevelDetails(null);
-        setSelectedLevelProgress(null);
-        setError(null); 
-    }
 
     const levelButtonOffset = '32px'; 
 
-    if (loading) {
-        return <div className="p-8 text-center text-xl">Ładowanie szczegółów kursu</div>;
-    }
-
-    if (error && !selectedLevelDetails) {
-        return <div className="p-8 text-center text-red-600 font-semibold">Błąd: {error}</div>;
-    }
+    if (loading) return (
+        <div className="min-h-screen bg-gray-50">
+            <Header currentPage="courses" />
+            <div className="p-8 text-center text-xl">Ładowanie...</div>
+        </div>
+    );
 
     return (
-        <div className="min-h-screen bg-gray-50 p-4 sm:p-8 text-gray-800">
-            <div className="mx-auto w-full max-w-7xl"> 
-                
+        <div className="min-h-screen bg-gray-50 text-gray-800">
+            <Header currentPage="courses" />
+            
+            <main className="mx-auto w-full max-w-7xl p-4 sm:p-8"> 
                 <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 space-y-4 sm:space-y-0">
-                    <Link to="/dashboard" className="text-blue-400 hover:text-blue-500 transition duration-150 flex items-center space-x-2 font-medium">
+                    <Link to="/courses" className="text-blue-400 hover:text-blue-500 flex items-center space-x-2 font-medium">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
                         <span>Powrót do kursów</span>
                     </Link>
-                    <h1 className="text-4xl font-extrabold text-blue-400">
+                    <h1 className="text-4xl font-extrabold text-blue-500 uppercase tracking-tight">
                         {courseTitle}
                     </h1>
                 </header>
 
-                {/* Level Map Container */}
-                <div className="border-4 border-blue-200 rounded-xl shadow-xl bg-white p-4 sm:p-6 md:p-8"> 
+                <div className="border-4 border-blue-200 rounded-2xl shadow-2xl bg-white p-4 sm:p-6 md:p-8 relative overflow-hidden"> 
                     
                     {(selectedLevelDetails || isDetailsLoading) && (
                          <LevelDetailsModal 
                             lessonDetails={selectedLevelDetails}
                             progress={selectedLevelProgress}
-                            onClose={handleCloseModal}
+                            onClose={() => { setSelectedLevelDetails(null); setSelectedLevelProgress(null); }}
                             courseId={courseId}
                             userHearts={userHearts}
                         />
                     )}
 
-                    <div 
-                        className="relative w-full overflow-y-scroll overflow-x-hidden" 
-                        style={{ height: '70vh' }}
-                    >
-                        {/* CONTENT CONTAINER: Height is set to match the total path length */}
-                        <div 
-                            className="relative w-full"
-                            style={{ height: `${mapHeight}px` }} 
-                        >
+                    <div className="relative w-full overflow-y-scroll overflow-x-hidden custom-scrollbar" style={{ height: '70vh' }}>
+                        <div className="relative w-full" style={{ height: `${mapHeight}px` }}>
                             
-                            <svg
-                                className="absolute top-0 left-0 w-full h-full"
-                                style={{ height: `${mapHeight}px` }}
-                                preserveAspectRatio="none"
-                            >
+                            <div className="absolute w-full text-center" style={{ top: `${INITIAL_OFFSET_Y - 70}px` }}>
+                                <span className="bg-green-100 text-green-700 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest border border-green-200">
+                                    Start Przygody
+                                </span>
+                            </div>
+
+                            <svg className="absolute top-0 left-0 w-full h-full" style={{ height: `${mapHeight}px` }} preserveAspectRatio="none">
                                 {Object.keys(normalizedPositions).map(level => {
                                     const n = Number(level);
                                     if (n === 1) return null;
-
                                     const p1 = normalizedPositions[n - 1];
                                     const p2 = normalizedPositions[n];
                                     const active = (n - 1) <= lastCompletedLevel;
-
                                     return (
                                         <line
                                             key={`line-${n - 1}-${n}`}
@@ -246,19 +196,18 @@ export default function LevelSelectionPage() {
                                         />
                                     );
                                 })}
-                        </svg>
+                            </svg>
 
-                            
-                            {/* Render Level Buttons */}
                             {Object.keys(normalizedPositions).map(level => {
                                 const pos = normalizedPositions[level];
                                 const levelNumber = Number(level);
                                 const isUnlocked = levelStatus[levelNumber];
+                                const isCurrent = levelNumber === lastCompletedLevel + 1;
 
                                 return (
                                     <div 
                                         key={level} 
-                                        className="absolute z-10"
+                                        className="absolute z-10 flex items-center"
                                         style={{
                                             left: `calc(${pos.x}% - ${levelButtonOffset})`, 
                                             top: `calc(${pos.y}px - ${levelButtonOffset})`, 
@@ -267,21 +216,34 @@ export default function LevelSelectionPage() {
                                         <Link 
                                             to={isUnlocked ? `/course/${courseId}/level/${levelNumber}` : '#'}
                                             onClick={(e) => handleLevelClick(e, levelNumber, isUnlocked)}
-                                            className={!isUnlocked ? 'cursor-not-allowed' : ''}
+                                            className={`${!isUnlocked ? 'cursor-not-allowed' : ''} relative group`}
                                         >
                                             <LevelButton 
                                                 levelNumber={levelNumber} 
                                                 isUnlocked={isUnlocked} 
                                                 courseId={courseId}
                                             />
+                                            {isCurrent && (
+                                                <div className="absolute -right-32 top-1/2 -translate-y-1/2 bg-blue-600 text-white px-3 py-1 rounded-lg text-xs font-bold flex items-center space-x-1 animate-bounce">
+                                                    <PlayCircle size={14} />
+                                                    <span>KONTYNUUJ</span>
+                                                </div>
+                                            )}
                                         </Link>
                                     </div>
                                 );
                             })}
+
+                            <div className="absolute w-full text-center" style={{ top: `${mapHeight - 40}px` }}>
+                                <div className="flex flex-col items-center text-gray-400">
+                                    <Flag size={24} className="mb-1" />
+                                    <span className="text-xs font-bold uppercase tracking-widest">Cel Kursu</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </main>
         </div>
     );
 }
