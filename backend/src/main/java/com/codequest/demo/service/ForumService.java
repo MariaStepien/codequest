@@ -1,9 +1,10 @@
 package com.codequest.demo.service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,8 +25,8 @@ public class ForumService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
 
-    public List<Post> getAllPosts() {
-        return postRepository.findAllByOrderByCreatedAtDesc();
+    public Page<Post> getAllPosts(Pageable pageable) {
+        return postRepository.findAllByOrderByCreatedAtDesc(pageable);
     }
 
     @Transactional(readOnly = true)

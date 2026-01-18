@@ -6,6 +6,8 @@ import Toast from '../components/Toast';
 
 export default function AdminForumPage() {
   const [posts, setPosts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [selectedPost, setSelectedPost] = useState(null);
   const [userData, setUserData] = useState({ id: null, login: "", role: 'ADMIN' });
   
@@ -67,34 +69,25 @@ export default function AdminForumPage() {
     }
   };
 
-  const fetchPosts = async () => {
+  const fetchPosts = async (page = 0) => {
     try {
-        const res = await fetch('http://localhost:8080/api/forum/posts');
-        const data = await res.json();
-        
-        console.log("Dane pobrane z API:", data);
-
-        if (Array.isArray(data)) {
-        setPosts(data);
-        } else if (data && Array.isArray(data.content)) {
-        setPosts(data.content);
-        } else {
-        console.error("Błąd, nie zwrócono treści", data);
-        setPosts([]);
-        }
-    } catch (error) {
-        console.error("Błąd pobierania:", error);
-        setPosts([]);
-    }
-    };
-
-  const fetchPostDetails = async (postId) => {
-    const res = await fetch(`http://localhost:8080/api/forum/posts/${postId}`);
-    if (res.ok) {
+      const res = await fetch(`http://localhost:8080/api/forum/posts?page=${page}&size=10`);
       const data = await res.json();
-      setSelectedPost(data);
+      setPosts(data.content);
+      setTotalPages(data.page.totalPages);
+      setCurrentPage(data.page.number);
+    } catch (error) {
+      setToast({ show: true, message: error, isError: true });
     }
   };
+
+    const fetchPostDetails = async (postId) => {
+      const res = await fetch(`http://localhost:8080/api/forum/posts/${postId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setSelectedPost(data);
+      }
+    };
 
   const handleAddComment = async (e) => {
     e.preventDefault();
@@ -494,6 +487,25 @@ export default function AdminForumPage() {
                     <button onClick={(e) => { e.stopPropagation(); setModal({ show: true, type: 'post', id: post.id }); }} className="text-red-400 hover:text-red-600 p-2"><Trash2 className="w-6 h-6" /></button>
                   </div>
                 ))}
+                <div className="flex justify-center gap-2 mt-8">
+                  <button 
+                    disabled={currentPage === 0}
+                    onClick={() => fetchPosts(currentPage - 1)}
+                    className="text-indigo-600 px-4 py-2 bg-white border rounded disabled:opacity-50"
+                  >
+                    Poprzednia
+                  </button>
+                  <span className="text-gray-600 flex items-center px-4">
+                    Strona {currentPage + 1} z {totalPages}
+                  </span>
+                  <button 
+                    disabled={currentPage >= totalPages - 1}
+                    onClick={() => fetchPosts(currentPage + 1)}
+                    className=" text-indigo-600 px-4 py-2 bg-white border rounded disabled:opacity-50"
+                  >
+                    Następna
+                  </button>
+                </div>
               </div>
             </div>
           )}

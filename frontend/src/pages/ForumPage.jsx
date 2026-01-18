@@ -7,6 +7,8 @@ import ReportModal from '../components/ReportModal';
 
 export default function ForumPage() {
   const [posts, setPosts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [selectedPost, setSelectedPost] = useState(null);
   const [newPostTitle, setNewPostTitle] = useState('');
   const [newPostContent, setNewPostContent] = useState('');
@@ -55,10 +57,16 @@ export default function ForumPage() {
     }
   }
 
-  const fetchPosts = async () => {
-    const res = await fetch('http://localhost:8080/api/forum/posts');
-    const data = await res.json();
-    setPosts(data);
+  const fetchPosts = async (page = 0) => {
+    try {
+      const res = await fetch(`http://localhost:8080/api/forum/posts?page=${page}&size=10`);
+      const data = await res.json();
+      setPosts(data.content);
+      setTotalPages(data.page.totalPages);
+      setCurrentPage(data.page.number);
+    } catch (error) {
+      setToast({ show: true, message: error, isError: true });
+    }
   };
 
   const fetchPostDetails = async (postId) => {
@@ -226,25 +234,35 @@ export default function ForumPage() {
   };
 
   const handleConfirmedDelete = async () => {
-    const { type, id } = modal;
-    const label = type === 'post' ? 'post' : 'komentarz';
-    
     try {
+      if (modal.type === 'post') {
+        const res = await fetch(`http://localhost:8080/api/forum/posts/${modal.id}?userId=${userData.id}&isAdmin=false`, {
+          method: 'DELETE',
+        });
+
         if (res.ok) {
-            triggerToast(`Pomyślnie usunięto ${label}.`);
-            if (type === 'post') {
-                setSelectedPost(null);
-                fetchPosts();
-            } else {
-                await fetchPostDetails(selectedPost.id);
-            }
+          setToast({ show: true, message: 'Post został usunięty', isError: false });
+          if (selectedPost && selectedPost.id === modal.id) {
+            setSelectedPost(null);
+          }
+          fetchPosts(currentPage);
         } else {
-            triggerToast(`Nie udało się usunąć ${label}.`, true);
+          setToast({ show: true, message: 'Błąd podczas usuwania posta', isError: true });
         }
-    } catch (e) {
-        triggerToast("Błąd połączenia z serwerem.", true);
+      } else if (modal.type === 'comment') {
+        const res = await fetch(`http://localhost:8080/api/forum/comments/${modal.id}?userId=${userData.id}&isAdmin=false`, {
+          method: 'DELETE',
+        });
+        if (res.ok) {
+          setToast({ show: true, message: 'Komentarz usunięty', isError: false });
+          if (selectedPost) fetchPostDetails(selectedPost.id);
+        }
+      }
+    } catch (error) {
+      setToast({ show: true, message: 'Błąd połączenia', isError: true });
+    } finally {
+      setModal({ show: false, type: null, id: null });
     }
-    setModal({ show: false, type: null, id: null });
   };
 
   const startEditingPost = () => {
@@ -497,6 +515,25 @@ export default function ForumPage() {
                   </div>
                 </div>
               ))}
+              <div className="flex justify-center gap-2 mt-8">
+                <button 
+                  disabled={currentPage === 0}
+                  onClick={() => fetchPosts(currentPage - 1)}
+                  className="text-indigo-600 px-4 py-2 bg-white border rounded disabled:opacity-50"
+                >
+                  Poprzednia
+                </button>
+                <span className="text-gray-600 flex items-center px-4">
+                  Strona {currentPage + 1} z {totalPages}
+                </span>
+                <button 
+                  disabled={currentPage >= totalPages - 1}
+                  onClick={() => fetchPosts(currentPage + 1)}
+                  className=" text-indigo-600 px-4 py-2 bg-white border rounded disabled:opacity-50"
+                >
+                  Następna
+                </button>
+              </div>
             </div>
           </div>
         )}
