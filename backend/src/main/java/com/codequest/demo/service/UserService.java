@@ -142,6 +142,26 @@ public class UserService {
                 .build();
     }
 
+    @Transactional
+    public void changePassword(Long userId, String currentPassword, String newPassword) {
+        User user = findUserById(userId);
+
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new RuntimeException("Obecne hasło jest nieprawidłowe.");
+        }
+
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            throw new RuntimeException("Nowe hasło musi być inne niż obecne.");
+        }
+
+        if (newPassword.length() < 8) {
+            throw new RuntimeException("Nowe hasło musi zawierać co najmniej 8 znaków.");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
     public List<RankingEntryDto> getGlobalRanking() {
         List<User> rankedUsers = userRepository.findByRoleOrderByPointsDesc("USER"); 
         

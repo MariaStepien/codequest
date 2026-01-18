@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { LogOut, BarChart3, BookOpenText, User, Backpack, Trophy, Award, MessageSquare, Heart } from 'lucide-react';
+import { LogOut, BarChart3, BookOpenText, User, Backpack, Trophy, Award, MessageSquare, Heart, KeyRound } from 'lucide-react';
 import HeartModal from './HeartModal';
 
 const navLinks = [
@@ -113,11 +113,18 @@ export default function Header({ currentPage }) {
               </div>
               <User className="w-4 h-4 text-gray-500 hidden sm:block" />
             </button>
-
             {isMenuOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-1 z-20">
                 <a 
-                  href="#"
+                  href="/change-password"
+                  className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                >
+                  <KeyRound className="w-4 h-4" />
+                  <span>Zmień hasło</span>
+                </a>
+                <div className="border-t border-gray-100 my-1"></div>
+                <a 
+                  href="/"
                   onClick={(e) => { e.preventDefault(); handleLogout(); }}
                   className="flex items-center space-x-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                 >

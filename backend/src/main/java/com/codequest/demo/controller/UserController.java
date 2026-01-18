@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -48,6 +49,20 @@ public class UserController {
     public ResponseEntity<Void> toggleBlock(@PathVariable Long id) {
         userService.toggleBlockStatus(id);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<Map<String, String>> changePassword(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody Map<String, String> passwords) {
+        
+        Long userId = Long.valueOf(userDetails.getUsername());
+        String currentPassword = passwords.get("currentPassword");
+        String newPassword = passwords.get("newPassword");
+
+        userService.changePassword(userId, currentPassword, newPassword);
+        
+        return ResponseEntity.ok(Map.of("message", "Hasło zostało pomyślnie zmienione."));
     }
 
     @PostMapping("/consume-heart")

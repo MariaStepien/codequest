@@ -28,6 +28,7 @@ import ForumPage from './pages/ForumPage'
 import ReportListPage from './pages/ReportListPage'
 import AdminUserListPage from './pages/AdminUserListPage'
 import AdminForumPage from './pages/AdminForumPage'
+import ChangePasswordPage from './pages/ChangePasswordPage'
 
 function App() {
   return (
@@ -97,6 +98,8 @@ function App() {
       <Route path='/admin/reports' element={<ReportListPage />} />
 
       <Route path='/admin/user-list' element={<AdminUserListPage />} />
+
+      <Route path='/change-password' element={<ChangePasswordPage />} />
 
       {/* Error screen */}
       <Route path="*" element={<h1>404 Not Found</h1>} />
