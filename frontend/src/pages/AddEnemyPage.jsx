@@ -66,14 +66,10 @@ export default function AddEnemyPage() {
             
             <main className="flex-1 ml-64 p-8">
                 <div className="max-w-2xl mx-auto">
-                    <div className="flex items-center space-x-3 mb-8">
-                        <div className="p-3 bg-red-100 text-red-600 rounded-xl">
-                            <Skull className="w-8 h-8" />
-                        </div>
-                        <div>
-                            <h1 className="text-2xl font-bold text-gray-900">Dodaj Przeciwnika</h1>
-                            <p className="text-gray-500">Stwórz nowego wroga</p>
-                        </div>
+                    <div>
+                        <h1 className="text-3xl font-bold mb-8 text-gray-900 pb-2">
+                            <Skull className="inline-block w-8 h-8 mr-2 text-red-600"/> Dodaj przeciwnika
+                        </h1>
                     </div>
 
                     <form onSubmit={handleSubmit} className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 space-y-6">

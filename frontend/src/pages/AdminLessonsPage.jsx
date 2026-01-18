@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminSidebar from '../components/AdminSidebar';
-import { BookOpenText, ListOrdered, X, Edit, Loader2, Trash2, Eye } from 'lucide-react';
+import { BookOpenText, ListOrdered, X, Edit, Loader2, Trash2, Eye, ArrowLeft } from 'lucide-react';
 import ConfirmationModal from '../components/ConfirmationModal';
 import Toast from '../components/Toast';
 
@@ -156,16 +156,18 @@ export default function AdminLessonsPage() {
     <div className="flex min-h-screen bg-gray-50">
       <AdminSidebar currentPage={currentPage} />
       <div className="flex-1 flex flex-col p-8 ml-64">
+        <div>
+          <button
+              onClick={() => navigate('/admin/courses')}
+              className="flex items-center text-indigo-600 hover:text-indigo-800 mb-6 font-medium">
+              <ArrowLeft className="w-5 h-5 mr-1" /> Wróć do listy kursów
+          </button>
+        </div>
         <header className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900 flex items-center space-x-3">
             <BookOpenText className="w-8 h-8 text-indigo-600" />
             <span>Lista Lekcji dla Kursu: {courseTitle}</span>
           </h1>
-          <div className="flex items-center justify-between mt-1">
-            <p className="text-gray-500">
-              Zarządzanie lekcjami w kursie. ID kursu: {courseId}
-            </p>
-          </div>
         </header>
 
         <div className="flex-1 bg-white shadow-xl rounded-xl overflow-hidden">

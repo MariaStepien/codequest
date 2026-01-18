@@ -164,6 +164,11 @@ export default function CourseCreationPage() {
       <AdminSidebar userLogin={userData.userLogin || "Admin"} currentPage="add-course" />
       <main className="md:ml-64"> 
         <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+          <div>
+            <h1 className="text-3xl font-bold mb-8 text-gray-900 pb-2">
+              <Upload className="inline-block w-8 h-8 mr-2 text-indigo-600"/> Utwórz Nowy Kurs
+          </h1>
+          </div>
           <div className="max-w-xl mx-auto bg-white p-8 rounded-xl shadow-2xl">
             {successMessage && (
               <div className="flex items-center p-4 mb-4 text-sm font-medium text-green-800 rounded-lg bg-green-100 ring-1 ring-green-300">
@@ -207,7 +212,7 @@ export default function CourseCreationPage() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="estimatedHours" className="block text-sm font-semibold text-gray-700 mb-1">Godziny</label>
+                  <label htmlFor="estimatedHours" className="block text-sm font-semibold text-gray-700 mb-1">Przewidywany czas na ukończenie(h)</label>
                   <input
                     type="number"
                     name="estimatedHours"

@@ -126,8 +126,7 @@ export default function CourseUsersListPage() {
             
             <button
                 onClick={() => navigate('/admin/courses')}
-                className="flex items-center text-indigo-600 hover:text-indigo-800 mb-6 font-medium"
-            >
+                className="flex items-center text-indigo-600 hover:text-indigo-800 mb-6 font-medium">
                 <ArrowLeft className="w-5 h-5 mr-1" /> Wróć do listy kursów
             </button>
             

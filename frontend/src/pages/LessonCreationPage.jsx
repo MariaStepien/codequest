@@ -220,7 +220,7 @@ export default function LessonCreationPage() {
             
             <main className="flex-1 overflow-y-auto p-8 lg:ml-64">
                 <div className="max-w-4xl mx-auto">
-                    <h1 className="text-3xl font-extrabold mb-8 text-gray-900 border-b pb-2">
+                    <h1 className="text-3xl font-bold mb-8 text-gray-900 pb-2">
                         <Upload className="inline-block w-8 h-8 mr-2 text-indigo-600"/> Utwórz Nową Lekcję
                     </h1>
                     

@@ -106,8 +106,9 @@ export default function AddEquipmentPage() {
       <main className="md:ml-64 p-8">
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center space-x-3 mb-8">
-            <PackagePlus className="w-8 h-8 text-indigo-600" />
-            <h1 className="text-3xl font-bold text-gray-900">Dodaj Nowy Ekwipunek</h1>
+            <h1 className="text-3xl font-bold mb-8 text-gray-900 pb-2">
+              <PackagePlus className="inline-block w-8 h-8 mr-2 text-indigo-600"/> Dodaj Nowy Ekwipunek
+          </h1>
           </div>
 
           <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl p-8 space-y-6 border border-gray-100">

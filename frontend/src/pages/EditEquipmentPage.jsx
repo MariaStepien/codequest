@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Save, X, Upload, CheckCircle, AlertTriangle, ArrowLeft } from 'lucide-react';
+import { Save, X, Upload, CheckCircle, AlertTriangle, ArrowLeft, Edit2 } from 'lucide-react';
 import AdminSidebar from '../components/AdminSidebar';
 
 const API_BASE_URL = 'http://localhost:8080/api';
@@ -137,20 +137,22 @@ export default function EditEquipmentPage() {
             
             <main className="flex-1 ml-64 p-8">
                 <div className="max-w-2xl mx-auto">
-                    <button 
-                        onClick={() => navigate('/admin/equipment')}
-                        className="flex items-center text-gray-500 hover:text-indigo-600 mb-6 transition"
-                    >
-                        <ArrowLeft className="w-4 h-4 mr-2" />
-                        Powrót do listy
-                    </button>
+                    <div>
+                        <button
+                            onClick={() => navigate('/admin/equipment')}
+                            className="flex items-center text-indigo-600 hover:text-indigo-800 mb-6 font-medium">
+                            <ArrowLeft className="w-5 h-5 mr-1" /> Wróć do listy przedmiotów
+                        </button>
+                    </div>
+
+                    <header className="mb-6">
+                        <h1 className="text-3xl font-bold text-gray-900 pb-2">
+                            <Edit2 className="inline-block w-8 h-8 mr-2 text-indigo-600"/> Edytuj przedmiot
+                        </h1>
+                        <p className="text-indigo-300 opacity-90">ID: {id}</p>
+                    </header>
 
                     <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
-                        <div className="p-8 bg-gradient-to-r from-indigo-600 to-violet-600 text-white">
-                            <h1 className="text-2xl font-bold">Edytuj Przedmiot</h1>
-                            <p className="text-indigo-100 opacity-90">ID: {id}</p>
-                        </div>
-
                         <form onSubmit={handleSubmit} className="p-8 space-y-6">
                             {error && (
                                 <div className="bg-red-50 text-red-600 p-4 rounded-xl flex items-center">
@@ -218,7 +220,7 @@ export default function EditEquipmentPage() {
                                     />
                                     {maxAllowedNumber && (
                                         <p className="text-xs text-gray-500 mt-1">
-                                            Zmiana zakresu nie zmienia nazwy pliku
+                                            Zmiana numeru nie zmienia nazwy pliku
                                         </p>
                                     )}
                                 </div>

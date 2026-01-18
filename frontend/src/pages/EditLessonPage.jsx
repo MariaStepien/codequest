@@ -190,9 +190,8 @@ export default function EditLessonPage() {
             <AdminSidebar currentPage={currentPage} />
             <div className="flex-1 flex flex-col p-8 ml-64">
                 <header className="mb-6">
-                    <h1 className="text-3xl font-bold text-gray-900 flex items-center space-x-3">
-                        <Edit className="w-8 h-8 text-indigo-600" />
-                        <span>Edycja Lekcji: {lessonData.title}</span>
+                    <h1 className="text-3xl font-bold text-gray-900 pb-2">
+                        <Edit className="inline-block w-8 h-8 mr-2 text-indigo-600"/> Edycja Lekcji: {lessonData.title}
                     </h1>
                     <p className="text-gray-500 mt-1">
                         Zaktualizuj tytuł, kolejność i zawartość lekcji. ID lekcji: {lessonId}
