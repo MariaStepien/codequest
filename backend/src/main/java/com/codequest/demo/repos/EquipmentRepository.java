@@ -19,4 +19,5 @@ public interface EquipmentRepository extends JpaRepository<Equipment, Long>{
     Integer findMaxItemNumberByType(@Param("type") EquipmentType type);
 
     Optional<Equipment> findByTypeAndItemNumber(Equipment.EquipmentType type, int itemNumber);
+    List<Equipment> findByTypeAndHiddenFalse(EquipmentType type);
 }

@@ -44,5 +44,8 @@ public class Equipment {
 
     @Column
     private int itemNumber;
+
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private boolean hidden = true;
     
 }

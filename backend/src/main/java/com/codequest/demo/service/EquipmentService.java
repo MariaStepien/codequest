@@ -68,9 +68,20 @@ public class EquipmentService {
     
     @Transactional(readOnly = true)
     public List<Equipment> getEquipmentByType(EquipmentType type) {
+        return equipmentRepository.findByTypeAndHiddenFalse(type);
+    }
+
+    public List<Equipment> getAllEquipmentByTypeAdmin(EquipmentType type) {
         return equipmentRepository.findByType(type);
     }
 
+    @Transactional
+    public void toggleVisibility(Long id) {
+        Equipment equipment = equipmentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Equipment not found"));
+        equipment.setHidden(!equipment.isHidden());
+        equipmentRepository.save(equipment);
+    }
     @Transactional
     public Equipment updateEquipment(Long id, Equipment equipmentDetails, MultipartFile file) throws IOException {
         Equipment currentEquipment = equipmentRepository.findById(id)

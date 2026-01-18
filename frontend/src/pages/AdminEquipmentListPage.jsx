@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Package, Search, Edit2, AlertTriangle, Plus } from 'lucide-react';
+import { Package, Search, Edit2, AlertTriangle, Plus, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AdminSidebar from '../components/AdminSidebar';
 
@@ -26,7 +26,7 @@ export default function AdminEquipmentListPage() {
     const fetchItems = useCallback(async (category) => {
         setIsLoading(true);
         try {
-            const response = await fetch(`${API_BASE_URL}/equipment/type/${category}`, {
+            const response = await fetch(`${API_BASE_URL}/equipment/admin/type/${category}`, {
                 headers: { 'Authorization': `Bearer ${jwtToken}` }
             });
             if (response.ok) {
@@ -44,6 +44,23 @@ export default function AdminEquipmentListPage() {
             setIsLoading(false);
         }
     }, [jwtToken]);
+
+    const toggleVisibility = async (id) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/equipment/${id}/toggle-visibility`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${jwtToken}` }
+            });
+            if (response.ok) {
+                setItems(items.map(item => 
+                    item.id === id ? { ...item, hidden: !item.hidden } : item
+                ));
+                showToast("Zmieniono widoczność przedmiotu");
+            }
+        } catch (err) {
+            showToast("Błąd zmiany widoczności", true);
+        }
+    };
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -124,13 +141,21 @@ export default function AdminEquipmentListPage() {
                                             <p className="text-sm text-gray-500">Koszt: {item.cost} monet</p>
                                             <p className="text-xs text-gray-400">Nr: {item.itemNumber}</p>
                                         </div>
-                                        <button
-                                            onClick={() => navigate(`/admin/edit-equipment/${item.id}`)}
-                                            className="w-full flex items-center justify-center space-x-2 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-indigo-50 hover:text-indigo-600 transition font-medium"
-                                        >
-                                            <Edit2 className="w-4 h-4" />
-                                            <span>Edytuj</span>
-                                        </button>
+                                        <div className="flex justify-center space-x-2">
+                                            <button
+                                                onClick={() => toggleVisibility(item.id)}
+                                                className={`p-2 rounded-lg transition ${item.hidden ? 'bg-gray-100 text-gray-400' : 'bg-green-50 text-green-600'}`}
+                                                title={item.hidden ? "Pokaż w sklepie" : "Ukryj w sklepie"}
+                                            >
+                                                {item.hidden ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                            </button>
+                                            <button
+                                                onClick={() => navigate(`/admin/edit-equipment/${item.id}`)}
+                                                className="p-2 bg-yellow-50 text-yellow-600 rounded-lg hover:bg-yellow-100 transition"
+                                            >
+                                                <Edit2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>

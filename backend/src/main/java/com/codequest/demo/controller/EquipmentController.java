@@ -77,11 +77,11 @@ public class EquipmentController {
      * @param type Equipment type is given in api.
      * @return Returns list of items matching given type.
      */
-    @GetMapping("/type/{type}")
-    public ResponseEntity<List<Equipment>> getEquipmentByType(@PathVariable String type) {
+    @GetMapping("/admin/type/{type}")
+    public ResponseEntity<List<Equipment>> getAdminEquipmentByType(@PathVariable String type) {
         try {
             EquipmentType equipmentType = EquipmentType.valueOf(type.toUpperCase());
-            List<Equipment> equipmentList = equipmentService.getEquipmentByType(equipmentType);
+            List<Equipment> equipmentList = equipmentService.getAllEquipmentByTypeAdmin(equipmentType);
             
             if (equipmentList.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND); 
@@ -92,7 +92,25 @@ public class EquipmentController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-    
+
+    @PutMapping("/{id}/toggle-visibility")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> toggleVisibility(@PathVariable Long id) {
+        equipmentService.toggleVisibility(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/type/{type}")
+    public ResponseEntity<List<Equipment>> getEquipmentByType(@PathVariable String type) {
+        try {
+            EquipmentType equipmentType = EquipmentType.valueOf(type.toUpperCase());
+            List<Equipment> equipmentList = equipmentService.getEquipmentByType(equipmentType);
+            return ResponseEntity.ok(equipmentList);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+        
     /**
      * 
      * @return returns all equipment.
