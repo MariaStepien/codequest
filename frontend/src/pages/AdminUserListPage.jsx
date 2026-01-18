@@ -6,6 +6,8 @@ import { Ban, CheckCircle } from 'lucide-react';
 
 export default function AdminUserListPage() {
     const [users, setUsers] = useState([]);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
     const [loading, setLoading] = useState(true);
     const [toast, setToast] = useState({ show: false, message: '', isError: false });
     const [modal, setModal] = useState({ show: false, userId: null, isBlocked: false });
@@ -14,13 +16,17 @@ export default function AdminUserListPage() {
         fetchUsers();
     }, []);
 
-    const fetchUsers = async () => {
+    const fetchUsers = async (page = 0) => {
+        setLoading(true);
         try {
-            const response = await fetch('/api/user/all', {
+            const response = await fetch(`/api/user/all?page=${page}&size=10`, {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
             });
             const data = await response.json();
-            setUsers(data);
+            
+            setUsers(data.content);
+            setTotalPages(data.page.totalPages);
+            setCurrentPage(data.page.number);
         } catch (error) {
             showToast("Błąd podczas ładowania użytkowników", true);
         } finally {
@@ -97,6 +103,25 @@ export default function AdminUserListPage() {
                                 ))}
                             </tbody>
                         </table>
+                        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-center items-center gap-4">
+                            <button 
+                                disabled={currentPage === 0}
+                                onClick={() => fetchUsers(currentPage - 1)}
+                                className="text-indigo-600 px-4 py-2 bg-white border rounded disabled:opacity-50"
+                                >
+                                Poprzednia
+                                </button>
+                                <span className="text-gray-600 flex items-center px-4">
+                                Strona {currentPage + 1} z {totalPages}
+                                </span>
+                                <button 
+                                disabled={currentPage >= totalPages - 1}
+                                onClick={() => fetchUsers(currentPage + 1)}
+                                className=" text-indigo-600 px-4 py-2 bg-white border rounded disabled:opacity-50"
+                                >
+                                Następna
+                                </button>
+                        </div>
                     </div>
                 </div>
             </main>
