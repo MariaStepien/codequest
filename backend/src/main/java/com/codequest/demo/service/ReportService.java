@@ -1,9 +1,9 @@
 package com.codequest.demo.service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,22 +32,18 @@ public class ReportService {
         return reportRepository.save(report);
     }
 
-    public List<Report> getFilteredReports(String status, String targetType, String sortDirection) {
-        Sort sort = sortDirection.equalsIgnoreCase("ASC") 
-                    ? Sort.by("createdAt").ascending() 
-                    : Sort.by("createdAt").descending();
-
+    public Page<Report> getFilteredReports(String status, String targetType, Pageable pageable) {
         boolean statusAll = (status == null || status.equals("ALL"));
         boolean targetTypeAll = (targetType == null || targetType.equals("ALL"));
 
         if (statusAll && targetTypeAll) {
-            return reportRepository.findAll(sort);
+            return reportRepository.findAll(pageable);
         } else if (!statusAll && targetTypeAll) {
-            return reportRepository.findByStatus(ReportStatus.valueOf(status), sort);
+            return reportRepository.findByStatus(ReportStatus.valueOf(status), pageable);
         } else if (statusAll && !targetTypeAll) {
-            return reportRepository.findByTargetType(targetType, sort);
+            return reportRepository.findByTargetType(targetType, pageable);
         } else {
-            return reportRepository.findByStatusAndTargetType(ReportStatus.valueOf(status), targetType, sort);
+            return reportRepository.findByStatusAndTargetType(ReportStatus.valueOf(status), targetType, pageable);
         }
     }
 

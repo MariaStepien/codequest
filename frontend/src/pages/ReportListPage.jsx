@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { CheckCircle, XCircle, Filter, Calendar, Flag, MessageSquare, FileText, Eye, X, Trash2, BookOpen, Ban } from 'lucide-react';
 import AdminSidebar from '../components/AdminSidebar';
 import Toast from '../components/Toast';
@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router-dom';
 export default function ReportListPage() {
   const navigate = useNavigate();
   const [reports, setReports] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [filterStatus, setFilterStatus] = useState('ALL');
   const [filterTargetType, setFilterTargetType] = useState('ALL');
   const [sortDate, setSortDate] = useState('DESC');
@@ -61,26 +63,28 @@ export default function ReportListPage() {
     }
   };
 
-  const fetchReports = useCallback(async () => {
-    try {
-      const url = `http://localhost:8080/api/reports?status=${filterStatus}&targetType=${filterTargetType}&sort=${sortDate}`;
-      const res = await fetch(url);
-      if (res.ok) {
-        const data = await res.json();
-        setReports(data);
-      }
-    } catch (error) {
-      triggerToast("Błąd podczas pobierania zgłoszeń.", true);
-    }
+  useEffect(() => {
+      fetchReports(0);
   }, [filterStatus, filterTargetType, sortDate]);
+
+  const fetchReports = async (page = 0) => {
+      try {
+          const response = await fetch(
+              `/api/reports?status=${filterStatus}&targetType=${filterTargetType}&page=${page}&size=10&sort=createdAt,${sortDate}`
+          );
+          const data = await response.json();
+          
+          setReports(data.content);
+          setTotalPages(data.page.totalPages);
+          setCurrentPage(data.page.number);
+      } catch (error) {
+          setToast({ show: true, message: 'Błąd ładowania zgłoszeń', isError: true });
+      }
+  };
 
   useEffect(() => {
     fetchAdminData();
   }, []);
-
-  useEffect(() => {
-    fetchReports();
-  }, [fetchReports]);
 
   const openConfirmStatusModal = (id, status) => {
     const isResolve = status === 'RESOLVED';
@@ -375,6 +379,25 @@ export default function ReportListPage() {
                 ))}
               </tbody>
             </table>
+            <div className="flex justify-center gap-2 mt-8">
+                <button 
+                  disabled={currentPage === 0}
+                  onClick={() => fetchReports(currentPage - 1)}
+                  className="text-indigo-600 px-4 py-2 bg-white border rounded disabled:opacity-50"
+                >
+                  Poprzednia
+                </button>
+                <span className="text-gray-600 flex items-center px-4">
+                  Strona {currentPage + 1} z {totalPages}
+                </span>
+                <button 
+                  disabled={currentPage >= totalPages - 1}
+                  onClick={() => fetchReports(currentPage + 1)}
+                  className=" text-indigo-600 px-4 py-2 bg-white border rounded disabled:opacity-50"
+                >
+                  Następna
+                </button>
+              </div>
           </div>
         </div>
       </main>

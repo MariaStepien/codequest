@@ -1,7 +1,9 @@
 package com.codequest.demo.controller;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,11 +41,11 @@ public class ReportController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Report>> getReports(
+    public ResponseEntity<Page<Report>> getReports(
             @RequestParam(required = false, defaultValue = "ALL") String status,
-            @RequestParam(required = false, defaultValue= "ALL") String targetType,
-            @RequestParam(required = false, defaultValue = "DESC") String sort) {
-        return ResponseEntity.ok(reportService.getFilteredReports(status,targetType, sort));
+            @RequestParam(required = false, defaultValue = "ALL") String targetType,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(reportService.getFilteredReports(status, targetType, pageable));
     }
 
     @PatchMapping("/{id}/status")
