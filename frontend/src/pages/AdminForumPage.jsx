@@ -153,7 +153,7 @@ export default function AdminForumPage() {
             triggerToast("Opublikowano post jako Administrator!");
             fetchPosts();
         } else {
-            triggerToast("Nie udało się opublikować posta.", true);
+            triggerToast("Nie udało się opublikować wpisu.", true);
         }
     } catch (error) {
         triggerToast("Błąd połączenia z serwerem.", true);
@@ -175,7 +175,7 @@ export default function AdminForumPage() {
         fetchPosts();
       }
     } catch (error) {
-      triggerToast("Błąd podczas edycji posta.", true);
+      triggerToast("Błąd podczas edycji wpisu.", true);
     }
   };
 
@@ -387,7 +387,7 @@ export default function AdminForumPage() {
                             <button 
                                 onClick={() => openModal('user-block', selectedPost.author?.id, selectedPost.author?.userLogin)} 
                                 className="text-gray-400 hover:text-orange-500 p-2"
-                                title="Zablokuj/Odblokuj autora posta"
+                                title="Zablokuj/Odblokuj autora wpisu"
                             >
                                 {selectedPost.author?.isBlocked ? <UserCheck className="w-5 h-5"/> : <UserX className="w-5 h-5"/>}
                             </button>
@@ -453,14 +453,14 @@ export default function AdminForumPage() {
                   <form onSubmit={handleCreatePost} className="space-y-3">
                     <input 
                       className="text-black w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none" 
-                      placeholder="Tytuł posta" 
+                      placeholder="Tytuł wpisu" 
                       value={newPostTitle}
                       onChange={(e) => setNewPostTitle(e.target.value)}
                       required
                     />
                     <textarea 
                       className="text-black w-full border rounded-lg px-4 py-2 h-32 focus:ring-2 focus:ring-indigo-500 outline-none" 
-                      placeholder="Treść posta..." 
+                      placeholder="Treść wpisu..." 
                       value={newPostContent}
                       onChange={(e) => setNewPostContent(e.target.value)}
                       required

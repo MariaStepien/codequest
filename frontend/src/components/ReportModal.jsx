@@ -12,7 +12,7 @@ const CATEGORIES = [
 
 const getTargetLabel = (type) => {
   switch (type) {
-    case 'POST': return 'post';
+    case 'POST': return 'wpis';
     case 'COMMENT': return 'komentarz';
     case 'LESSON': return 'lekcję';
     default: return 'treść';

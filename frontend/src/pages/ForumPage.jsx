@@ -77,7 +77,7 @@ export default function ForumPage() {
             setSelectedPost(data);
         }
     } catch (error) {
-        console.error("Error refreshing post:", error);
+        console.error("Błąd odświeżania wpisu:", error);
     }
   };
 
@@ -120,10 +120,10 @@ export default function ForumPage() {
             setNewPostTitle('');
             setNewPostContent('');
             setShowCreateForm(false);
-            triggerToast("Opublikowano post!");
+            triggerToast("Opublikowano wpis!");
             fetchPosts();
         } else {
-            triggerToast("Nie udało się opublikować posta.", true);
+            triggerToast("Nie udało się opublikować wpisu.", true);
         }
     } catch (error) {
         triggerToast("Błąd połączenia z serwerem.", true);
@@ -146,7 +146,7 @@ export default function ForumPage() {
         fetchPosts();
       }
     } catch (error) {
-      triggerToast("Błąd podczas edycji posta.", true);
+      triggerToast("Błąd podczas edycji wpisu.", true);
     }
   };
 
@@ -247,7 +247,7 @@ export default function ForumPage() {
           }
           fetchPosts(currentPage);
         } else {
-          setToast({ show: true, message: 'Błąd podczas usuwania posta', isError: true });
+          setToast({ show: true, message: 'Błąd podczas usuwania wpisu', isError: true });
         }
       } else if (modal.type === 'comment') {
         const res = await fetch(`http://localhost:8080/api/forum/comments/${modal.id}?userId=${userData.id}&isAdmin=false`, {
@@ -356,7 +356,7 @@ export default function ForumPage() {
       <Toast {...toast} />
       <ConfirmationModal 
             show={modal.show}
-            message={`Czy na pewno chcesz usunąć ten ${modal.type === 'post' ? 'post' : 'komentarz'}?`}
+            message={`Czy na pewno chcesz usunąć ten ${modal.type === 'post' ? 'wpis' : 'komentarz'}?`}
             onConfirm={handleConfirmedDelete}
             onCancel={() => setModal({ show: false, type: null, id: null })}
         />
@@ -404,7 +404,7 @@ export default function ForumPage() {
                       <button 
                         onClick={() => setReportData({ show: true, targetType: 'POST', targetId: selectedPost.id })}
                         className="text-gray-400 hover:text-orange-500 p-2"
-                        title="Zgłoś post"
+                        title="Zgłoś wpis"
                       >
                         <Flag className="w-5 h-5" />
                       </button>
@@ -473,21 +473,21 @@ export default function ForumPage() {
                 <form onSubmit={handleCreatePost} className="space-y-3">
                   <input 
                     className="text-black w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none" 
-                    placeholder="Tytuł posta" 
+                    placeholder="Tytuł wpisu" 
                     value={newPostTitle}
                     onChange={(e) => setNewPostTitle(e.target.value)}
                     required
                   />
                   <textarea 
                     className="text-black w-full border rounded-lg px-4 py-2 h-32 focus:ring-2 focus:ring-indigo-500 outline-none" 
-                    placeholder="Treść posta..." 
+                    placeholder="Treść wpisu..." 
                     value={newPostContent}
                     onChange={(e) => setNewPostContent(e.target.value)}
                     required
                   />
                   <div className="flex justify-end gap-3">
                     <button type="button" onClick={() => setShowCreateForm(false)} className="px-4 py-2 text-gray-500 hover:text-gray-700">Anuluj</button>
-                    <button type="submit" className="bg-indigo-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-indigo-700">Opublikuj post</button>
+                    <button type="submit" className="bg-indigo-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-indigo-700">Opublikuj wpis</button>
                   </div>
                 </form>
               </div>

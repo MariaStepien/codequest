@@ -38,7 +38,7 @@ export default function ReportListPage() {
 
   const targetTypeOptions = [
     { value: 'ALL', label: 'Wszystkie typy' },
-    { value: 'POST', label: 'Posty' },
+    { value: 'POST', label: 'Wpisy' },
     { value: 'COMMENT', label: 'Komentarze' },
     { value: 'LESSON', label: 'Lekcje' }
   ];
@@ -105,7 +105,7 @@ export default function ReportListPage() {
       show: true,
       type: 'DELETE',
       title: "Usuń treść",
-      message: `Czy na pewno chcesz trwale usunąć ten ${selectedReportContent.contentType === 'POST' ? 'post' : 'komentarz'}? Tej operacji nie można cofnąć.`
+      message: `Czy na pewno chcesz trwale usunąć ten ${selectedReportContent.contentType === 'POST' ? 'wpis' : 'komentarz'}? Tej operacji nie można cofnąć.`
     });
   };
 
@@ -122,30 +122,6 @@ export default function ReportListPage() {
       }
     } catch (error) {
       triggerToast("Błąd podczas aktualizacji statusu.", true);
-    }
-  };
-
-  const handleBlockUser = async (userId, currentIsBlocked) => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8080/api/user/${userId}/toggle-block`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-
-      if (response.ok) {
-        const newStatus = !currentIsBlocked;
-        triggerToast(newStatus ? "Użytkownik zablokowany" : "Użytkownik odblokowany");
-
-        setSelectedReportContent(prev => ({
-          ...prev,
-          author: { ...prev.author, isBlocked: newStatus }
-        }));
-      } else {
-        throw new Error();
-      }
-    } catch (error) {
-      triggerToast("Operacja nie powiodła się", true);
     }
   };
 
@@ -442,26 +418,6 @@ export default function ReportListPage() {
                     </p>
                     </div>
                 </div>
-                <button 
-                  onClick={() => handleBlockUser(selectedReportContent.author.id, selectedReportContent.author.isBlocked)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold transition-colors ${
-                    selectedReportContent.author.isBlocked 
-                      ? 'bg-green-600 text-white hover:bg-green-700' 
-                      : 'bg-black text-white hover:bg-gray-800'
-                  }`}
-                >
-                  {selectedReportContent.author.isBlocked ? (
-                    <>
-                      <CheckCircle className="w-4 h-4" />
-                      Odblokuj autora
-                    </>
-                  ) : (
-                    <>
-                      <Ban className="w-4 h-4" />
-                      Zablokuj autora
-                    </>
-                  )}
-                </button>
                 <button 
                   onClick={openDeleteConfirmModal}
                   className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-xl font-bold hover:bg-red-100 transition-colors"
