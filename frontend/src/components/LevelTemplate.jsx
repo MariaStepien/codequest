@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Flag, Clock, ArrowRight } from 'lucide-react';
+import { Flag, Clock, ArrowRight, Crown } from 'lucide-react';
 
 import FillInTheBlank from './FillInTheBlank';
 import MatchingPairs from './MatchingPairs';
@@ -246,7 +246,6 @@ export default function LevelTemplate({ isAdminPreview = false }) {
     const handleTaskCompletion = (isCorrect) => {
         if (isCorrect) {
             setIsCurrentTaskComplete(true);
-            setFeedbackMessage('Zadanie zakończone sukcesem! Możemy ruszać dalej.');
         } else {
             setHealth(prevHealth => Math.max(0, prevHealth - healthLossPerFail));
             setIsCurrentTaskComplete(false);
@@ -310,7 +309,7 @@ export default function LevelTemplate({ isAdminPreview = false }) {
         return (
             <div className="flex items-center justify-center p-4" style={backgroundStyle}>
                 <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-2xl p-10 w-full max-w-lg border-t-8 border-red-600 text-center">
-                    <p className="text-5xl font-extrabold text-red-700 mb-4">Misja nieudana</p>
+                    <p className="text-5xl font-extrabold text-red-700 mb-4">Lekcja nieudana</p>
                     
                     {hasNoHearts ? (
                         <>
@@ -327,14 +326,23 @@ export default function LevelTemplate({ isAdminPreview = false }) {
                     ) : (
                         <>
                             <p className="text-xl text-gray-600 mb-8">
-                                Wykorzystałeś całe swoje życie w tym poziomie. Pozostałe serca: {userHearts}
+                                Wykorzystałeś całe swoje życie w tej lekcji. Pozostałe serca: {userHearts}
                             </p>
-                            <button 
-                                onClick={handleRetryLevel} 
-                                className="px-8 py-4 rounded-full bg-indigo-600 text-white font-bold text-lg hover:bg-indigo-700 transition shadow-lg"
-                            >
-                                Ponów poziom
-                            </button>
+                            <div className="flex justify-center space-x-4">
+                                <button 
+                                    onClick={handleRetryLevel} 
+                                    className="px-8 py-4 rounded-full bg-indigo-600 text-white font-bold text-lg hover:bg-indigo-700 transition shadow-lg"
+                                >
+                                    Ponów lekcję
+                                </button>
+                                <button 
+                                    onClick={() => navigate('/dashboard')} 
+                                    className="px-8 py-4 rounded-full bg-indigo-600 text-white font-bold text-lg hover:bg-indigo-700 transition shadow-lg"
+                                >
+                                    Wyjdź
+                                </button>
+                            </div>
+                            
                         </>
                     )}
                 </div>
@@ -383,7 +391,7 @@ export default function LevelTemplate({ isAdminPreview = false }) {
                         <div className="flex justify-between items-start">
                             <div className="flex items-start gap-4">
                                 <div>
-                                    <h2 className="text-3xl font-bold text-gray-800">{lessonData?.title || `Poziom ${orderIndex}`}</h2>
+                                    <h2 className="text-3xl font-bold text-gray-800">{lessonData?.title || `Lekcja ${orderIndex}`}</h2>
                                     {!isLevelComplete && <p className="text-sm text-indigo-500 font-semibold mt-2">{currentTaskIndex + 1} z {tasks.length}</p>}
                                 </div>
                                 {!isLevelComplete && (
@@ -408,21 +416,25 @@ export default function LevelTemplate({ isAdminPreview = false }) {
                         </div>
                     </header>
 
-                    <div className="min-h-[250px] flex flex-col justify-center">
+                    <div className="flex flex-col justify-center">
                         {!isLevelComplete ? (
                             CurrentTaskComponent ? (
                                 <CurrentTaskComponent key={currentTaskIndex} {...currentTaskObject} onTaskComplete={handleTaskCompletion} />
                             ) : <p className="text-red-500 font-bold">Błąd typu zadania</p>
                         ) : (
-                            <div className="text-center py-10">
-                                <p className="text-3xl font-extrabold text-green-700 mb-6">👑 Poziom ukończony! 👑</p>
+                            <div className="text-center">
+                                <div className="flex gap-2 text-xl font-bold justify-center mb-6">
+                                    <Crown className="w-6 h-6 fill-current text-yellow-600" />
+                                    <span className='text-3xl font-extrabold text-green-700'>Lekcja ukończona!</span>
+                                    <Crown className="w-6 h-6 fill-current text-yellow-600" />
+                                </div>
                                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                                     {hasNextLevel && !isAdminPreview && (
                                         <button 
                                             onClick={() => navigate(`/course/${courseId}/level/${orderIndex + 1}`)} 
                                             className="flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-green-600 text-white font-bold text-lg hover:bg-green-700 transition shadow-lg"
                                         >
-                                            Następny poziom <ArrowRight className="w-5 h-5" />
+                                            Następna lekcja <ArrowRight className="w-5 h-5" />
                                         </button>
                                     )}
                                     <button 
@@ -459,7 +471,7 @@ export default function LevelTemplate({ isAdminPreview = false }) {
                                         disabled={!isCurrentTaskComplete && !isAdminPreview} 
                                         className={`px-8 py-3 rounded-full text-white font-semibold transition shadow-md ${isCurrentTaskComplete || isAdminPreview ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-400 cursor-not-allowed'}`}
                                     >
-                                        {currentTaskIndex < tasks.length - 1 ? 'Następne zadanie' : 'Ukończ poziom'}
+                                        {currentTaskIndex < tasks.length - 1 ? 'Dalej' : 'Ukończ lekcję'}
                                     </button>
                                 </div>
                             </div>
@@ -475,7 +487,7 @@ export default function LevelTemplate({ isAdminPreview = false }) {
             {showExitConfirmation && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
                     <div className="bg-white p-8 rounded-xl shadow-2xl max-w-sm w-full text-center">
-                        <h3 className="text-xl font-bold text-gray-800 mb-4">Czy na pewno chcesz opuścić ten poziom?</h3>
+                        <h3 className="text-xl font-bold text-gray-800 mb-4">Czy na pewno chcesz opuścić tą lekcję?</h3>
                         <div className="flex justify-center space-x-4">
                             <button onClick={() => isAdminPreview? navigate('/admin/courses') : navigate('/dashboard')} className="px-6 py-2 rounded-md bg-red-600 text-white font-semibold hover:bg-red-700">Tak</button>
                             <button onClick={() => setShowExitConfirmation(false)} className="px-6 py-2 rounded-md bg-gray-300 text-gray-800 font-semibold hover:bg-gray-400">Nie</button>

@@ -76,7 +76,7 @@ export default function Header({ currentPage }) {
   };
 
   return (
-    <header className="sticky top-0 z-10 bg-white shadow-md">
+    <header className="sticky top-0 z-50 bg-white shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
         
         <a href="/dashboard" className="flex items-center space-x-2 cursor-pointer">

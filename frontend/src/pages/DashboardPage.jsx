@@ -49,7 +49,7 @@ const DashboardContentArea = ({ userData }) => {
                       </p>
                       <h3 className="text-2xl font-bold mb-4">
                           {latestActivity ? 
-                              `${latestActivity.courseTitle}: Poziom ${latestActivity.completedLevelOrderIndex} ukończony` : 
+                              `${latestActivity.courseTitle}: Lekcja ${latestActivity.completedLevelOrderIndex} ukończona` : 
                               "Zacznij swój pierwszy kurs!"
                           }
                       </h3>
@@ -57,7 +57,7 @@ const DashboardContentArea = ({ userData }) => {
                         href={latestActivity ? `/course/${latestActivity.courseId}` : '/courses'} 
                         className="flex items-center space-x-2 bg-white text-indigo-600 px-6 py-2 rounded-full font-semibold shadow-lg hover:bg-indigo-50 transition duration-150"
                       >
-                          <span>{latestActivity ? 'Przejdź do następnego poziomu' : 'Zacznij kurs'}</span>
+                          <span>{latestActivity ? 'Przejdź do następnej lekcji' : 'Zacznij kurs'}</span>
                           <ArrowRight className="w-5 h-5" />
                       </a>
                   </div>
@@ -67,7 +67,7 @@ const DashboardContentArea = ({ userData }) => {
                   
                   <div className="bg-white p-6 rounded-xl shadow-lg">
                       <h3 className="text-xl font-bold text-gray-900 mb-4 border-b pb-2">
-                          Statystyki gracza
+                          Twoje statystyki:
                       </h3>
                       <div className="grid grid-cols-3 gap-4 text-center">
                           <DashboardStatCard 

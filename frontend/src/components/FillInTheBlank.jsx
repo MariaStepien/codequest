@@ -172,7 +172,7 @@ export default function FillInTheBlank({ sentence, correctAnswers, onTaskComplet
         
         {isSubmitted && !allCorrect && (
           <p className="text-sm text-red-600 text-center">
-            Glify wibrują... Sprawdź swoje odpowiedzi. Niektóre odpowiedzi są nieprawidłowo umieszczone.
+            Sprawdź swoje odpowiedzi. Niektóre odpowiedzi są nieprawidłowo umieszczone.
           </p>
         )}
       </div>

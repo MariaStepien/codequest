@@ -92,10 +92,9 @@ const InventoryItemCard = ({ item, isEquipped, onAction, userCoins }) => {
                         className="max-w-full max-h-full object-contain" 
                     />
                 </div>
-                <p className="text-sm font-semibold text-gray-800 truncate" title={item.name}>
+                <p className="text-sm font-semibold text-gray-800 break-words leading-tight" title={item.name}>
                     {item.name}
                 </p>
-                <p className="text-xs text-gray-500 uppercase">{item.type}</p>
             </div>
             <div className="h-8">
                 {button}
@@ -200,11 +199,6 @@ export default function EquipmentPage() {
             case 'EQUIP':
                 url = `http://localhost:8080/api/user-equipment/equip/${userId}/${itemId}`;
                 successMsg = "Pomyślnie założono przedmiot!";
-                break;
-            case 'UNEQUIP':
-                url = `http://localhost:8080/api/user-equipment/unequip/${userId}/${slotType}`;
-                method = 'PUT';
-                successMsg = "Pomyślnie zdjęto przedmiot.";
                 break;
             case 'BUY':
                 url = `http://localhost:8080/api/user-bought-equipment/buy/${userId}/${itemId}`;

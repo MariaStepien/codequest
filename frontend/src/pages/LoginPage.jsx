@@ -76,8 +76,6 @@ export default function LoginPage() {
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">
           CodeQuest
         </h2>
-        
-        <div id="custom-alert" className="opacity-0 transition-opacity duration-300"></div>
 
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl mb-4 text-sm">

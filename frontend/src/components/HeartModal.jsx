@@ -54,6 +54,7 @@ export default function HeartModal({ user, onClose, onUpdate }) {
                     <X size={24} />
                 </button>
 
+                <p className="text-gray-500 mb-6">Twoje aktualne serca:</p>
                 <div className="flex justify-center mb-4">
                     <div className="relative">
                         <Heart size={64} className="fill-red-500 text-red-500 animate-pulse" />
@@ -62,9 +63,6 @@ export default function HeartModal({ user, onClose, onUpdate }) {
                         </span>
                     </div>
                 </div>
-
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">Witaj, {user.login}</h2>
-                <p className="text-gray-500 mb-6">Twoje aktualne serca</p>
                 
                 {user.hearts < 5 ? (
                     <div className="flex items-center justify-center gap-2 text-indigo-600 font-mono text-lg mb-6 bg-indigo-50 py-2 rounded-lg">

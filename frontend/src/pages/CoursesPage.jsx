@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header'; 
+import { BookOpen, Clock2 } from 'lucide-react';
 
 const CoursesPage = () => {
     const [courses, setCourses] = useState([]);
@@ -90,10 +91,10 @@ const CoursesPage = () => {
                             <h2 style={styles.courseTitle}>{course.title}</h2>
                             <div style={styles.courseInfo}>
                                 <p style={styles.infoText}>
-                                    <span role="img" aria-label="lessons">📖</span> {course.totalLessons} Lekcje
+                                    <BookOpen className='w-8'/> {course.totalLessons} Lekcje
                                 </p>
                                 <p style={styles.infoText}>
-                                    <span role="img" aria-label="time">🕒</span> ~{course.estimatedHours} Godziny
+                                    <Clock2 className='w-8'/> ~{course.estimatedHours} Godziny
                                 </p>
                             </div>
                             <div style={styles.progressBarContainer}>

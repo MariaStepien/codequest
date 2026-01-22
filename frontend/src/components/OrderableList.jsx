@@ -122,7 +122,7 @@ export default function OrderableList({ initialItems, correctOrder, onTaskComple
             </div>
             {isSubmitted && !isCorrect && (
                 <p className="text-center text-red-600 font-medium">
-                   Sekwencja zaklęć jest nieprawidłowa. Spróbuj ponownie!
+                   Kolejność jest nieprawidłowa. Spróbuj ponownie!
                 </p>
             )}
         </div>

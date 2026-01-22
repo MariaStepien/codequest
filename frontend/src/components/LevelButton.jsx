@@ -27,7 +27,7 @@ export default function LevelButton({ levelNumber, isUnlocked = true }) {
     return (
         <button
             disabled={!isUnlocked}
-            title={isUnlocked ? `Zacznij poziom ${levelNumber}` : 'Poziom zablokowany'}
+            title={isUnlocked ? `Zacznij lekcję ${levelNumber}` : 'Lekcja zablokowana'}
             className={`
                 w-16 h-16 rounded-full 
                 flex items-center justify-center
