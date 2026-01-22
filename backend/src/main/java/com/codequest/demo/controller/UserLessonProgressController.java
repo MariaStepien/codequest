@@ -34,7 +34,7 @@ public class UserLessonProgressController {
         }
 
         try {
-            Long userId = Long.parseLong(userDetails.getUsername());
+            Long userId = Long.valueOf(userDetails.getUsername());
             
             UserLessonProgressDto updatedProgress = progressService.recordProgress(
                 userId, 
@@ -61,7 +61,7 @@ public class UserLessonProgressController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        Long userId = Long.parseLong(userDetails.getUsername());
+        Long userId = Long.valueOf(userDetails.getUsername());
 
         return progressService.getLessonProgress(userId, lessonId)
                 .map(ResponseEntity::ok)

@@ -70,7 +70,7 @@ public class UserCourseProgressController {
             return ResponseEntity.status(401).build();
         }
 
-        Long userId = Long.parseLong(userDetails.getUsername());
+        Long userId = Long.valueOf(userDetails.getUsername());
 
         // Delegate to the service to get the latest activity DTO
         Optional<UserCourseProgressService.LatestActivityDto> latestActivity = 
