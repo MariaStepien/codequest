@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import {Search, Edit, Skull, Trash2} from 'lucide-react';
+import { Edit, Trash2} from 'lucide-react';
 import AdminSidebar from '../components/AdminSidebar';
 import { useNavigate } from 'react-router-dom';
 import ConfirmationModal from '../components/ConfirmationModal';
@@ -10,7 +10,6 @@ const API_BASE_URL = 'http://localhost:8080/api';
 export default function EnemyListPage() {
     const navigate = useNavigate();
     const [enemies, setEnemies] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
     const [userData, setUserData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -47,10 +46,6 @@ export default function EnemyListPage() {
         };
         fetchData();
     }, [jwtToken]);
-
-    const filteredEnemies = enemies.filter(enemy => 
-        enemy.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
 
     const openDeleteModal = (id, name) => {
         setModalConfig({ show: true, enemyId: id, name });
@@ -89,16 +84,12 @@ export default function EnemyListPage() {
                             <h1 className="text-2xl font-bold text-gray-900">Lista Przeciwników</h1>
                             <p className="text-gray-500">Zarządzaj bazą potworów w grze</p>
                         </div>
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                            <input 
-                                type="text"
-                                placeholder="Szukaj przeciwnika..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none w-64"
-                            />
-                        </div>
+                        <button 
+                            onClick={() => navigate('/admin/add-enemy')}
+                            className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition shadow-md"
+                        >
+                            + Nowy Wróg
+                        </button>
                     </div>
 
                     {isLoading ? (
@@ -116,8 +107,8 @@ export default function EnemyListPage() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
-                                    {filteredEnemies.length > 0 ? (
-                                        filteredEnemies.map((enemy) => (
+                                    {enemies.length > 0 ? (
+                                        enemies.map((enemy) => (
                                             <tr key={enemy.id} className="hover:bg-gray-50 transition">
                                                 <td className="px-6 py-4">
                                                     <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
