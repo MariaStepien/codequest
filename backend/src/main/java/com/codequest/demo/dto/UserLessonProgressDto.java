@@ -1,6 +1,6 @@
 package com.codequest.demo.dto;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 import lombok.Data;
 
@@ -14,6 +14,6 @@ public class UserLessonProgressDto {
     private Integer starsEarned;
     private Integer timeTakenSeconds;
     private Integer pointsEarned;
-    private OffsetDateTime dateCreated;
-    private OffsetDateTime lastUpdated;
+    private LocalDateTime dateCreated;
+    private LocalDateTime lastUpdated;
 }

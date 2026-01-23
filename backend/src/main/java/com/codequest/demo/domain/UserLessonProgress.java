@@ -1,6 +1,6 @@
 package com.codequest.demo.domain;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -54,9 +54,9 @@ public class UserLessonProgress {
     
     @CreatedDate
     @Column(name = "date_created", updatable = false)
-    private OffsetDateTime dateCreated;
+    private LocalDateTime dateCreated;
 
     @LastModifiedDate
     @Column(name = "last_updated")
-    private OffsetDateTime lastUpdated;
+    private LocalDateTime lastUpdated;
 }

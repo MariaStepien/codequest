@@ -1,6 +1,5 @@
 package com.codequest.demo.service;
 
-import java.time.OffsetDateTime;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -34,96 +33,54 @@ public class UserLessonProgressService {
     // 3 stars: 20 coins
     private static final int[] STAR_COIN_REWARDS = {0, 5, 10, 20};
 
-    @Transactional
-    public UserLessonProgressDto recordProgress(Long userId, UserLessonProgressCreationDto creationDto) {
-        
+   @Transactional
+    public UserLessonProgressDto recordProgress(Long userId, UserLessonProgressCreationDto dto) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Nie znaleziono użytkownika z ID: " + userId));
+                .orElseThrow(() -> new RuntimeException("Nie znaleziono użytkownika: " + userId));
         
-        Course course = courseRepository.findById(creationDto.getCourseId())
-                .orElseThrow(() -> new RuntimeException("Nie znaleziono kursu z ID: " + creationDto.getCourseId()));
-        
-        Lesson lesson = lessonRepository.findById(creationDto.getLessonId())
-                .orElseThrow(() -> new RuntimeException("Nie znaleziono lekcji z ID: " + creationDto.getLessonId()));
+        Course course = courseRepository.getReferenceById(dto.getCourseId());
+        Lesson lesson = lessonRepository.getReferenceById(dto.getLessonId());
 
-        Optional<UserLessonProgress> existingProgress = userLessonProgressRepository
-                .findByUserIdAndLessonId(userId, creationDto.getLessonId());
+        UserLessonProgress progress = userLessonProgressRepository
+                .findByUserIdAndLessonId(userId, dto.getLessonId())
+                .orElseGet(() -> {
+                    UserLessonProgress newProgress = new UserLessonProgress();
+                    newProgress.setUser(user);
+                    newProgress.setCourse(course);
+                    newProgress.setLesson(lesson);
+                    newProgress.setPointsEarned(0);
+                    newProgress.setStarsEarned(0);
+                    return newProgress;
+                });
 
-        UserLessonProgress progress;
-        
-        if (existingProgress.isPresent()) {
-            progress = existingProgress.get();
-            
-            boolean shouldUpdate = false;
-            
-            if (creationDto.getPointsEarned() > progress.getPointsEarned()) {
-                
-                int oldPoints = progress.getPointsEarned();
-                int newPoints = creationDto.getPointsEarned();
-                int pointsToAdd = newPoints - oldPoints;
-                
-                user.setPoints(user.getPoints() + pointsToAdd);
-                userRepository.save(user); 
-                
-                progress.setPointsEarned(newPoints);
-                shouldUpdate = true;
-            }
-            if (progress.getTimeTakenSeconds() == null || creationDto.getTimeTakenSeconds() < progress.getTimeTakenSeconds()) {
-                progress.setTimeTakenSeconds(creationDto.getTimeTakenSeconds());
-                shouldUpdate = true;
-            }
+        updateStatsAndRewards(user, progress, dto);
 
-            if (creationDto.getStarsEarned() > progress.getStarsEarned()) {
-                
-                int oldStars = progress.getStarsEarned();
-                int newStars = creationDto.getStarsEarned();
-
-                int oldMaxCoins = oldStars < STAR_COIN_REWARDS.length ? STAR_COIN_REWARDS[oldStars] : STAR_COIN_REWARDS[STAR_COIN_REWARDS.length - 1];
-                int newMaxCoins = newStars < STAR_COIN_REWARDS.length ? STAR_COIN_REWARDS[newStars] : STAR_COIN_REWARDS[STAR_COIN_REWARDS.length - 1];
-
-                int coinsToAward = newMaxCoins - oldMaxCoins;
-                
-                if (coinsToAward > 0) {
-                     user.setCoins(user.getCoins() + coinsToAward);
-                     userRepository.save(user); 
-                }
-
-                progress.setStarsEarned(newStars); 
-                shouldUpdate = true;
-            }
-
-            if (shouldUpdate) {
-                progress.setLastUpdated(OffsetDateTime.now());
-            }
-            
-        } else {
-            int initialStars = creationDto.getStarsEarned();
-            int initialCoins = initialStars < STAR_COIN_REWARDS.length ? STAR_COIN_REWARDS[initialStars] : STAR_COIN_REWARDS[STAR_COIN_REWARDS.length - 1];
-            
-            if (initialCoins > 0) {
-                 user.setCoins(user.getCoins() + initialCoins);
-            }
-            
-            if (creationDto.getPointsEarned() > 0) {
-                 user.setPoints(user.getPoints() + creationDto.getPointsEarned());
-            }
-
-            userRepository.save(user); 
-            
-            progress = new UserLessonProgress();
-            progress.setUser(user); 
-            progress.setCourse(course); 
-            progress.setLesson(lesson);
-            progress.setStarsEarned(creationDto.getStarsEarned());
-            progress.setTimeTakenSeconds(creationDto.getTimeTakenSeconds());
-            progress.setPointsEarned(creationDto.getPointsEarned());
-            progress.setDateCreated(OffsetDateTime.now());
-            progress.setLastUpdated(OffsetDateTime.now());
-        }
-        
         UserLessonProgress savedProgress = userLessonProgressRepository.save(progress);
         
         return mapToDto(savedProgress);
+    }
+
+    private void updateStatsAndRewards(User user, UserLessonProgress progress, UserLessonProgressCreationDto dto) {
+        if (dto.getPointsEarned() > progress.getPointsEarned()) {
+            int diff = dto.getPointsEarned() - progress.getPointsEarned();
+            user.setPoints(user.getPoints() + diff);
+            progress.setPointsEarned(dto.getPointsEarned());
+        }
+
+        if (dto.getStarsEarned() > progress.getStarsEarned()) {
+            int coinsToAward = getCoinsForStars(dto.getStarsEarned()) - getCoinsForStars(progress.getStarsEarned());
+            user.setCoins(user.getCoins() + coinsToAward);
+            progress.setStarsEarned(dto.getStarsEarned());
+        }
+
+        if (progress.getTimeTakenSeconds() == null || dto.getTimeTakenSeconds() < progress.getTimeTakenSeconds()) {
+            progress.setTimeTakenSeconds(dto.getTimeTakenSeconds());
+        }
+    }
+
+    private int getCoinsForStars(int stars) {
+        int index = Math.min(stars, STAR_COIN_REWARDS.length - 1);
+        return STAR_COIN_REWARDS[index];
     }
 
     public Optional<UserLessonProgressDto> getLessonProgress(Long userId, Long lessonId) {
