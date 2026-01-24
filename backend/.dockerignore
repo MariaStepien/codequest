@@ -1,0 +1,6 @@
+target
+*.jar
+.mvn
+.git
+.gitignore
+uploads
