@@ -71,13 +71,13 @@ export default function RankingPage() {
 
         const fetchRankingData = async () => {
             try {
-                const userRankResponse = await fetch('http://localhost:8080/api/ranking/me', { headers });
+                const userRankResponse = await fetch('/api/ranking/me', { headers });
                 if (userRankResponse.ok) {
                     const data = await userRankResponse.json();
                     setUserRankEntry(data);
                 }
                 
-                const globalRankResponse = await fetch('http://localhost:8080/api/ranking/global', { headers });
+                const globalRankResponse = await fetch('/api/ranking/global', { headers });
                 
                 if (!globalRankResponse.ok) {
                     throw new Error('Nie udało się pobrać globalnego rankingu.');

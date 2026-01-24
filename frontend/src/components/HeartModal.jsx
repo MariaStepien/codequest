@@ -31,7 +31,7 @@ export default function HeartModal({ user, onClose, onUpdate }) {
     const handleBuy = async () => {
         const token = localStorage.getItem('token');
         try {
-            const res = await fetch('http://localhost:8080/api/user/buy-heart', {
+            const res = await fetch('/api/user/buy-heart', {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` }
             });

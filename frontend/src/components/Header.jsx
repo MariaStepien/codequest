@@ -21,7 +21,7 @@ export default function Header({ currentPage }) {
     if (!token) return;
 
     try {
-      const response = await fetch('http://localhost:8080/api/user/me', {
+      const response = await fetch('/api/user/me', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {

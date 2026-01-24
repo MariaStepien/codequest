@@ -69,20 +69,20 @@ export default function CourseUsersListPage() {
 
     const fetchCourseData = async () => {
       try {
-        const userResponse = await fetch('http://localhost:8080/api/user/me', {
+        const userResponse = await fetch('/api/user/me', {
             headers: { 'Authorization': `Bearer ${jwtToken}` }
         });
         if (!userResponse.ok) throw new Error('Nie udało się pobrać danych użytkownika.');
         setUserData(await userResponse.json());
 
-        const courseResponse = await fetch(`http://localhost:8080/api/courses/${courseId}`, {
+        const courseResponse = await fetch(`/api/courses/${courseId}`, {
             headers: { 'Authorization': `Bearer ${jwtToken}` }
         });
         if (!courseResponse.ok) throw new Error('Nie udało się pobrać danych kursu.');
         const courseData = await courseResponse.json();
         setCourseTitle(courseData.title);
 
-        const progressResponse = await fetch(`http://localhost:8080/api/progress/list-users/${courseId}`, {
+        const progressResponse = await fetch(`/api/progress/list-users/${courseId}`, {
           headers: { 'Authorization': `Bearer ${jwtToken}` }
         });
         

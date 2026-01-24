@@ -118,7 +118,7 @@ export default function DashboardPage() {
 
     const fetchLatestActivity = async () => {
         try {
-            const response = await fetch('http://localhost:8080/api/progress/latest-activity', {
+            const response = await fetch('/api/progress/latest-activity', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${jwtToken}`, 
@@ -142,7 +142,7 @@ export default function DashboardPage() {
 
     const fetchUserData = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/user/me', {
+        const response = await fetch('/api/user/me', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${jwtToken}`, 

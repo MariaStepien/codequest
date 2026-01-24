@@ -58,9 +58,9 @@ export default function AdminDashboardPage() {
           };
 
           const [userRes, reportRes, pendingRes] = await Promise.all([
-            fetch('http://localhost:8080/api/user/me', { headers }),
-            fetch('http://localhost:8080/api/reports/stats/daily-count', { headers }),
-            fetch('http://localhost:8080/api/reports/stats/pending-count', { headers })
+            fetch('/api/user/me', { headers }),
+            fetch('/api/reports/stats/daily-count', { headers }),
+            fetch('/api/reports/stats/pending-count', { headers })
           ]);
 
           if (userRes.ok && reportRes.ok && pendingRes.ok) {

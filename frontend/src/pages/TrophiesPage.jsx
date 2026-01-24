@@ -10,18 +10,18 @@ export default function TrophiesPage() {
   const itemsPerPage = 9;
 
   const jwtToken = localStorage.getItem('token');
-  const IMAGE_BASE_URL = 'http://localhost:8080/api/uploads';
+  const IMAGE_BASE_URL = '/api/uploads';
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userRes = await fetch('http://localhost:8080/api/user/me', {
+        const userRes = await fetch('/api/user/me', {
           headers: { 'Authorization': `Bearer ${jwtToken}` }
         });
         const user = await userRes.json();
         setUserData(user);
 
-        const coursesRes = await fetch('http://localhost:8080/api/courses/with-progress', {
+        const coursesRes = await fetch('/api/courses/with-progress', {
           headers: { 'Authorization': `Bearer ${jwtToken}` }
         });
         const allCourses = await coursesRes.json();

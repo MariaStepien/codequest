@@ -42,7 +42,7 @@ export default function CourseCreationPage() {
 
     const fetchUserData = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/user/me', {
+        const response = await fetch('/api/user/me', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${jwtToken}`,
@@ -101,7 +101,7 @@ export default function CourseCreationPage() {
     }
 
     try {
-      const response = await fetch('http://localhost:8080/api/courses/create-course', {
+      const response = await fetch('/api/courses/create-course', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${jwtToken}`, 
@@ -121,7 +121,7 @@ export default function CourseCreationPage() {
         const fileData = new FormData();
         fileData.append('file', selectedFile);
 
-        const uploadResponse = await fetch(`http://localhost:8080/api/courses/${createdCourse.id}/upload-trophy`, {
+        const uploadResponse = await fetch(`/api/courses/${createdCourse.id}/upload-trophy`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${jwtToken}`,

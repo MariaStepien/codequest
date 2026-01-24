@@ -21,7 +21,7 @@ export default function AddEquipmentPage() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/user/me', {
+        const response = await fetch('/api/user/me', {
           headers: { 'Authorization': `Bearer ${jwtToken}` }
         });
         if (response.ok) setUserData(await response.json());
@@ -30,7 +30,7 @@ export default function AddEquipmentPage() {
 
     const fetchNextNumber = async () => {
       try {
-        const response = await fetch(`http://localhost:8080/api/equipment/next-number/${formData.type}`, {
+        const response = await fetch(`/api/equipment/next-number/${formData.type}`, {
           headers: { 'Authorization': `Bearer ${jwtToken}` }
         });
         if (response.ok) {
@@ -78,7 +78,7 @@ export default function AddEquipmentPage() {
     data.append('file', selectedFile);
 
     try {
-      const response = await fetch('http://localhost:8080/api/equipment', {
+      const response = await fetch('/api/equipment', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${jwtToken}`

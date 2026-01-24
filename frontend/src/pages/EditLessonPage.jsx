@@ -96,7 +96,7 @@ export default function EditLessonPage() {
                 console.error("Błąd podczas ładowania listy kursów:", err);
             }
 
-            fetch('http://localhost:8080/api/enemies', {
+            fetch('/api/enemies', {
                 headers: { 'Authorization': `Bearer ${jwtToken}` }
             })
             .then(res => res.json())
@@ -262,7 +262,7 @@ export default function EditLessonPage() {
                                 </p>
                                 <div className="flex justify-center">
                                     <img
-                                        src={bgPreviewUrl || `http://localhost:8080/api/${currentBgImage}`}
+                                        src={bgPreviewUrl || `/api/${currentBgImage}`}
                                         alt="Background preview"
                                         className="h-32 rounded-lg border object-cover"
                                     />
@@ -335,7 +335,7 @@ export default function EditLessonPage() {
                                         return (
                                             <div className="flex items-center space-x-4 p-3 bg-indigo-50 rounded-lg">
                                                 <img
-                                                    src={`http://localhost:8080/api/${enemy.imgSource}`}
+                                                    src={`/api/${enemy.imgSource}`}
                                                     className="w-12 h-12 object-contain"
                                                     alt={enemy.name}
                                                 />

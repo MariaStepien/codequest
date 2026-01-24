@@ -3,8 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Save, X, Upload, CheckCircle, AlertTriangle, ArrowLeft, Edit2 } from 'lucide-react';
 import AdminSidebar from '../components/AdminSidebar';
 
-const API_BASE_URL = 'http://localhost:8080/api';
-
 export default function EditEquipmentPage() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -28,7 +26,7 @@ export default function EditEquipmentPage() {
 
     const fetchMaxNumber = async (type) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/equipment/next-number/${type}`, {
+            const response = await fetch(`/api/equipment/next-number/${type}`, {
                 headers: { 'Authorization': `Bearer ${jwtToken}` }
             });
             if (response.ok) {
@@ -49,12 +47,12 @@ export default function EditEquipmentPage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const userRes = await fetch(`${API_BASE_URL}/user/me`, {
+                const userRes = await fetch(`/api/user/me`, {
                     headers: { 'Authorization': `Bearer ${jwtToken}` }
                 });
                 if (userRes.ok) setUserData(await userRes.json());
 
-                const equipRes = await fetch(`${API_BASE_URL}/equipment/${id}`, {
+                const equipRes = await fetch(`/api/equipment/${id}`, {
                     headers: { 'Authorization': `Bearer ${jwtToken}` }
                 });
                 if (equipRes.ok) {
@@ -109,7 +107,7 @@ export default function EditEquipmentPage() {
         }
 
         try {
-            const response = await fetch(`${API_BASE_URL}/equipment/${id}`, {
+            const response = await fetch(`/api/equipment/${id}`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${jwtToken}` },
                 body: data
@@ -230,7 +228,7 @@ export default function EditEquipmentPage() {
                                 <label className="block text-sm font-bold text-gray-700 mb-2">Grafika</label>
                                 <div className="flex flex-col items-center p-4 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50">
                                     <img 
-                                        src={previewUrl || `${API_BASE_URL}/${currentImgSource}`} 
+                                        src={previewUrl || `/api/${currentImgSource}`} 
                                         alt="Podgląd" 
                                         className="h-32 object-contain mb-4"
                                     />

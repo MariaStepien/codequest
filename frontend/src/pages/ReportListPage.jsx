@@ -51,7 +51,7 @@ export default function ReportListPage() {
   const fetchAdminData = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:8080/api/user/me', {
+      const res = await fetch('/api/user/me', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -112,7 +112,7 @@ export default function ReportListPage() {
   const handleUpdateStatus = async () => {
     const { id, status } = confirmModal;
     try {
-      const res = await fetch(`http://localhost:8080/api/reports/${id}/status?status=${status}`, {
+      const res = await fetch(`/api/reports/${id}/status?status=${status}`, {
         method: 'PATCH'
       });
       if (res.ok) {
@@ -131,7 +131,7 @@ export default function ReportListPage() {
     const userId = adminData.id;
 
     try {
-      const res = await fetch(`http://localhost:8080/api/forum/${type}/${id}?userId=${userId}&isAdmin=true`, {
+      const res = await fetch(`/api/forum/${type}/${id}?userId=${userId}&isAdmin=true`, {
         method: 'DELETE'
       });
 
@@ -153,7 +153,7 @@ export default function ReportListPage() {
     try {
       const token = localStorage.getItem('token');
       if (report.targetType === 'LESSON') {
-        const lessonRes = await fetch(`http://localhost:8080/api/lessons/${report.targetId}`, {
+        const lessonRes = await fetch(`/api/lessons/${report.targetId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         
@@ -165,7 +165,7 @@ export default function ReportListPage() {
           throw new Error("Nie udało się pobrać danych lekcji");
         }
       }
-      const res = await fetch(`http://localhost:8080/api/reports/${report.id}/content`);
+      const res = await fetch(`/api/reports/${report.id}/content`);
       if (res.ok) {
         const data = await res.json();
         setSelectedReportContent({

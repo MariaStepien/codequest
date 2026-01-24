@@ -17,7 +17,7 @@ export default function LoginPage() {
       password,
     };
 
-    const API_URL = "http://localhost:8080/api/auth/login"; 
+    const API_URL = "/api/auth/login"; 
 
     try {
       const response = await fetch(API_URL, {

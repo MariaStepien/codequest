@@ -49,7 +49,7 @@ export default function RegisterPage() {
       password,
     };
 
-    const API_URL = "http://localhost:8080/api/auth/register"; 
+    const API_URL = "/api/auth/register"; 
 
     try {
       const response = await fetch(API_URL, {

@@ -89,12 +89,12 @@ export default function LevelTemplate({ isAdminPreview = false }) {
         if (!token) return;
 
         try {
-            const userRes = await fetch('http://localhost:8080/api/user/me', {
+            const userRes = await fetch('/api/user/me', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const userData = await userRes.json();
 
-            const consumeRes = await fetch(`http://localhost:8080/api/user/consume-heart`, {
+            const consumeRes = await fetch(`/api/user/consume-heart`, {
                 method: 'POST',
                 headers: { 
                     'Authorization': `Bearer ${token}`,
@@ -148,12 +148,12 @@ export default function LevelTemplate({ isAdminPreview = false }) {
     const handleSendReport = async (data) => {
         try {
             const token = localStorage.getItem('token');
-            const userRes = await fetch('http://localhost:8080/api/user/me', {
+            const userRes = await fetch('/api/user/me', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const userData = await userRes.json();
 
-            const res = await fetch(`http://localhost:8080/api/reports?reporterId=${userData.id}`, {
+            const res = await fetch(`/api/reports?reporterId=${userData.id}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
@@ -174,7 +174,7 @@ export default function LevelTemplate({ isAdminPreview = false }) {
         if (!jwtToken) return;
 
         try {
-            await fetch('http://localhost:8080/api/progress/update', {
+            await fetch('/api/progress/update', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -195,7 +195,7 @@ export default function LevelTemplate({ isAdminPreview = false }) {
         if (!jwtToken) return;
         
         try {
-            await fetch('http://localhost:8080/api/lesson-progress/record', {
+            await fetch('/api/lesson-progress/record', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -286,7 +286,7 @@ export default function LevelTemplate({ isAdminPreview = false }) {
 
     const getBackgroundImage = () => {
         if (lessonData && lessonData.backgroundImage) {
-            return `url(http://localhost:8080/api/${lessonData.backgroundImage})`;
+            return `url(/api/${lessonData.backgroundImage})`;
         }
         return `url(${defaultLevelBackground})`;
     };

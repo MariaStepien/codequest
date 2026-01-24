@@ -5,8 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import ConfirmationModal from '../components/ConfirmationModal';
 import Toast from '../components/Toast';
 
-const API_BASE_URL = 'http://localhost:8080/api';
-
 export default function EnemyListPage() {
     const navigate = useNavigate();
     const [enemies, setEnemies] = useState([]);
@@ -26,12 +24,12 @@ export default function EnemyListPage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const userRes = await fetch(`${API_BASE_URL}/user/me`, {
+                const userRes = await fetch(`/api/user/me`, {
                     headers: { 'Authorization': `Bearer ${jwtToken}` }
                 });
                 if (userRes.ok) setUserData(await userRes.json());
 
-                const enemyRes = await fetch(`${API_BASE_URL}/enemies`, {
+                const enemyRes = await fetch(`/api/enemies`, {
                     headers: { 'Authorization': `Bearer ${jwtToken}` }
                 });
                 if (enemyRes.ok) {
@@ -56,7 +54,7 @@ export default function EnemyListPage() {
         setModalConfig({ show: false, enemyId: null, name: '' });
 
         try {
-            const res = await fetch(`${API_BASE_URL}/enemies/${enemyId}`, {
+            const res = await fetch(`/api/enemies/${enemyId}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${jwtToken}` }
             });
@@ -113,7 +111,7 @@ export default function EnemyListPage() {
                                                 <td className="px-6 py-4">
                                                     <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
                                                         <img 
-                                                            src={`${API_BASE_URL}/${enemy.imgSource}`} 
+                                                            src={`/api/${enemy.imgSource}`} 
                                                             alt={enemy.name}
                                                             className="w-10 h-10 object-contain"
                                                         />

@@ -26,8 +26,8 @@ export default function EditCoursePage() {
   const jwtToken = localStorage.getItem('token');
   const userLogin = userData?.userLogin || "Admin";
 
-  const API_BASE_URL = 'http://localhost:8080/api/courses';
-  const IMAGE_BASE_URL = 'http://localhost:8080/api/uploads';
+  const API_BASE_URL = '/api/courses';
+  const IMAGE_BASE_URL = '/api/uploads';
 
   const [toast, setToast] = useState({ show: false, message: '', isError: false });
 
@@ -45,7 +45,7 @@ export default function EditCoursePage() {
 
     const fetchCourseData = async () => {
       try {
-        const userResponse = await fetch('http://localhost:8080/api/user/me', {
+        const userResponse = await fetch('/api/user/me', {
           headers: { 'Authorization': `Bearer ${jwtToken}` }
         });
         if (!userResponse.ok) throw new Error('Błąd użytkownika.');

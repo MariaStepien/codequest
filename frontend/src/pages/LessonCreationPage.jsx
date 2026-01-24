@@ -113,7 +113,7 @@ export default function LessonCreationPage() {
         };
 
         const fetchEnemyData = async () => {
-            fetch('http://localhost:8080/api/enemies', {
+            fetch('/api/enemies', {
                 headers: { 'Authorization': `Bearer ${jwtToken}` }
             })
             .then(res => res.json())
@@ -364,7 +364,7 @@ export default function LessonCreationPage() {
                                     {selectedEnemyId && enemies.find(e => e.id == selectedEnemyId) && (
                                         <div className="flex items-center space-x-4 p-3 bg-indigo-50 rounded-lg">
                                             <img 
-                                                src={`http://localhost:8080/api/${enemies.find(e => e.id == selectedEnemyId).imgSource}`} 
+                                                src={`/api/${enemies.find(e => e.id == selectedEnemyId).imgSource}`} 
                                                 className="w-12 h-12 object-contain" 
                                                 alt="preview"
                                             />

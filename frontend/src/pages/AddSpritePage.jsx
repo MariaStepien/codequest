@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react';
 import { Upload, CheckCircle, AlertTriangle, Image as ImageIcon } from 'lucide-react';
 import AdminSidebar from '../components/AdminSidebar';
 
-const API_BASE_URL = 'http://localhost:8080/api';
-
 const EQUIPMENT_LABELS = {
     HELM: 'Hełm',
     ARMOR: 'Zbroja',
@@ -25,12 +23,12 @@ export default function AddSpritePage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const userRes = await fetch(`${API_BASE_URL}/user/me`, {
+                const userRes = await fetch(`/api/user/me`, {
                     headers: { 'Authorization': `Bearer ${jwtToken}` }
                 });
                 if (userRes.ok) setUserData(await userRes.json());
 
-                const equipRes = await fetch(`${API_BASE_URL}/equipment`, {
+                const equipRes = await fetch(`/api/equipment`, {
                     headers: { 'Authorization': `Bearer ${jwtToken}` }
                 });
                 const data = await equipRes.json();
@@ -72,7 +70,7 @@ export default function AddSpritePage() {
         formData.append('file', selectedFile);
 
         try {
-            const res = await fetch(`${API_BASE_URL}/sprites/upload`, {
+            const res = await fetch(`/api/sprites/upload`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${jwtToken}` },
                 body: formData

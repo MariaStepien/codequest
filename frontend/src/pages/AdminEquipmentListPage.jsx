@@ -3,8 +3,6 @@ import { Package, Search, Edit2, AlertTriangle, Plus, Eye, EyeOff } from 'lucide
 import { useNavigate } from 'react-router-dom';
 import AdminSidebar from '../components/AdminSidebar';
 
-const API_BASE_URL = 'http://localhost:8080/api';
-
 const EQUIPMENT_SLOTS = [
     { type: 'HELM', label: 'Hełm' },
     { type: 'ARMOR', label: 'Zbroja' },
@@ -26,7 +24,7 @@ export default function AdminEquipmentListPage() {
     const fetchItems = useCallback(async (category) => {
         setIsLoading(true);
         try {
-            const response = await fetch(`${API_BASE_URL}/equipment/admin/type/${category}`, {
+            const response = await fetch(`/api/equipment/admin/type/${category}`, {
                 headers: { 'Authorization': `Bearer ${jwtToken}` }
             });
             if (response.ok) {
@@ -47,7 +45,7 @@ export default function AdminEquipmentListPage() {
 
     const toggleVisibility = async (id) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/equipment/${id}/toggle-visibility`, {
+            const response = await fetch(`/api/equipment/${id}/toggle-visibility`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${jwtToken}` }
             });
@@ -65,7 +63,7 @@ export default function AdminEquipmentListPage() {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const response = await fetch(`${API_BASE_URL}/user/me`, {
+                const response = await fetch(`/api/user/me`, {
                     headers: { 'Authorization': `Bearer ${jwtToken}` }
                 });
                 if (response.ok) setUserData(await response.json());
@@ -78,7 +76,7 @@ export default function AdminEquipmentListPage() {
 
     const getItemIcon = (imgSource) => {
         if (!imgSource) return '';
-        return `${API_BASE_URL}/${imgSource}`;
+        return `/api/${imgSource}`;
     };
 
     return (

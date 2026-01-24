@@ -45,7 +45,7 @@ export default function ForumPage() {
   const fetchUserData = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:8080/api/user/me', {
+      const res = await fetch('/api/user/me', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -59,7 +59,7 @@ export default function ForumPage() {
 
   const fetchPosts = async (page = 0) => {
     try {
-      const res = await fetch(`http://localhost:8080/api/forum/posts?page=${page}&size=10`);
+      const res = await fetch(`/api/forum/posts?page=${page}&size=10`);
       const data = await res.json();
       setPosts(data.content);
       setTotalPages(data.page.totalPages);
@@ -71,7 +71,7 @@ export default function ForumPage() {
 
   const fetchPostDetails = async (postId) => {
     try {
-        const res = await fetch(`http://localhost:8080/api/forum/posts/${postId}`);
+        const res = await fetch(`/api/forum/posts/${postId}`);
         if (res.ok) {
             const data = await res.json();
             setSelectedPost(data);
@@ -110,7 +110,7 @@ export default function ForumPage() {
     e.preventDefault();
     const postData = { title: newPostTitle, content: newPostContent };
     try {
-        const res = await fetch(`http://localhost:8080/api/forum/posts?authorId=${userData.id}`, {
+        const res = await fetch(`/api/forum/posts?authorId=${userData.id}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(postData)
@@ -133,7 +133,7 @@ export default function ForumPage() {
   const handleUpdatePost = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`http://localhost:8080/api/forum/posts/${selectedPost.id}?userId=${userData.id}`, {
+      const res = await fetch(`/api/forum/posts/${selectedPost.id}?userId=${userData.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editValue)
@@ -152,7 +152,7 @@ export default function ForumPage() {
 
   const handleUpdateComment = async (commentId) => {
     try {
-      const res = await fetch(`http://localhost:8080/api/forum/comments/${commentId}?userId=${userData.id}`, {
+      const res = await fetch(`/api/forum/comments/${commentId}?userId=${userData.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: editValue.content })
@@ -173,7 +173,7 @@ export default function ForumPage() {
     if (!newComment.trim()) return;
 
     try {
-        const res = await fetch(`http://localhost:8080/api/forum/posts/${selectedPost.id}/comments?authorId=${userData.id}`, {
+        const res = await fetch(`/api/forum/posts/${selectedPost.id}/comments?authorId=${userData.id}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ content: newComment })
@@ -196,7 +196,7 @@ export default function ForumPage() {
     if (!replyValue.trim()) return;
 
     try {
-        const res = await fetch(`http://localhost:8080/api/forum/posts/${selectedPost.id}/comments/${parentCommentId}/replies?authorId=${userData.id}`, {
+        const res = await fetch(`/api/forum/posts/${selectedPost.id}/comments/${parentCommentId}/replies?authorId=${userData.id}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ content: replyValue })
@@ -217,7 +217,7 @@ export default function ForumPage() {
 
   const handleSendReport = async (data) => {
     try {
-      const res = await fetch(`http://localhost:8080/api/reports?reporterId=${userData.id}`, {
+      const res = await fetch(`/api/reports?reporterId=${userData.id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -236,7 +236,7 @@ export default function ForumPage() {
   const handleConfirmedDelete = async () => {
     try {
       if (modal.type === 'post') {
-        const res = await fetch(`http://localhost:8080/api/forum/posts/${modal.id}?userId=${userData.id}&isAdmin=false`, {
+        const res = await fetch(`/api/forum/posts/${modal.id}?userId=${userData.id}&isAdmin=false`, {
           method: 'DELETE',
         });
 
@@ -250,7 +250,7 @@ export default function ForumPage() {
           setToast({ show: true, message: 'Błąd podczas usuwania wpisu', isError: true });
         }
       } else if (modal.type === 'comment') {
-        const res = await fetch(`http://localhost:8080/api/forum/comments/${modal.id}?userId=${userData.id}&isAdmin=false`, {
+        const res = await fetch(`/api/forum/comments/${modal.id}?userId=${userData.id}&isAdmin=false`, {
           method: 'DELETE',
         });
         if (res.ok) {

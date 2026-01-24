@@ -57,7 +57,7 @@ export default function AdminForumPage() {
   const fetchUserData = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:8080/api/user/me', {
+      const res = await fetch('/api/user/me', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -71,7 +71,7 @@ export default function AdminForumPage() {
 
   const fetchPosts = async (page = 0) => {
     try {
-      const res = await fetch(`http://localhost:8080/api/forum/posts?page=${page}&size=10`);
+      const res = await fetch(`/api/forum/posts?page=${page}&size=10`);
       const data = await res.json();
       setPosts(data.content);
       setTotalPages(data.page.totalPages);
@@ -82,7 +82,7 @@ export default function AdminForumPage() {
   };
 
     const fetchPostDetails = async (postId) => {
-      const res = await fetch(`http://localhost:8080/api/forum/posts/${postId}`);
+      const res = await fetch(`/api/forum/posts/${postId}`);
       if (res.ok) {
         const data = await res.json();
         setSelectedPost(data);
@@ -94,7 +94,7 @@ export default function AdminForumPage() {
     if (!newComment.trim()) return;
 
     try {
-        const res = await fetch(`http://localhost:8080/api/forum/posts/${selectedPost.id}/comments?authorId=${userData.id}`, {
+        const res = await fetch(`/api/forum/posts/${selectedPost.id}/comments?authorId=${userData.id}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ content: newComment })
@@ -117,7 +117,7 @@ export default function AdminForumPage() {
     if (!replyValue.trim()) return;
 
     try {
-        const res = await fetch(`http://localhost:8080/api/forum/posts/${selectedPost.id}/comments/${parentCommentId}/replies?authorId=${userData.id}`, {
+        const res = await fetch(`/api/forum/posts/${selectedPost.id}/comments/${parentCommentId}/replies?authorId=${userData.id}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ content: replyValue })
@@ -140,7 +140,7 @@ export default function AdminForumPage() {
     e.preventDefault();
     const postData = { title: newPostTitle, content: newPostContent };
     try {
-        const res = await fetch(`http://localhost:8080/api/forum/posts?authorId=${userData.id}`, {
+        const res = await fetch(`/api/forum/posts?authorId=${userData.id}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(postData)
@@ -163,7 +163,7 @@ export default function AdminForumPage() {
   const handleUpdatePost = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`http://localhost:8080/api/forum/posts/${selectedPost.id}?userId=${userData.id}`, {
+      const res = await fetch(`/api/forum/posts/${selectedPost.id}?userId=${userData.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editValue)
@@ -182,7 +182,7 @@ export default function AdminForumPage() {
   const handleUpdateComment = async (commentId) => {
     try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`http://localhost:8080/api/forum/comments/${commentId}?userId=${userData.id}`, {
+        const res = await fetch(`/api/forum/comments/${commentId}?userId=${userData.id}`, {
         method: 'PUT',
         headers: { 
             'Content-Type': 'application/json',
@@ -242,9 +242,9 @@ export default function AdminForumPage() {
       let url = '';
       let method = 'DELETE';
       if (type === 'post' || type === 'comment') {
-        url = `http://localhost:8080/api/forum/${type}s/${id}?userId=${userData.id}&isAdmin=true`;
+        url = `/api/forum/${type}s/${id}?userId=${userData.id}&isAdmin=true`;
       } else if (type === 'user-block') {
-        url = `http://localhost:8080/api/user/${id}/toggle-block`;
+        url = `/api/user/${id}/toggle-block`;
         method = 'POST';
       }
       const res = await fetch(url, {

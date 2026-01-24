@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react';
 import { Skull, Upload, CheckCircle, AlertTriangle } from 'lucide-react';
 import AdminSidebar from '../components/AdminSidebar';
 
-const API_BASE_URL = 'http://localhost:8080/api';
-
 export default function AddEnemyPage() {
     const [name, setName] = useState('');
     const [selectedFile, setSelectedFile] = useState(null);
@@ -14,7 +12,7 @@ export default function AddEnemyPage() {
     const jwtToken = localStorage.getItem('token');
 
     useEffect(() => {
-        fetch(`${API_BASE_URL}/user/me`, {
+        fetch(`/api/user/me`, {
             headers: { 'Authorization': `Bearer ${jwtToken}` }
         })
         .then(res => res.json())
@@ -40,7 +38,7 @@ export default function AddEnemyPage() {
         formData.append('file', selectedFile);
 
         try {
-            const res = await fetch(`${API_BASE_URL}/enemies`, {
+            const res = await fetch(`/api/enemies`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${jwtToken}` },
                 body: formData

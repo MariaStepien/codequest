@@ -7,7 +7,7 @@ export default function EnemySprite({ enemyId }) {
         const fetchEnemy = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch(`http://localhost:8080/api/enemies/${enemyId}`, {
+                const response = await fetch(`/api/enemies/${enemyId}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
@@ -33,7 +33,7 @@ export default function EnemySprite({ enemyId }) {
         <div className="flex flex-col items-center">
             <div className="w-64 h-64 flex items-center justify-center rounded-lg">
                 <img 
-                    src={`http://localhost:8080/api/${enemy.imgSource}`} 
+                    src={`/api/${enemy.imgSource}`} 
                     alt={enemy.name} 
                     className="h-full w-full object-contain" 
                 />

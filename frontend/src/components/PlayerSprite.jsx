@@ -7,7 +7,7 @@ export default function PlayerSprite() {
         const fetchPlayerStyle = async () => {
             const token = localStorage.getItem('token');
             try {
-                const response = await fetch(`http://localhost:8080/api/user-equipment/me`, {
+                const response = await fetch(`/api/user-equipment/me`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -24,7 +24,7 @@ export default function PlayerSprite() {
     }, []);
 
     const spriteFilename = spriteInfo?.sprite_img_source || 'uploads/sprites/sprite_1_1_1_1_1.png';
-    const imageUrl = `http://localhost:8080/api/${spriteFilename}`;
+    const imageUrl = `/api/${spriteFilename}`;
 
     return (
         <div className="flex flex-col items-center">

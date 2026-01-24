@@ -2,8 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { Coins, X, Shirt, Zap, AlertTriangle } from 'lucide-react';
 import Header from '../components/Header'; 
 
-const API_BASE_URL = 'http://localhost:8080/api';
-
 const EQUIPMENT_SLOTS = [
     { type: 'HELM', label: 'Hełm' },
     { type: 'ARMOR', label: 'Zbroja' },
@@ -29,9 +27,9 @@ const getCharacterSprite = (spriteImgSource) => {
     const fileName = spriteImgSource || 'sprite_1_1_1_1_1.png';
 
     try {
-        return `${API_BASE_URL}/uploads/sprites/${fileName}`;
+        return `/api/uploads/sprites/${fileName}`;
     } catch (error) {
-        return new URL(`${API_BASE_URL}/uploads/sprites/sprite_1_1_1_1_1.png`, import.meta.url).href; 
+        return new URL(`/api/uploads/sprites/sprite_1_1_1_1_1.png`, import.meta.url).href; 
     }
 };
 
@@ -39,9 +37,9 @@ const getItemIcon = (imgSource) => {
     if (!imgSource) return '';
 
     try {
-        return `${API_BASE_URL}/${imgSource}`;
+        return `/api/${imgSource}`;
     } catch (e) {
-        return new URL(`${API_BASE_URL}/uploads/sprites/sprite_1_1_1_1_1.png`, import.meta.url).href;
+        return new URL(`/api/uploads/sprites/sprite_1_1_1_1_1.png`, import.meta.url).href;
     }
 };
 
@@ -122,12 +120,12 @@ export default function EquipmentPage() {
 
         setIsLoading(true);
         try {
-            const equipmentResponse = await fetch(`http://localhost:8080/api/user-equipment/${userId}`, {
+            const equipmentResponse = await fetch(`/api/user-equipment/${userId}`, {
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${jwtToken}` },
             });
 
-            const userResponse = await fetch('http://localhost:8080/api/user/me', {
+            const userResponse = await fetch('/api/user/me', {
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${jwtToken}` },
             });
@@ -164,7 +162,7 @@ export default function EquipmentPage() {
 
     const fetchItemsByType = useCallback(async (type) => {
         try {
-            const response = await fetch(`http://localhost:8080/api/equipment/type/${type}`, {
+            const response = await fetch(`/api/equipment/type/${type}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${jwtToken}`,
@@ -197,11 +195,11 @@ export default function EquipmentPage() {
 
         switch (action) {
             case 'EQUIP':
-                url = `http://localhost:8080/api/user-equipment/equip/${userId}/${itemId}`;
+                url = `/api/user-equipment/equip/${userId}/${itemId}`;
                 successMsg = "Pomyślnie założono przedmiot!";
                 break;
             case 'BUY':
-                url = `http://localhost:8080/api/user-bought-equipment/buy/${userId}/${itemId}`;
+                url = `/api/user-bought-equipment/buy/${userId}/${itemId}`;
                 method = 'POST';
                 body = JSON.stringify({}); 
                 successMsg = "Pomyślnie zakupiono przedmiot!";

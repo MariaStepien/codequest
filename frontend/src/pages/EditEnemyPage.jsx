@@ -3,8 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Edit, Upload, CheckCircle, AlertTriangle, ArrowLeft } from 'lucide-react';
 import AdminSidebar from '../components/AdminSidebar';
 
-const API_BASE_URL = 'http://localhost:8080/api';
-
 export default function EditEnemyPage() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -20,12 +18,12 @@ export default function EditEnemyPage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const userRes = await fetch(`${API_BASE_URL}/user/me`, {
+                const userRes = await fetch(`/api/user/me`, {
                     headers: { 'Authorization': `Bearer ${jwtToken}` }
                 });
                 if (userRes.ok) setUserData(await userRes.json());
 
-                const enemyRes = await fetch(`${API_BASE_URL}/enemies/${id}`, {
+                const enemyRes = await fetch(`/api/enemies/${id}`, {
                     headers: { 'Authorization': `Bearer ${jwtToken}` }
                 });
                 if (enemyRes.ok) {
@@ -59,7 +57,7 @@ export default function EditEnemyPage() {
         if (selectedFile) formData.append('file', selectedFile);
 
         try {
-            const res = await fetch(`${API_BASE_URL}/enemies/${id}`, {
+            const res = await fetch(`/api/enemies/${id}`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${jwtToken}` },
                 body: formData
@@ -113,7 +111,7 @@ export default function EditEnemyPage() {
                                     <img src={previewUrl} alt="New Preview" className="h-full object-contain p-4" />
                                 ) : (
                                     <div className="text-center">
-                                        <img src={`${API_BASE_URL}/${currentImg}`} alt="Current" className="h-32 mx-auto mb-2 object-contain opacity-50" />
+                                        <img src={`/api/${currentImg}`} alt="Current" className="h-32 mx-auto mb-2 object-contain opacity-50" />
                                         <p className="text-sm text-gray-500">Kliknij, aby zmienić grafikę</p>
                                     </div>
                                 )}
