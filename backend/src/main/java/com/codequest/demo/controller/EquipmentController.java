@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.codequest.demo.domain.Equipment;
-import com.codequest.demo.domain.Equipment.EquipmentType;
+import com.codequest.demo.model.Equipment;
+import com.codequest.demo.model.Equipment.EquipmentType;
 import com.codequest.demo.service.EquipmentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

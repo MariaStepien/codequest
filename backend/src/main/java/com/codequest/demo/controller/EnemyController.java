@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.codequest.demo.domain.Enemy;
+import com.codequest.demo.model.Enemy;
 import com.codequest.demo.service.EnemyService;
 
 import lombok.RequiredArgsConstructor;

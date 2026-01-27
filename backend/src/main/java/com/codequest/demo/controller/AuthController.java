@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.codequest.demo.domain.User;
 import com.codequest.demo.dto.LoginRequest;
 import com.codequest.demo.dto.LoginResponse;
 import com.codequest.demo.dto.RegisterRequest;
+import com.codequest.demo.model.User;
 import com.codequest.demo.service.JwtService;
 import com.codequest.demo.service.UserService;
 

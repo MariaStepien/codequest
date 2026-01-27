@@ -1,11 +1,11 @@
-package com.codequest.demo.repos;
+package com.codequest.demo.repository;
 
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.codequest.demo.domain.UserLessonProgress;
+import com.codequest.demo.model.UserLessonProgress;
 
 @Repository
 public interface UserLessonProgressRepository extends JpaRepository<UserLessonProgress, Long> {

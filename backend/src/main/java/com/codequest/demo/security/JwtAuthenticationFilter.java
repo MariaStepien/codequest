@@ -53,7 +53,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             
-            com.codequest.demo.domain.User appUser;
+            com.codequest.demo.model.User appUser;
             try {
                 appUser = userService.findUserById(userId);
             } catch (RuntimeException e) {

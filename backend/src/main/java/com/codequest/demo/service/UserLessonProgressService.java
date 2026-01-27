@@ -5,16 +5,16 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.codequest.demo.domain.Course;
-import com.codequest.demo.domain.Lesson;
-import com.codequest.demo.domain.User; 
-import com.codequest.demo.domain.UserLessonProgress;
 import com.codequest.demo.dto.UserLessonProgressCreationDto;
 import com.codequest.demo.dto.UserLessonProgressDto;
-import com.codequest.demo.repos.CourseRepository;
-import com.codequest.demo.repos.LessonRepository;
-import com.codequest.demo.repos.UserLessonProgressRepository;
-import com.codequest.demo.repos.UserRepository;
+import com.codequest.demo.model.Course;
+import com.codequest.demo.model.Lesson;
+import com.codequest.demo.model.User;
+import com.codequest.demo.model.UserLessonProgress;
+import com.codequest.demo.repository.CourseRepository;
+import com.codequest.demo.repository.LessonRepository;
+import com.codequest.demo.repository.UserLessonProgressRepository;
+import com.codequest.demo.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 

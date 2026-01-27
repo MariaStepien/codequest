@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.codequest.demo.domain.User;
 import com.codequest.demo.dto.UserDto;
+import com.codequest.demo.model.User;
 import com.codequest.demo.service.UserService;
 
 import lombok.RequiredArgsConstructor;

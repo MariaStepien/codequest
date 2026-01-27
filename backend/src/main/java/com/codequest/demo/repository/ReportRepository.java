@@ -1,4 +1,4 @@
-package com.codequest.demo.repos;
+package com.codequest.demo.repository;
 
 import java.time.LocalDateTime;
 
@@ -7,8 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.codequest.demo.domain.Report;
-import com.codequest.demo.domain.ReportStatus;
+import com.codequest.demo.model.Report;
+import com.codequest.demo.model.ReportStatus;
 
 @Repository
 public interface ReportRepository extends JpaRepository<Report, Long> {

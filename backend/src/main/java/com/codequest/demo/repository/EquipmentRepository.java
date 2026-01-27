@@ -1,4 +1,4 @@
-package com.codequest.demo.repos;
+package com.codequest.demo.repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -7,8 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.codequest.demo.domain.Equipment;
-import com.codequest.demo.domain.Equipment.EquipmentType;
+import com.codequest.demo.model.Equipment;
+import com.codequest.demo.model.Equipment.EquipmentType;
 
 public interface EquipmentRepository extends JpaRepository<Equipment, Long>{
     List<Equipment> findByType(EquipmentType type);

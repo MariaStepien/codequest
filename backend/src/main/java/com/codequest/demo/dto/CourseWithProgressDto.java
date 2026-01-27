@@ -1,6 +1,6 @@
 package com.codequest.demo.dto;
 
-import com.codequest.demo.domain.Course;
+import com.codequest.demo.model.Course;
 
 import lombok.Data;
 

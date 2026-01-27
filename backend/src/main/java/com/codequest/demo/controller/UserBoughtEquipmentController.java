@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.codequest.demo.domain.UserBoughtEquipment;
+import com.codequest.demo.model.UserBoughtEquipment;
 import com.codequest.demo.service.UserBoughtEquipmentService;
 
 import lombok.RequiredArgsConstructor;

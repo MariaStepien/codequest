@@ -7,13 +7,13 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.codequest.demo.domain.Course;
-import com.codequest.demo.domain.User;
-import com.codequest.demo.domain.UserCourseProgress;
 import com.codequest.demo.dto.CourseProgressByUserDetailsDto;
-import com.codequest.demo.repos.CourseRepository;
-import com.codequest.demo.repos.UserCourseProgressRepository;
-import com.codequest.demo.repos.UserRepository;
+import com.codequest.demo.model.Course;
+import com.codequest.demo.model.User;
+import com.codequest.demo.model.UserCourseProgress;
+import com.codequest.demo.repository.CourseRepository;
+import com.codequest.demo.repository.UserCourseProgressRepository;
+import com.codequest.demo.repository.UserRepository;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;

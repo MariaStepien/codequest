@@ -1,4 +1,4 @@
-package com.codequest.demo.repos;
+package com.codequest.demo.repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.codequest.demo.domain.UserCourseProgress;
+import com.codequest.demo.model.UserCourseProgress;
 
 @Repository
 public interface  UserCourseProgressRepository extends JpaRepository<UserCourseProgress, Long> {

@@ -7,13 +7,13 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.codequest.demo.domain.Equipment;
-import com.codequest.demo.domain.User;
-import com.codequest.demo.domain.UserBoughtEquipment;
 import com.codequest.demo.dto.EquipmentDetailsDto;
-import com.codequest.demo.repos.EquipmentRepository;
-import com.codequest.demo.repos.UserBoughtEquipmentRepository;
-import com.codequest.demo.repos.UserRepository;
+import com.codequest.demo.model.Equipment;
+import com.codequest.demo.model.User;
+import com.codequest.demo.model.UserBoughtEquipment;
+import com.codequest.demo.repository.EquipmentRepository;
+import com.codequest.demo.repository.UserBoughtEquipmentRepository;
+import com.codequest.demo.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 

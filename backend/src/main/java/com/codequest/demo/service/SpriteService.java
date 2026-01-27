@@ -9,8 +9,8 @@ import java.nio.file.StandardCopyOption;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.codequest.demo.domain.Equipment;
-import com.codequest.demo.repos.EquipmentRepository;
+import com.codequest.demo.model.Equipment;
+import com.codequest.demo.repository.EquipmentRepository;
 
 import lombok.RequiredArgsConstructor;
 

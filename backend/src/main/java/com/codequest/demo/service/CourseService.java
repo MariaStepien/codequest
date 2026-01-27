@@ -12,13 +12,13 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.codequest.demo.domain.Course;
 import com.codequest.demo.dto.CourseDTO;
 import com.codequest.demo.dto.CourseWithProgressDto;
-import com.codequest.demo.repos.CourseRepository;
-import com.codequest.demo.repos.LessonRepository;
-import com.codequest.demo.repos.UserCourseProgressRepository;
-import com.codequest.demo.repos.UserLessonProgressRepository;
+import com.codequest.demo.model.Course;
+import com.codequest.demo.repository.CourseRepository;
+import com.codequest.demo.repository.LessonRepository;
+import com.codequest.demo.repository.UserCourseProgressRepository;
+import com.codequest.demo.repository.UserLessonProgressRepository;
 
 import lombok.RequiredArgsConstructor;
 

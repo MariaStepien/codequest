@@ -1,4 +1,4 @@
-package com.codequest.demo.domain;
+package com.codequest.demo.model;
 
 import java.time.LocalDateTime;
 

@@ -16,11 +16,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import com.codequest.demo.domain.User;
 import com.codequest.demo.dto.RankingEntryDto;
 import com.codequest.demo.dto.RegisterRequest;
 import com.codequest.demo.dto.UserDto;
-import com.codequest.demo.repos.UserRepository;
+import com.codequest.demo.model.User;
+import com.codequest.demo.repository.UserRepository;
 
 import jakarta.validation.Valid;
 

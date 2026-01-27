@@ -1,6 +1,6 @@
-package com.codequest.demo.domain;
+package com.codequest.demo.model;
 
-import com.codequest.demo.domain.Equipment.EquipmentType;
+import com.codequest.demo.model.Equipment.EquipmentType;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

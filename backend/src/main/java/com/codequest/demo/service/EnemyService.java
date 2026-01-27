@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.codequest.demo.domain.Enemy;
-import com.codequest.demo.repos.EnemyRepository;
+import com.codequest.demo.model.Enemy;
+import com.codequest.demo.repository.EnemyRepository;
 
 import lombok.RequiredArgsConstructor;
 

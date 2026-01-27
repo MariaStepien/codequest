@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.codequest.demo.domain.UserCourseProgress;
 import com.codequest.demo.dto.CourseProgressByUserDetailsDto;
+import com.codequest.demo.model.UserCourseProgress;
 import com.codequest.demo.service.UserCourseProgressService;
 
 import lombok.Data;

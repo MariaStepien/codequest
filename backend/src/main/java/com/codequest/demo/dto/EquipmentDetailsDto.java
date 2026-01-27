@@ -1,6 +1,6 @@
 package com.codequest.demo.dto;
 
-import com.codequest.demo.domain.Equipment.EquipmentType;
+import com.codequest.demo.model.Equipment.EquipmentType;
 
 import lombok.Builder;
 import lombok.Value;

@@ -8,12 +8,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.codequest.demo.domain.Comment;
-import com.codequest.demo.domain.Post;
-import com.codequest.demo.domain.User;
-import com.codequest.demo.repos.CommentRepository;
-import com.codequest.demo.repos.PostRepository;
-import com.codequest.demo.repos.UserRepository;
+import com.codequest.demo.model.Comment;
+import com.codequest.demo.model.Post;
+import com.codequest.demo.model.User;
+import com.codequest.demo.repository.CommentRepository;
+import com.codequest.demo.repository.PostRepository;
+import com.codequest.demo.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 

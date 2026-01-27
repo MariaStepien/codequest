@@ -7,11 +7,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.codequest.demo.domain.Report;
-import com.codequest.demo.domain.ReportStatus;
-import com.codequest.demo.domain.User;
-import com.codequest.demo.repos.ReportRepository;
-import com.codequest.demo.repos.UserRepository;
+import com.codequest.demo.model.Report;
+import com.codequest.demo.model.ReportStatus;
+import com.codequest.demo.model.User;
+import com.codequest.demo.repository.ReportRepository;
+import com.codequest.demo.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 

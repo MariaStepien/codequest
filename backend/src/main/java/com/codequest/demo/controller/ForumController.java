@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.codequest.demo.domain.Comment;
-import com.codequest.demo.domain.Post;
+import com.codequest.demo.model.Comment;
+import com.codequest.demo.model.Post;
 import com.codequest.demo.service.ForumService;
 
 import lombok.RequiredArgsConstructor;

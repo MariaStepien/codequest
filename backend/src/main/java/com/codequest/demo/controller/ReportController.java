@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.codequest.demo.domain.Report;
-import com.codequest.demo.domain.ReportStatus;
-import com.codequest.demo.repos.CommentRepository;
-import com.codequest.demo.repos.LessonRepository;
-import com.codequest.demo.repos.PostRepository;
+import com.codequest.demo.model.Report;
+import com.codequest.demo.model.ReportStatus;
+import com.codequest.demo.repository.CommentRepository;
+import com.codequest.demo.repository.LessonRepository;
+import com.codequest.demo.repository.PostRepository;
 import com.codequest.demo.service.ReportService;
 
 import lombok.RequiredArgsConstructor;
