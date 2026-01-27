@@ -36,7 +36,7 @@ public class RankingController {
         }
 
         try {
-            Long userId = Long.parseLong(userDetails.getUsername());
+            Long userId = Long.valueOf(userDetails.getUsername());
             RankingEntryDto userEntry = userService.getUserRankEntry(userId);
             return ResponseEntity.ok(userEntry);
         } catch (Exception e) {

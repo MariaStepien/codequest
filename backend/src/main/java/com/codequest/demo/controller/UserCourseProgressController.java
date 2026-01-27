@@ -39,15 +39,12 @@ public class UserCourseProgressController {
         private int completedLevelOrderIndex;
     }
 
-    /**
-     * Protected endpoint to update or create user course progress.
-     */
     @PutMapping("/update")
     public ResponseEntity<UserCourseProgress> updateProgress(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody ProgressUpdateRequest request) {
         
-        Long userId = Long.parseLong(userDetails.getUsername());
+        Long userId = Long.valueOf(userDetails.getUsername());
         
         UserCourseProgress updatedProgress = progressService.updateProgress(
             userId, 
@@ -58,25 +55,17 @@ public class UserCourseProgressController {
         return ResponseEntity.ok(updatedProgress);
     }
 
-    /**
-     * Protected endpoint to fetch the user's single latest progress activity.
-     */
     @GetMapping("/latest-activity")
     public ResponseEntity<Optional<UserCourseProgressService.LatestActivityDto>> getLatestActivity(
             @AuthenticationPrincipal UserDetails userDetails) {
 
-        // Add a null check here to avoid the NPE you experienced previously
         if (userDetails == null) {
             return ResponseEntity.status(401).build();
         }
 
         Long userId = Long.valueOf(userDetails.getUsername());
+        Optional<UserCourseProgressService.LatestActivityDto> latestActivity = progressService.getLatestActivity(userId);
 
-        // Delegate to the service to get the latest activity DTO
-        Optional<UserCourseProgressService.LatestActivityDto> latestActivity = 
-            progressService.getLatestActivity(userId);
-
-        // Return 200 OK with the DTO (or empty if no progress exists)
         return ResponseEntity.ok(latestActivity);
     }
 
