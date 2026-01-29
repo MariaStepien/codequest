@@ -1,5 +1,6 @@
 package com.codequest.demo.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -31,6 +32,10 @@ public class LessonController {
 
     private final LessonService lessonService;
 
+    /**
+     * Fetches lesson details for a given lesson Id.
+     * Maps to the /api/lessons/{lessonId} endpoint.
+     */
     @GetMapping("/{lessonId}")
     public ResponseEntity<LessonDto> getLessonDetails(@PathVariable Long lessonId) {
         
@@ -39,12 +44,20 @@ public class LessonController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    /**
+     * Fetches the next available order index for a lesson in a given course.
+     * Maps to the /api/lessons/course/{courseId}/next-order endpoint.
+     */
     @GetMapping("/course/{courseId}/next-order")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Integer> getNextOrderIndex(@PathVariable Long courseId) {
         return ResponseEntity.ok(lessonService.getNextOrderIndex(courseId));
     }
 
+    /**
+     * Creates a new lesson with optional file attachment.
+     * Maps to the /api/lessons/create endpoint.
+     */
     @PostMapping(value = "/create", consumes = {"multipart/form-data"})
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<LessonDto> createLesson(
@@ -53,11 +66,15 @@ public class LessonController {
         try {
             LessonDto createdLesson = lessonService.createLesson(creationDto, file);
             return new ResponseEntity<>(createdLesson, HttpStatus.CREATED);
-        } catch (Exception e) {
+        } catch (IOException e) {
             return ResponseEntity.badRequest().build(); 
         }
     }
 
+    /**
+     * Deletes a specific lesson.
+     * Maps to the /api/lessons/{lessonId} endpoint.
+     */
     @DeleteMapping("/{lessonId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteLesson(@PathVariable Long lessonId) {
@@ -69,7 +86,10 @@ public class LessonController {
         }
     }
     
-    //gives back Lesson with specific courseId and orderIndex
+    /**
+     * Fetches lesson details for a specific course and order index.
+     * Maps to the /api/lessons/course/{courseId}/order/{orderIndex} endpoint.
+     */
     @GetMapping("/course/{courseId}/order/{orderIndex}")
     public ResponseEntity<LessonDto> getLessonDetailsByCourseAndOrder(
             @PathVariable Long courseId,
@@ -80,6 +100,10 @@ public class LessonController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    /**
+     * Fetches all lessons associated with a specific course.
+     * Maps to the /api/lessons/course/{courseId} endpoint.
+     */
     @GetMapping("/course/{courseId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<LessonDto>> getLessonsByCourseId(@PathVariable Long courseId) {
@@ -87,6 +111,10 @@ public class LessonController {
         return ResponseEntity.ok(lessons);
     }
 
+    /**
+     * Updates an existing lesson's details and/or attached file.
+     * Maps to the /api/lessons/{lessonId} endpoint.
+     */
     @PutMapping(value = "/{lessonId}", consumes = {"multipart/form-data"})
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<LessonDto> updateLesson(
@@ -96,7 +124,7 @@ public class LessonController {
         try {
             LessonDto updatedLesson = lessonService.updateLesson(lessonId, updateDto, file);
             return ResponseEntity.ok(updatedLesson);
-        } catch (Exception e) {
+        } catch (IOException e) {
             if (e.getMessage() != null && e.getMessage().contains("not found")) {
                 return ResponseEntity.notFound().build();
             }

@@ -21,12 +21,20 @@ public class RankingController {
 
     private final UserService userService;
 
+    /**
+     * Fetches the global ranking of all users.
+     * Maps to the /api/ranking/global endpoint.
+     */
     @GetMapping("/global")
     public ResponseEntity<List<RankingEntryDto>> getGlobalRanking() {
         List<RankingEntryDto> ranking = userService.getGlobalRanking();
         return ResponseEntity.ok(ranking);
     }
     
+    /**
+     * Fetches the ranking entry for the currently authenticated user.
+     * Maps to the /api/ranking/me endpoint.
+     */
     @GetMapping("/me")
     public ResponseEntity<RankingEntryDto> getUserRankingEntry(
             @AuthenticationPrincipal UserDetails userDetails) {
@@ -39,7 +47,7 @@ public class RankingController {
             Long userId = Long.valueOf(userDetails.getUsername());
             RankingEntryDto userEntry = userService.getUserRankEntry(userId);
             return ResponseEntity.ok(userEntry);
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             return ResponseEntity.notFound().build();
         }
     }

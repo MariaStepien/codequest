@@ -39,6 +39,10 @@ public class UserCourseProgressController {
         private int completedLevelOrderIndex;
     }
 
+    /**
+     * Updates the course progress for the authenticated user.
+     * Maps to the /api/progress/update endpoint.
+     */
     @PutMapping("/update")
     public ResponseEntity<UserCourseProgress> updateProgress(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -55,6 +59,10 @@ public class UserCourseProgressController {
         return ResponseEntity.ok(updatedProgress);
     }
 
+    /**
+     * Fetches the latest course activity for the authenticated user.
+     * Maps to the /api/progress/latest-activity endpoint.
+     */
     @GetMapping("/latest-activity")
     public ResponseEntity<Optional<UserCourseProgressService.LatestActivityDto>> getLatestActivity(
             @AuthenticationPrincipal UserDetails userDetails) {
@@ -69,6 +77,10 @@ public class UserCourseProgressController {
         return ResponseEntity.ok(latestActivity);
     }
 
+    /**
+     * Fetches course progress details for all users (Admin only).
+     * Maps to the /api/progress/list-users/{id} endpoint.
+     */
     @GetMapping("/list-users/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<CourseProgressByUserDetailsDto>> getCourseProgressForAllUsers(@PathVariable Long id) {

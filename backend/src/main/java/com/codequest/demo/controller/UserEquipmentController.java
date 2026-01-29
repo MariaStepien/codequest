@@ -22,12 +22,20 @@ public class UserEquipmentController {
 
     private final UserEquipmentService userEquipmentService;
 
+    /**
+     * Fetches equipment details for a specific user by their Id.
+     * Maps to the /api/user-equipment/{userId} endpoint.
+     */
     @GetMapping("/{userId}")
     public ResponseEntity<UserEquipmentDto> getUserEquipment(@PathVariable Long userId) {
         UserEquipmentDto dto = userEquipmentService.getUserEquipment(userId);
         return ResponseEntity.ok(dto);
     }
 
+    /**
+     * Equips a specific item for a user.
+     * Maps to the /api/user-equipment/equip/{userId}/{equipmentId} endpoint.
+     */
     @PutMapping("/equip/{userId}/{equipmentId}")
     public ResponseEntity<UserEquipmentDto> equipItem(
             @PathVariable Long userId, 
@@ -40,9 +48,13 @@ public class UserEquipmentController {
         }
     }
 
+    /**
+     * Fetches equipment details for the currently authenticated user.
+     * Maps to the /api/user-equipment/me endpoint.
+     */
     @GetMapping("/me")
     public ResponseEntity<UserEquipmentDto> getMyEquipment(@AuthenticationPrincipal UserDetails userDetails) {
-        Long userId = Long.parseLong(userDetails.getUsername());
+        Long userId = Long.valueOf(userDetails.getUsername());
         UserEquipmentDto dto = userEquipmentService.getUserEquipment(userId);
 
         return ResponseEntity.ok(dto);

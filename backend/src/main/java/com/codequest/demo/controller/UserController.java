@@ -30,6 +30,10 @@ public class UserController {
     
     private final UserService userService;
 
+    /**
+     * Fetches details of the currently authenticated user.
+     * Maps to the /api/user/me endpoint.
+     */
     @GetMapping("/me")
     public ResponseEntity<UserDto> getLoggedInUser(@AuthenticationPrincipal UserDetails userDetails) {
         Long userId = Long.valueOf(userDetails.getUsername());
@@ -37,20 +41,31 @@ public class UserController {
         return ResponseEntity.ok(userService.convertToDto(loggedInUser));
     }
 
-    @GetMapping("/all")
+    /**
+     * Fetches a paginated list of all users.
+     * Maps to the /api/user endpoint.
+     */
+    @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<UserDto>> getAllUsersPage(@PageableDefault(size = 10, sort = "id", direction= Sort.Direction.ASC) Pageable pageable) {
         Page<UserDto> users = userService.getAllUsersPage(pageable);
         return ResponseEntity.ok(users);
     }
-
+    /**
+     * Toggles the blocked status of a specific user.
+     * Maps to the /api/user/{id}/toggle-block endpoint.
+     */
     @PostMapping("/{id}/toggle-block")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> toggleBlock(@PathVariable Long id) {
+    public ResponseEntity<Void> toggleBlockStatus(@PathVariable Long id) {
         userService.toggleBlockStatus(id);
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Changes the password for the currently authenticated user.
+     * Maps to the /api/user/change-password endpoint.
+     */
     @PostMapping("/change-password")
     public ResponseEntity<Map<String, String>> changePassword(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -65,6 +80,10 @@ public class UserController {
         return ResponseEntity.ok(Map.of("message", "Hasło zostało pomyślnie zmienione."));
     }
 
+    /**
+     * Consumes a heart for the currently authenticated user (e.g., after a failed task).
+     * Maps to the /api/user/consume-heart endpoint.
+     */
     @PostMapping("/consume-heart")
     public ResponseEntity<Map<String, Object>> consumeHeart(@AuthenticationPrincipal UserDetails userDetails) {
         Long userId = Long.valueOf(userDetails.getUsername());
@@ -76,6 +95,10 @@ public class UserController {
         ));
     }
 
+    /**
+     * Processes a heart purchase for the currently authenticated user.
+     * Maps to the /api/user/buy-heart endpoint.
+     */
     @PostMapping("/buy-heart")
     public ResponseEntity<UserDto> buyHeart(@AuthenticationPrincipal UserDetails userDetails) {
         Long userId = Long.valueOf(userDetails.getUsername());

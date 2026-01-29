@@ -1,5 +1,6 @@
 package com.codequest.demo.controller;
 
+import java.io.IOException;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,10 @@ public class SpriteController {
 
     private final SpriteService spriteService;
 
+    /**
+     * Uploads and saves a character sprite image based on provided equipment IDs.
+     * Maps to the /api/sprites/upload endpoint.
+     */
     @PostMapping("/upload")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> uploadSprite(
@@ -33,7 +38,7 @@ public class SpriteController {
         try {
             String fileName = spriteService.saveSprite(helmId, armorId, pantsId, shoesId, weaponId, file);
             return ResponseEntity.ok(Map.of("message", "Sprite saved successfully", "fileName", fileName));
-        } catch (Exception e) {
+        } catch (IOException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

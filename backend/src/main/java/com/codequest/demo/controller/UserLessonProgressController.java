@@ -24,6 +24,10 @@ public class UserLessonProgressController {
     
     private final UserLessonProgressService progressService;
 
+    /**
+     * Records or updates lesson progress for the authenticated user.
+     * Maps to the /api/lesson-progress/record endpoint.
+     */
     @PutMapping("/record")
     public ResponseEntity<UserLessonProgressDto> recordProgress(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -52,6 +56,10 @@ public class UserLessonProgressController {
         }
     }
 
+    /**
+     * Fetches the progress of a specific lesson for the authenticated user.
+     * Maps to the /api/lesson-progress/lesson/{lessonId} endpoint.
+     */
     @GetMapping("/lesson/{lessonId}")
     public ResponseEntity<UserLessonProgressDto> getLessonProgress(
             @PathVariable Long lessonId,

@@ -35,11 +35,19 @@ public class ReportController {
     private final PostRepository postRepository;
     private final LessonRepository lessonRepository;
 
+    /**
+     * Creates a new report.
+     * Maps to the /api/reports endpoint.
+     */
     @PostMapping
     public ResponseEntity<Report> createReport(@RequestBody Report report, @RequestParam Long reporterId) {
         return ResponseEntity.ok(reportService.createReport(reporterId, report));
     }
 
+    /**
+     * Fetches a paginated list of reports, optionally filtered by status and target type.
+     * Maps to the /api/reports endpoint.
+     */
     @GetMapping
     public ResponseEntity<Page<Report>> getReports(
             @RequestParam(required = false, defaultValue = "ALL") String status,
@@ -48,6 +56,10 @@ public class ReportController {
         return ResponseEntity.ok(reportService.getFilteredReports(status, targetType, pageable));
     }
 
+    /**
+     * Updates the status of a specific report.
+     * Maps to the /api/reports/{id}/status endpoint.
+     */
     @PatchMapping("/{id}/status")
     public ResponseEntity<Void> updateStatus(
             @PathVariable Long id, 
@@ -56,6 +68,10 @@ public class ReportController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Fetches the actual content associated with a report based on its target type.
+     * Maps to the /api/reports/{id}/content endpoint.
+     */
     @GetMapping("/{id}/content")
     public ResponseEntity<?> getReportedContent(@PathVariable Long id) {
         Report report = reportService.getById(id);
@@ -69,11 +85,19 @@ public class ReportController {
         return ResponseEntity.badRequest().build();
     }
 
+    /**
+     * Fetches the total number of reports created today.
+     * Maps to the /api/reports/stats/daily-count endpoint.
+     */
     @GetMapping("/stats/daily-count")
     public ResponseEntity<Long> getDailyCount() {
         return ResponseEntity.ok(reportService.getDailyReportCount());
     }
 
+    /**
+     * Fetches the total number of reports with a pending status.
+     * Maps to the /api/reports/stats/pending-count endpoint.
+     */
     @GetMapping("/stats/pending-count")
     public ResponseEntity<Long> getPendingCount() {
         return ResponseEntity.ok(reportService.getPendingReportCount());

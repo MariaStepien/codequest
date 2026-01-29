@@ -19,6 +19,10 @@ public class UserBoughtEquipmentController {
 
     private final UserBoughtEquipmentService userBoughtEquipmentService;
 
+    /**
+     * Processes a purchase of equipment by a user.
+     * Maps to the /api/user-bought-equipment/buy/{userId}/{equipmentId} endpoint.
+     */
     @PostMapping("/buy/{userId}/{equipmentId}")
     public ResponseEntity<UserBoughtEquipment> buyEquipment(
             @PathVariable Long userId, 
