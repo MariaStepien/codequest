@@ -31,10 +31,8 @@ public class EquipmentController {
     private final EquipmentService equipmentService;
 
     /**
-     * Adds new item to equipment table.
-     * Endpoint: POST /api/equipment
-     * @param equipment new item data.
-     * @return Saved Equipment.
+     * Creates a new equipment item with an associated image.
+     * Maps to the /api/equipment endpoint.
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
@@ -53,6 +51,10 @@ public class EquipmentController {
         }
     }
 
+    /**
+     * Updates an existing equipment item.
+     * Maps to the /api/equipment/{id} endpoint.
+     */
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> updateEquipment(
@@ -72,10 +74,8 @@ public class EquipmentController {
     }
 
     /**
-     * Gets all equipment of specified type.
-     * Endpoint: GET /api/equipment/type/{type}
-     * @param type Equipment type is given in api.
-     * @return Returns list of items matching given type.
+     * Fetches all equipment of a specified type for admin.
+     * Maps to the /api/equipment/admin/type/{type} endpoint.
      */
     @GetMapping("/admin/type/{type}")
     public ResponseEntity<List<Equipment>> getAdminEquipmentByType(@PathVariable String type) {
@@ -93,6 +93,10 @@ public class EquipmentController {
         }
     }
 
+    /**
+     * Toggles the visibility status of a specific equipment item.
+     * Maps to the /api/equipment/{id}/toggle-visibility endpoint.
+     */
     @PutMapping("/{id}/toggle-visibility")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> toggleVisibility(@PathVariable Long id) {
@@ -100,6 +104,10 @@ public class EquipmentController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Fetches visible equipment of a specified type.
+     * Maps to the /api/equipment/type/{type} endpoint.
+     */
     @GetMapping("/type/{type}")
     public ResponseEntity<List<Equipment>> getEquipmentByType(@PathVariable String type) {
         try {
@@ -112,8 +120,8 @@ public class EquipmentController {
     }
         
     /**
-     * 
-     * @return returns all equipment.
+     * Fetches all equipment items.
+     * Maps to the /api/equipment endpoint.
      */
     @GetMapping
     public ResponseEntity<List<Equipment>> getAllEquipment() {
@@ -121,6 +129,10 @@ public class EquipmentController {
         return ResponseEntity.ok(allEquipment);
     }
 
+    /**
+     * Fetches equipment details for a given equipment Id.
+     * Maps to the /api/equipment/{id} endpoint.
+     */
     @GetMapping("/{id}")
     public ResponseEntity<Equipment> getEquipmentById(@PathVariable Long id) {
         return equipmentService.getEquipmentById(id)
@@ -128,6 +140,10 @@ public class EquipmentController {
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    /**
+     * Fetches the next available item number for a specific equipment type.
+     * Maps to the /api/equipment/next-number/{type} endpoint.
+     */
     @GetMapping("/next-number/{type}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Integer> getNextItemNumber(@PathVariable String type) {

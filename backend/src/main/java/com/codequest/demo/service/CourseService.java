@@ -33,6 +33,10 @@ public class CourseService {
     private final LessonRepository lessonRepository;
     private final UserCourseProgressService progressService;
 
+    /**
+     * Retrieves all courses from the database and converts them to DTOs.
+     * @return a list of all CourseDTOs.
+     */
     public List<CourseDTO> findAllCourses() {
         List<Course> courses = courseRepository.findAll();
         
@@ -41,6 +45,11 @@ public class CourseService {
             .collect(Collectors.toList());
     }
 
+    /**
+     * Finds a specific course by its Id.
+     * @param id the Id of the course.
+     * @return an Optional containing the Course if found.
+     */
     public Optional<CourseDTO> findCourseDetailsById(Long id) {
         if (id == null) {
             throw new IllegalArgumentException("ID kursu nie może być null.");
@@ -49,6 +58,11 @@ public class CourseService {
             .map(this::mapToDTO);
     }
 
+    /**
+     * Saves a new course.
+     * @param course the course entity to save.
+     * @return the saved Course entity.
+     */
     public CourseDTO createCourse(CourseDTO courseDTO) {
         if (courseRepository.existsByTitle(courseDTO.getTitle())) {
             throw new RuntimeException("Kurs o takim tytule już istnieje.");
@@ -65,6 +79,12 @@ public class CourseService {
         return mapToDTO(savedCourse);
     }
 
+    /**
+     * Updates existing course.
+     * @param id the Id of the course to update.
+     * @param courseDTO data transfer object possesing current information about the course.
+     * @return optional courseDTO.
+     */
     @Transactional
     public Optional<CourseDTO> updateCourse(Long id, CourseDTO courseDTO) {
         if (id == null) {
@@ -93,6 +113,10 @@ public class CourseService {
         });
     }
 
+    /**
+     * Deletes a course by its Id.
+     * @param id the Id of the course to delete.
+     */
     @Transactional
     public void deleteCourse(Long courseId) {
         if (courseId == null) {
@@ -121,6 +145,11 @@ public class CourseService {
         courseRepository.delete(course);
     }
 
+    /**
+     * Converts a Course entity to a CourseDTO.
+     * @param course the course entity.
+     * @return the mapped CourseDTO.
+     */
     private CourseDTO mapToDTO(Course course) {
         return new CourseDTO(
             course.getId(),
@@ -132,9 +161,14 @@ public class CourseService {
         );
     }
 
+    /**
+     * Retrieves all courses along with the specific progress for a given user.
+     * @param userId the Id of the user.
+     * @return a list of CourseWithProgressDto objects.
+     */
     public List<CourseWithProgressDto> getAllCoursesWithProgressForUser(Long userId) {
         if (userId == null) {
-            throw new IllegalArgumentException("Nie uzyskano ID użytkownika.");
+            throw new IllegalArgumentException("Coś poszło nie tak. Spróbuj ponownie później.");
         }
         List<Course> courses = courseRepository.findByIsPublishedTrue();
 
@@ -149,17 +183,27 @@ public class CourseService {
         }).collect(Collectors.toList());
     }
 
+    /**
+     * Calculates the number of completed levels (lessons) for a user in a specific course.
+     * @param userId the Id of the user.
+     * @param courseId the Id of the course.
+     * @return the count of completed lessons.
+     */
     public int getCompletedLevelsForCourse(Long userId, Long courseId) {
         if (userId == null) {
-            throw new IllegalArgumentException("Nie uzyskano ID użytkownika.");
+            throw new IllegalArgumentException("Coś poszło nie tak. Spróbuj ponownie później.");
         }
 
         if (courseId == null) {
-            throw new IllegalArgumentException("ID kursu nie może być null.");
+            throw new IllegalArgumentException("Coś poszło nie tak. Spróbuj ponownie później.");
         }
         return progressService.getCompletedLevelsForCourse(userId, courseId);
     }
 
+    /**
+     * Retrieves all courses that are published.
+     * @return a list of published CourseDTOs.
+     */
     public List<CourseDTO> findAllPublishedCourses() {
         List<Course> courses = courseRepository.findByIsPublishedTrue();
         
@@ -168,6 +212,10 @@ public class CourseService {
             .collect(Collectors.toList());
     }
 
+    /**
+     * Retrieves all courses that are not yet published.
+     * @return a list of unpublished CourseDTOs.
+     */
     public List<CourseDTO> findAllUnpublishedCourses() {
         List<Course> courses = courseRepository.findByIsPublishedFalse();
         
@@ -176,6 +224,14 @@ public class CourseService {
             .collect(Collectors.toList());
     }
 
+    /**
+     * Uploads and saves a trophy image for a specific course.
+     * @param id the Id of the course.
+     * @param file the image file to upload.
+     * @return the updated CourseDTO.
+     * @throws IllegalArgumentException if the course Id is null.
+     * @throws RuntimeException if the course is not found or file saving fails.
+     */
     @Transactional
     public CourseDTO uploadCourseTrophy(Long id, MultipartFile file) {
         if (id == null) {

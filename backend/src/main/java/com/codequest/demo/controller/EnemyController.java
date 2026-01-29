@@ -1,5 +1,6 @@
 package com.codequest.demo.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -30,6 +31,10 @@ public class EnemyController {
 
     private final EnemyService enemyService;
 
+    /**
+     * Adds a new enemy with an associated image file.
+     * Maps to the /api/enemies endpoint.
+     */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> addEnemy(
@@ -40,22 +45,34 @@ public class EnemyController {
             return new ResponseEntity<>(saved, HttpStatus.CREATED);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
+        } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Błąd serwera");
         }
     }
 
+    /**
+     * Fetches all enemies.
+     * Maps to the /api/enemies endpoint.
+     */
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Enemy>> getAllEnemies() {
         return ResponseEntity.ok(enemyService.getAllEnemies());
     }
 
+    /**
+     * Fetches enemy details for a given enemy Id.
+     * Maps to the /api/enemies/{id} endpoint.
+     */
     @GetMapping("/{id}")
     public ResponseEntity<Enemy> getEnemy(@PathVariable Long id) {
         return ResponseEntity.ok(enemyService.getEnemyById(id));
     }
 
+    /**
+     * Updates an existing enemy's details.
+     * Maps to the /api/enemies/{id} endpoint.
+     */
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> updateEnemy(
@@ -67,18 +84,22 @@ public class EnemyController {
             return ResponseEntity.ok(updated);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
+        } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Błąd serwera");
         }
     }
 
+    /**
+     * Deletes an enemy.
+     * Maps to the /api/enemies/{id} endpoint.
+     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteEnemy(@PathVariable Long id) {
         try {
             enemyService.deleteEnemy(id);
             return ResponseEntity.ok().build();
-        } catch (Exception e) {
+        } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Błąd podczas usuwania: " + e.getMessage());
         }

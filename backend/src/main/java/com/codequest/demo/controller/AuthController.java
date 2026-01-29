@@ -27,6 +27,10 @@ public class AuthController {
     private final UserService userService;
     private final JwtService jwtService;
 
+    /**
+     * Authenticates a user and generates a JWT token.
+     * Maps to the /api/auth/login endpoint.
+     */
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         User authenticatedUser = userService.authenticateUser(
@@ -47,6 +51,10 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Registers a new user in the system.
+     * Maps to the /api/auth/register endpoint.
+     */
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
         userService.registerNewUser(registerRequest);
