@@ -244,7 +244,7 @@ public class UserService {
         }
 
         if (user.getHearts() == 5) {
-            user.setLastHeartRecovery(LocalDateTime.now().plusHours(1));
+            user.setLastHeartRecovery(LocalDateTime.now());
         }
 
         user.setHearts(user.getHearts() - 1);

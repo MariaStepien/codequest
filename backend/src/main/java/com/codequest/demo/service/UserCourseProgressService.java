@@ -1,5 +1,6 @@
 package com.codequest.demo.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,6 +31,7 @@ public class UserCourseProgressService {
         private Long courseId;
         private String courseTitle;
         private int completedLevelOrderIndex;
+        private LocalDateTime lastActivityDate;
     }
 
     public Optional<LatestActivityDto> getLatestActivity(Long userId) {
@@ -39,12 +41,15 @@ public class UserCourseProgressService {
                 dto.setCourseId(progress.getCourse().getId());
                 dto.setCourseTitle(progress.getCourse().getTitle());
                 dto.setCompletedLevelOrderIndex(progress.getCompletedLessons());
+                dto.setLastActivityDate(progress.getLastUpdated());
                 return dto;
             });
     }
 
     public UserCourseProgress updateProgress(Long userId, Long courseId, int newCompletedLessons) {
-        
+        if (userId == null || courseId == null) {
+            throw new IllegalArgumentException("Wystąpił błąd, prosimy spróbować później.");
+        }
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Nie znaleziono użytkownika z ID: " + userId));
         
@@ -79,7 +84,9 @@ public class UserCourseProgressService {
     }
 
     public List<CourseProgressByUserDetailsDto> getCourseProgressForAllUsers(Long courseId) {
-        
+        if (courseId == null) {
+            throw new IllegalArgumentException();
+        }
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new RuntimeException("Nie znaleziono kursu z ID: " + courseId));
         

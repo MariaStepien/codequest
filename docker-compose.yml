@@ -6,10 +6,11 @@ services:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
       POSTGRES_DB: codequest
+      TZ: Europe/Warsaw
     volumes:
       - ./backend/src/main/resources/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - "5433:5432"
+      - "5432:5432"
 
   backend:
     build: ./backend
@@ -24,6 +25,7 @@ services:
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: password
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      TZ: Europe/Warsaw
 
   frontend:
     build: ./frontend
@@ -31,3 +33,6 @@ services:
       - "5173:5173"
     depends_on:
       - backend
+    environment:
+      TZ: Europe/Warsaw
+

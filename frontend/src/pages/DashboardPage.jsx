@@ -45,7 +45,7 @@ const DashboardContentArea = ({ userData }) => {
               <div className="lg:col-span-2 space-y-8">
                   <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-8 rounded-xl shadow-xl text-white">
                       <p className="text-sm font-semibold mb-2 opacity-80">
-                          Ostatnia aktywność: {latestActivity ? formatTimeAgo(latestActivity.lastUpdated) : "Nigdy"}
+                          Ostatnia aktywność: {latestActivity ? formatTimeAgo(latestActivity.lastActivityDate) : "Nigdy"}
                       </p>
                       <h3 className="text-2xl font-bold mb-4">
                           {latestActivity ? 
