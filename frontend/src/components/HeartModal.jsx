@@ -9,7 +9,7 @@ export default function HeartModal({ user, onClose, onUpdate }) {
 
         const calculateTime = () => {
             const lastRecovery = new Date(user.lastHeartRecovery);
-            const nextRecovery = new Date(lastRecovery.getTime() + 2 * 60000); 
+            const nextRecovery = new Date(lastRecovery.getTime() + 30 * 60000); 
             const now = new Date();
             const diff = nextRecovery - now;
 
