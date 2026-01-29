@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -54,8 +53,6 @@ public class CourseService {
         course.setTotalLessons(courseDTO.getTotalLessons());
         course.setEstimatedHours(courseDTO.getEstimatedHours());
         course.setTrophyImgSource(courseDTO.getTrophyImgSource());
-        course.setDateCreated(OffsetDateTime.now());
-        course.setLastUpdated(OffsetDateTime.now());
         course.setIsPublished(false);
 
         Course savedCourse = courseRepository.save(course);
@@ -79,8 +76,6 @@ public class CourseService {
             if (courseDTO.getIsPublished() != null) {
                 existingCourse.setIsPublished(courseDTO.getIsPublished());
             }
-            
-            existingCourse.setLastUpdated(OffsetDateTime.now()); 
             Course updatedCourse = courseRepository.save(existingCourse);
             
             return mapToDTO(updatedCourse);

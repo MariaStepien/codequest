@@ -1,6 +1,5 @@
 package com.codequest.demo.service;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 import org.springframework.data.domain.Page;
@@ -92,7 +91,6 @@ public class ForumService {
         post.setTitle(postDetails.getTitle());
         post.setContent(postDetails.getContent());
         post.setEdited(true);
-        post.setUpdatedAt(LocalDateTime.now());
 
         return postRepository.save(post);
     }
@@ -108,7 +106,6 @@ public class ForumService {
 
         comment.setContent(commentDetails.getContent());
         comment.setEdited(true);
-        comment.setUpdatedAt(LocalDateTime.now());
 
         return commentRepository.save(comment);
     }

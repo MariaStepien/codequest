@@ -2,6 +2,9 @@ package com.codequest.demo.model;
 
 import java.time.LocalDateTime;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -33,11 +36,13 @@ public class Comment {
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt = LocalDateTime.now();
-
+    @CreatedDate
     @Column
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column
+    private LocalDateTime updatedAt;
 
     @Column
     private Boolean edited;

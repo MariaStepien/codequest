@@ -1,12 +1,14 @@
 package com.codequest.demo.model;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -20,6 +22,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class UserCourseProgress {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
@@ -37,10 +40,10 @@ public class UserCourseProgress {
     private int completedLessons;
     
     @CreatedDate
-    private OffsetDateTime dateCreated;
+    private LocalDateTime dateCreated;
 
     @LastModifiedDate
-    private OffsetDateTime lastUpdated;
+    private LocalDateTime lastUpdated;
 
     @Column(columnDefinition = "boolean default false")
     private Boolean isFinished;

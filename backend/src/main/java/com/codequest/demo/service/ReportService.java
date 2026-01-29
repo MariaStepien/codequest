@@ -28,7 +28,6 @@ public class ReportService {
         
         report.setReporter(reporter);
         report.setStatus(ReportStatus.PENDING);
-        report.setCreatedAt(LocalDateTime.now());
         return reportRepository.save(report);
     }
 
@@ -53,7 +52,6 @@ public class ReportService {
                 .orElseThrow(() -> new RuntimeException("Report not found"));
         
         report.setStatus(status);
-        report.setResolvedAt(LocalDateTime.now());
         reportRepository.save(report);
     }
 

@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS public.course
 (
     id bigint NOT NULL,
-    date_created timestamp(6) with time zone,
+    date_created timestamp(6) without time zone,
     estimated_hours integer,
-    last_updated timestamp(6) with time zone,
+    last_updated timestamp(6) without time zone,
     title character varying(255) COLLATE pg_catalog."default",
     total_lessons integer,
     is_published boolean DEFAULT false,
@@ -109,8 +109,6 @@ INSERT INTO public.lesson (id, course_id, order_index, tasks_json, title, backgr
 
 INSERT INTO public.users (id, password, user_login, role, coins, points, rank, hearts, last_heart_recovery, is_blocked) VALUES (552, '$2a$10$7PhF61HKgmv2NvKKS/X7huTzMlWa4XOsidnv.O9T8VXbe9A.BJTMu', 'admin', 'ADMIN', 0, 0, 0, 5, NULL, false);
 
-
-SELECT pg_catalog.setval('public.course_id_seq', 203, true);
 
 SELECT pg_catalog.setval('public.enemy_id_seq', 2, true);
 

@@ -1,6 +1,5 @@
 package com.codequest.demo.service;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,7 +30,6 @@ public class UserCourseProgressService {
         private Long courseId;
         private String courseTitle;
         private int completedLevelOrderIndex;
-        private OffsetDateTime lastUpdated;
     }
 
     public Optional<LatestActivityDto> getLatestActivity(Long userId) {
@@ -41,7 +39,6 @@ public class UserCourseProgressService {
                 dto.setCourseId(progress.getCourse().getId());
                 dto.setCourseTitle(progress.getCourse().getTitle());
                 dto.setCompletedLevelOrderIndex(progress.getCompletedLessons());
-                dto.setLastUpdated(progress.getLastUpdated());
                 return dto;
             });
     }
@@ -64,12 +61,10 @@ public class UserCourseProgressService {
             
             if (newCompletedLessons > progress.getCompletedLessons()) {
                 progress.setCompletedLessons(newCompletedLessons);
-                progress.setLastUpdated(OffsetDateTime.now());
             }
 
             if (newCompletedLessons == course.getTotalLessons()) {
                 progress.setIsFinished(true);
-                progress.setLastUpdated(OffsetDateTime.now());
             }
             
         } else {
@@ -78,8 +73,6 @@ public class UserCourseProgressService {
             progress.setCourse(course); 
             progress.setCompletedLessons(newCompletedLessons);
             progress.setIsFinished(false);
-            progress.setDateCreated(OffsetDateTime.now());
-            progress.setLastUpdated(OffsetDateTime.now());
         }
         
         return userCourseProgressRepository.save(progress);
