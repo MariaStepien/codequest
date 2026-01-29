@@ -1,10 +1,5 @@
 package com.codequest.demo.controller;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import java.util.List;
 import java.util.Map;
 
@@ -30,8 +25,6 @@ import com.codequest.demo.service.CourseService;
 
 import lombok.RequiredArgsConstructor;
 
-
-
 @RestController
 @RequestMapping("/api/courses")
 @RequiredArgsConstructor
@@ -39,12 +32,21 @@ public class CourseController {
 
     private final CourseService courseService;
 
+    /**
+     * Fetches all courses.
+     * Maps to the /api/courses endpoint.
+     */
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<CourseDTO>> getAllCourses() {
         List<CourseDTO> courses = courseService.findAllCourses();
         return ResponseEntity.ok(courses);
     }
 
+    /**
+     * Fetches course details for given course Id.
+     * Maps to the /api/courses/{id} endpoint.
+     */
     @GetMapping("/{id}")
     public ResponseEntity<CourseDTO> getCourseDetails(@PathVariable Long id) {
         return courseService.findCourseDetailsById(id)
@@ -52,6 +54,10 @@ public class CourseController {
             .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    /**
+     * Creates course.
+     * Maps to the /api/courses/create-course endpoint.
+     */
     @PostMapping("/create-course")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> createCourse(@RequestBody CourseDTO courseDTO) {
@@ -63,30 +69,21 @@ public class CourseController {
         }
     }
 
+    /**
+     * Uploads trophy image to uploads/trophies.
+     * Maps to the /api/courses/{id}/upload-trophy endpoint.
+     */
     @PostMapping("/{id}/upload-trophy")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CourseDTO> uploadTrophy(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
-        try {
-            String fileName = "trophy-" + id + "-" + file.getOriginalFilename();
-            Path uploadPath = Paths.get("uploads", "trophies");
-            
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
-
-            Path filePath = uploadPath.resolve(fileName);
-            Files.copy(file.getInputStream(), filePath, REPLACE_EXISTING);
-
-            CourseDTO courseDTO = courseService.findCourseDetailsById(id).orElseThrow();
-            courseDTO.setTrophyImgSource("trophies/" + fileName);
-            courseService.updateCourse(id, courseDTO);
-
-            return ResponseEntity.ok(courseDTO);
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
+    public ResponseEntity<CourseDTO> uploadTrophy(@PathVariable Long id, @RequestParam MultipartFile file) {
+        CourseDTO updatedCourse = courseService.uploadCourseTrophy(id, file);
+        return ResponseEntity.ok(updatedCourse);
     }
 
+    /**
+     * Updates course.
+     * Maps to the /api/courses/{id} endpoint.
+     */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> updateCourse(@PathVariable Long id, @RequestBody CourseDTO courseDTO) {
@@ -101,6 +98,10 @@ public class CourseController {
 
     }
 
+    /**
+     * Deletes course.
+     * Maps to the /api/courses/{id} endpoint.
+     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteCourse(@PathVariable Long id) {
@@ -129,7 +130,10 @@ public class CourseController {
         
         return ResponseEntity.ok(coursesWithProgress);
     }
-
+    /**
+     * Fetches all information about completed levels in courses with the authenticated user's current progress.
+     * Maps to the /api/courses/completed-levels/{id} endpoint.
+     */
     @GetMapping("/completed-levels/{id}")
     public ResponseEntity<Integer> getCompletedLevelsForCourse(
             @PathVariable Long id,
@@ -142,6 +146,10 @@ public class CourseController {
         return ResponseEntity.ok(completedLevels);
     }
 
+    /**
+     * Fetches all published courses.
+     * Maps to the /api/courses/published endpoint.
+     */
     @GetMapping("/published")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<CourseDTO>> getAllPublishedCourses() {
@@ -149,6 +157,10 @@ public class CourseController {
         return ResponseEntity.ok(courses);
     }
 
+    /**
+     * Fetches all unpublished courses.
+     * Maps to the /api/courses/unpublished endpoint.
+     */
     @GetMapping("/unpublished")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<CourseDTO>> getAllUnpublishedCourses() {

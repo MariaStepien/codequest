@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.codequest.demo.dto.CourseDTO;
 import com.codequest.demo.dto.CourseWithProgressDto;
@@ -40,6 +42,9 @@ public class CourseService {
     }
 
     public Optional<CourseDTO> findCourseDetailsById(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID kursu nie może być null.");
+        }
         return courseRepository.findById(id)
             .map(this::mapToDTO);
     }
@@ -62,6 +67,9 @@ public class CourseService {
 
     @Transactional
     public Optional<CourseDTO> updateCourse(Long id, CourseDTO courseDTO) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID kursu nie może być null.");
+        }
         return courseRepository.findById(id).map(existingCourse -> {
 
             if (courseRepository.existsByTitleAndIdNot(courseDTO.getTitle(), id)) {
@@ -76,6 +84,9 @@ public class CourseService {
             if (courseDTO.getIsPublished() != null) {
                 existingCourse.setIsPublished(courseDTO.getIsPublished());
             }
+            if (courseDTO.getTrophyImgSource().isEmpty()) {
+                existingCourse.setTrophyImgSource(null);
+            }
             Course updatedCourse = courseRepository.save(existingCourse);
             
             return mapToDTO(updatedCourse);
@@ -84,11 +95,14 @@ public class CourseService {
 
     @Transactional
     public void deleteCourse(Long courseId) {
+        if (courseId == null) {
+            throw new IllegalArgumentException("ID kursu nie może być null.");
+        }
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new RuntimeException("Course not found"));
+                .orElseThrow(() -> new RuntimeException("Kurs nieznaleziony."));
 
-        if (Boolean.TRUE.equals(course.getIsPublished())) {
-            throw new IllegalStateException("Cannot delete a published course. Unpublish it first.");
+        if (course.getIsPublished()) {
+            throw new IllegalStateException("Nie można usunąć opublikowanego kursu.");
         }
 
         userCourseProgressRepository.deleteByCourseId(courseId);
@@ -100,7 +114,7 @@ public class CourseService {
                 Path path = Paths.get("uploads").resolve(course.getTrophyImgSource());
                 Files.deleteIfExists(path);
             } catch (IOException e) {
-                System.err.println("Could not delete trophy file: " + e.getMessage());
+                System.err.println("Nie mozna bylo usunac pliku trofeum: " + e.getMessage());
             }
         }
 
@@ -119,6 +133,9 @@ public class CourseService {
     }
 
     public List<CourseWithProgressDto> getAllCoursesWithProgressForUser(Long userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("Nie uzyskano ID użytkownika.");
+        }
         List<Course> courses = courseRepository.findByIsPublishedTrue();
 
         return courses.stream().map(course -> {
@@ -133,6 +150,13 @@ public class CourseService {
     }
 
     public int getCompletedLevelsForCourse(Long userId, Long courseId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("Nie uzyskano ID użytkownika.");
+        }
+
+        if (courseId == null) {
+            throw new IllegalArgumentException("ID kursu nie może być null.");
+        }
         return progressService.getCompletedLevelsForCourse(userId, courseId);
     }
 
@@ -150,5 +174,33 @@ public class CourseService {
         return courses.stream()
             .map(this::mapToDTO)
             .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public CourseDTO uploadCourseTrophy(Long id, MultipartFile file) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID kursu nie może być null.");
+        }
+        Course course = courseRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Kurs nieznaleziony."));
+
+        try {
+            String fileName = "trophy-" + id;
+            Path uploadPath = Paths.get("uploads", "trophies");
+
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            Path filePath = uploadPath.resolve(fileName);
+            Files.copy(file.getInputStream(), filePath, REPLACE_EXISTING);
+
+            course.setTrophyImgSource("trophies/" + fileName);
+            Course updatedCourse = courseRepository.save(course);
+            
+            return mapToDTO(updatedCourse);
+        } catch (IOException e) {
+            throw new RuntimeException("Błąd podczas zapisywania pliku trofeum: " + e.getMessage());
+        }
     }
 }
