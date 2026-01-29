@@ -10,10 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.codequest.demo.dto.EquipmentDetailsDto;
 import com.codequest.demo.dto.UserEquipmentDto;
 import com.codequest.demo.model.Equipment;
+import com.codequest.demo.model.Equipment.EquipmentType;
 import com.codequest.demo.model.User;
 import com.codequest.demo.model.UserBoughtEquipment;
 import com.codequest.demo.model.UserEquipment;
-import com.codequest.demo.model.Equipment.EquipmentType;
 import com.codequest.demo.repository.EquipmentRepository;
 import com.codequest.demo.repository.UserBoughtEquipmentRepository;
 import com.codequest.demo.repository.UserEquipmentRepository;
@@ -30,6 +30,11 @@ public class UserEquipmentService {
     private final UserRepository userRepository;
     private final UserBoughtEquipmentService userBoughtEquipmentService;
     
+    /**
+     * Maps equipment entity to its details DTO
+     * @param equipment equipment entity
+     * @return equipment details DTO or null if equipment is null
+     */
     private EquipmentDetailsDto mapEquipmentToDetailsDto(Equipment equipment) {
         if (equipment == null) return null;
         return EquipmentDetailsDto.builder()
@@ -40,6 +45,11 @@ public class UserEquipmentService {
                 .build();
     }
 
+    /**
+     * Gets current equipment and owned items for a specific user
+     * @param userId id of the user
+     * @return user equipment DTO including sprite and owned items
+     */
     public UserEquipmentDto getUserEquipment(Long userId) {
         UserEquipment userEquipment = userEquipmentRepository.findById(userId)
                 .orElseGet(() -> {
@@ -63,10 +73,19 @@ public class UserEquipmentService {
                 .build();
     }
 
+    /**
+     * Assigns base equipment to a new user(items with item number 1)
+     * @param userId id of the user
+     * @throws RuntimeException if user is not found
+     * @throws IllegalArgumentException if no id was given
+     */
     @Transactional
     public void initializeBaseEquipment(Long userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("Wystąpił błąd, prosimy spróbować później.");
+        }
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("Nieznaleziono użytkownika."));
 
         List<Equipment> baseItems = equipmentRepository.findByItemNumber(1); 
         
@@ -103,8 +122,19 @@ public class UserEquipmentService {
         userBoughtEquipmentRepository.saveAll(boughtItems);
     }
 
+    /**
+     * Updates user's active equipment with a new item
+     * @param userId id of the user
+     * @param equipmentId id of the item to equip
+     * @return updated user equipment DTO
+     * @throws RuntimeException if user equipment or item is not found
+     * @throws IllegalArgumentException if equipment type is unknown or id was not given
+     */
     @Transactional
     public UserEquipmentDto equipItem(Long userId, Long equipmentId) {
+        if (userId == null || equipmentId == null) {
+            throw new IllegalArgumentException("Wystąpił błąd, prosimy spróbować później.");
+        }
         UserEquipment userEquipment = userEquipmentRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Nie znaleziono ekwipunku użytkownika"));
 
@@ -127,6 +157,10 @@ public class UserEquipmentService {
         return getUserEquipment(userId);
     }
 
+    /**
+     * Updates the sprite image source string based on current equipment numbers
+     * @param userEquipment user equipment entity
+     */
     private void updateSpriteInfo(UserEquipment userEquipment) {
         int hNum = getItemNumberOrDefault(userEquipment.getHelm());
         int aNum = getItemNumberOrDefault(userEquipment.getArmor());
@@ -138,6 +172,11 @@ public class UserEquipmentService {
         userEquipment.setSprite_img_source(newSpriteSource);
     }
 
+    /**
+     * Gets item number from equipment or returns default value of 1
+     * @param equipment equipment entity
+     * @return item number
+     */
     private int getItemNumberOrDefault(Equipment equipment) {
         if (equipment == null) return 1;
         return equipment.getItemNumber();
