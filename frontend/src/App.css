@@ -41,3 +41,25 @@
 .read-the-docs {
   color: #888;
 }
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes flash-red {
+  0% { opacity: 1; }
+  50% { background-color: white; }
+  100% { opacity: 1; }
+}
+
+.animate-shake {
+  animation: shake 0.4s ease-in-out;
+}
+
+.animate-flash {
+  animation: flash-red 0.4s ease-in-out;
+}

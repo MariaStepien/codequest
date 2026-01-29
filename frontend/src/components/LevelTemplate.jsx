@@ -65,6 +65,9 @@ export default function LevelTemplate({ isAdminPreview = false }) {
     const [showExitConfirmation, setShowExitConfirmation] = useState(false); 
 
     const [health, setHealth] = useState(INITIAL_HEALTH);
+    const [enemyHealth, setEnemyHealth] = useState(INITIAL_HEALTH);
+    const [playerShake, setPlayerShake] = useState(false);
+    const [enemyShake, setEnemyShake] = useState(false);
     const [elapsedTime, setElapsedTime] = useState(0);
 
     const [reportData, setReportData] = useState({ show: false, targetType: 'LESSON', targetId: null });
@@ -77,7 +80,7 @@ export default function LevelTemplate({ isAdminPreview = false }) {
     const [userHearts, setUserHearts] = useState(null);
 
     const interactiveTasksCount = tasks.filter(t => t.type !== 'TextBox').length;
-    const healthLossPerFail = interactiveTasksCount > 0 ? INITIAL_HEALTH / interactiveTasksCount : 0;
+    const damagePerTask = interactiveTasksCount > 0 ? INITIAL_HEALTH / interactiveTasksCount : 0;
     
     const triggerToast = (msg, err = false) => {
         setToast({ show: true, message: msg, isError: err });
@@ -135,10 +138,27 @@ export default function LevelTemplate({ isAdminPreview = false }) {
         }
         
         return () => clearInterval(interval);
-    }, [isLevelComplete, isGameOver, currentTaskObject]); 
+    }, [isLevelComplete, isGameOver, currentTaskObject]);
+
+    useEffect(() => {
+        if (health < INITIAL_HEALTH) {
+            setPlayerShake(true);
+            const timer = setTimeout(() => setPlayerShake(false), 500); 
+            return () => clearTimeout(timer);
+        }
+    }, [health]);
+
+    useEffect(() => {
+        if (enemyHealth < INITIAL_HEALTH) {
+            setEnemyShake(true);
+            const timer = setTimeout(() => setEnemyShake(false), 500);
+            return () => clearTimeout(timer);
+        }
+    }, [enemyHealth]);
 
     const handleRetryLevel = () => {
         setHealth(INITIAL_HEALTH);
+        setEnemyHealth(INITIAL_HEALTH);
         setCurrentTaskIndex(0);
         setIsCurrentTaskComplete(false);
         setFeedbackMessage('');
@@ -238,6 +258,7 @@ export default function LevelTemplate({ isAdminPreview = false }) {
         fetchLessonAndNextCheck();
         setCurrentTaskIndex(0);
         setHealth(INITIAL_HEALTH);
+        setEnemyHealth(INITIAL_HEALTH);
         setElapsedTime(0);
         setIsCurrentTaskComplete(false);
         setFeedbackMessage('');
@@ -246,10 +267,14 @@ export default function LevelTemplate({ isAdminPreview = false }) {
     const handleTaskCompletion = (isCorrect) => {
         if (isCorrect) {
             setIsCurrentTaskComplete(true);
+            if (currentTaskObject.type !== 'TextBox') {
+                setEnemyHealth(prev => Math.max(0, prev - damagePerTask));
+                setFeedbackMessage("Zadanie wykonano poprawnie. Możesz iść dalej.");
+            }
         } else {
-            setHealth(prevHealth => Math.max(0, prevHealth - healthLossPerFail));
+            setHealth(prevHealth => Math.max(0, prevHealth - damagePerTask));
             setIsCurrentTaskComplete(false);
-            setFeedbackMessage(`Stój! Zadanie jest źle wykonane. Utracono ${Math.round(healthLossPerFail)}% życia. Spróbuj ponownie.`);
+            setFeedbackMessage(`Utracono ${Math.round(damagePerTask)}% życia. Spróbuj ponownie.`);
         }
     };
 
@@ -290,6 +315,21 @@ export default function LevelTemplate({ isAdminPreview = false }) {
         }
         return `url(${defaultLevelBackground})`;
     };
+
+    const HealthBar = ({ currentHealth, label, colorClass = "bg-red-500", isDamaged }) => (
+        <div className="w-full mb-4 px-4">
+            <div className="flex justify-between items-center mb-1">
+                <span className={`text-xs font-bold uppercase ${colorClass.replace('bg-', 'text-')}`}>{label}</span>
+                <span className="text-xs font-bold text-gray-700">{Math.max(0, Math.round(currentHealth))}%</span>
+            </div>
+            <div className="h-3 bg-gray-200 rounded-full overflow-hidden border border-gray-300 shadow-inner">
+                <div 
+                    className={`h-full ${colorClass} transition-all duration-500 ${isDamaged ? 'animate-flash' : ''}`} 
+                    style={{ width: `${(currentHealth / INITIAL_HEALTH) * 100}%` }}
+                ></div>
+            </div>
+        </div>
+    );
 
     const backgroundStyle = {
         backgroundImage: getBackgroundImage(),
@@ -382,8 +422,13 @@ export default function LevelTemplate({ isAdminPreview = false }) {
             )}
 
             <div className="flex items-center justify-center w-full max-w-7xl">
-                <div className="flex-shrink-0 hidden lg:block">
-                    {lessonData?.hasEnemy ? <PlayerSprite /> : <div className="w-32"></div>}
+               <div className={`flex-shrink-0 hidden lg:block transition-transform ${playerShake ? 'animate-shake' : ''}`}>
+                    {lessonData?.hasEnemy ? (
+                        <div className="flex flex-col items-center">
+                            {!isLevelComplete && <HealthBar currentHealth={health} label="Gracz" colorClass="bg-green-500" isDamaged={playerShake} />}
+                            <PlayerSprite />
+                        </div>
+                    ) : <div className="w-32"></div>}
                 </div>
 
                 <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-2xl p-8 w-full max-w-3xl border-t-8 border-indigo-500 mx-4">
@@ -405,7 +450,7 @@ export default function LevelTemplate({ isAdminPreview = false }) {
                                 )}
                             </div>
                             
-                            {!isLevelComplete && (
+                            {(!isLevelComplete && !lessonData?.hasEnemy) && (
                                 <div className="w-1/3 min-w-[120px] ml-4">
                                     <p className="text-sm font-semibold text-red-600 mb-1">Życie: {Math.max(0, Math.round(health))}%</p>
                                     <div className="h-4 bg-gray-200 rounded-full overflow-hidden border border-gray-300">
@@ -479,8 +524,13 @@ export default function LevelTemplate({ isAdminPreview = false }) {
                     )}
                 </div>
 
-                <div className="flex-shrink-0 hidden lg:block">
-                    {lessonData?.hasEnemy && lessonData?.enemyId ? <EnemySprite enemyId={lessonData.enemyId} /> : <div className="w-32"></div>}
+                <div className={`flex-shrink-0 hidden lg:block transition-transform ${enemyShake ? 'animate-shake' : ''}`}>
+                    {lessonData?.hasEnemy && lessonData?.enemyId ? (
+                        <div className="flex flex-col items-center">
+                            {!isLevelComplete && <HealthBar currentHealth={enemyHealth} label="Przeciwnik" colorClass="bg-red-600" isDamaged={enemyShake} />}
+                            <EnemySprite enemyId={lessonData.enemyId} />
+                        </div>
+                    ) : <div className="w-32"></div>}
                 </div>
             </div>
 
