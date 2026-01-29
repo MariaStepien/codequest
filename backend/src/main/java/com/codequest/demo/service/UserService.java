@@ -78,6 +78,10 @@ public class UserService {
         return savedUser;
     }
 
+    /**
+     * Allows to toggle status between blocked and not blocked user
+     * @param userId id of user whos status will change
+     */
     @Transactional
     public void toggleBlockStatus(Long userId) {
         User user = findUserById(userId);
@@ -117,6 +121,10 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Nie znaleziono użytkownika z ID: " + userId));
     }
 
+    /**
+     * Gets all users
+     * @return list of users mapped to DTO
+     */
     public List<UserDto> getAllUsers() {
         return userRepository.findAll()
                 .stream()
@@ -124,10 +132,19 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Gets all users with pagination
+     * @param pageable pagination information
+     * @return page of users mapped to DTO
+     */
     public Page<UserDto> getAllUsersPage(Pageable pageable) {
         return userRepository.findAll(pageable).map(this::convertToDto);
     }
 
+    /**
+     * Converts given user to DTO 
+     * @return user mapped to DTO
+     */
     public UserDto convertToDto(User user) {
         return UserDto.builder()
                 .id(user.getId())
@@ -142,6 +159,13 @@ public class UserService {
                 .build();
     }
 
+    /**
+     * Allows user to change password
+     * @param userId id of the user
+     * @param currentPassword string with current password of user
+     * @param newPassword string of new password of user
+     * @throws RuntimeException if one of passwords is incorrect
+     */
     @Transactional
     public void changePassword(Long userId, String currentPassword, String newPassword) {
         User user = findUserById(userId);
@@ -162,6 +186,10 @@ public class UserService {
         userRepository.save(user);
     }
 
+    /**
+     * Gets ranking
+     * @return ranking
+     */
     public List<RankingEntryDto> getGlobalRanking() {
         List<User> rankedUsers = userRepository.findByRoleOrderByPointsDesc("USER"); 
         
@@ -178,6 +206,12 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Gets user ranking position
+     * @param userId id of the user
+     * @throws RuntimeException if user is not found
+     * @return ranking of user
+     */
     public RankingEntryDto getUserRankEntry(Long userId) {
         List<RankingEntryDto> globalRanking = getGlobalRanking();
         
@@ -187,6 +221,9 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Użytkownik nie znaleziony w rankingu."));
     }
 
+    /**
+     * Scheduled method for updating user ranking in database. (base interval is 5 min)
+     */
     @Scheduled(fixedDelayString = "${app.ranking.update.interval:300000}")
     @Transactional
     public void recalculateRanksScheduled() {
@@ -216,6 +253,11 @@ public class UserService {
         }
     }
 
+    /**
+     * Returns user with recharged hearts
+     * @param userId id of the user
+     * @return User entity object
+     */
     public User getUserWithRechargedHearts(Long userId) {
         User user = findUserById(userId);
         int maxHearts = 5;
@@ -234,6 +276,11 @@ public class UserService {
         return user;
     }
 
+    /**
+     * Deducts one heart from user's health
+     * @param userId id of the user
+     * @throws RuntimeException if user is not found or has no hearts left
+     */
     @Transactional
     public User consumeHeart(Long userId) {
         User user = userRepository.findById(userId)
@@ -251,6 +298,12 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    /**
+     * Allows user to purchase a heart using coins
+     * @param userId id of the user
+     * @return updated user entity
+     * @throws RuntimeException if user is not found, has max hearts, or lacks coins
+     */
     @Transactional
     public User buyHeart(Long userId) {
         User user = userRepository.findById(userId)
@@ -270,6 +323,9 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    /**
+     * Scheduled task to regenerate hearts over time for all users
+     */
     @Scheduled(fixedRate = 60000)
     @Transactional
     public void regenerateHeartsScheduled() {

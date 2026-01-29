@@ -25,6 +25,11 @@ public class UserBoughtEquipmentService {
     private final UserRepository userRepository;
     private final EquipmentRepository equipmentRepository;
 
+    /**
+     * Retrieves all equipment owned by a specific user
+     * @param userId id of the user
+     * @return list of equipment details DTOs
+     */
     @Transactional(readOnly = true)
     public List<EquipmentDetailsDto> getOwnedEquipmentByUserId(Long userId) {
         return userBoughtEquipmentRepository.findByUserId(userId)
@@ -39,8 +44,20 @@ public class UserBoughtEquipmentService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Processes a purchase of equipment for a user
+     * @param userId id of the user buying the item
+     * @param equipmentId id of the equipment to be purchased
+     * @return the record of bought equipment
+     * @throws IllegalArgumentException if userId or equipmentId is null
+     * @throws RuntimeException if user or equipment is not found, or user lacks coins
+     * @throws IllegalStateException if user already owns the item
+     */
     @Transactional
     public UserBoughtEquipment buyEquipment(Long userId, Long equipmentId) {
+        if (userId == null || equipmentId == null) {
+            throw new IllegalArgumentException("Wystąpił błąd, prosimy spróbować później.");
+        }
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Nie znaleziono użytkownika o ID: " + userId));
         
@@ -69,8 +86,17 @@ public class UserBoughtEquipmentService {
         return userBoughtEquipmentRepository.save(boughtEquipment);
     }
     
+    /**
+     * Gets a specific purchase record by its id
+     * @param id id of the purchase record
+     * @return optional containing the bought equipment record
+     * @throws IllegalArgumentException if id is null
+     */
     @Transactional(readOnly = true)
     public Optional<UserBoughtEquipment> getBoughtEquipmentRecordById(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Wystąpił błąd, prosimy spróbować później.");
+        }
         return userBoughtEquipmentRepository.findById(id);
     }
 }

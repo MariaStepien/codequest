@@ -34,6 +34,11 @@ public class UserCourseProgressService {
         private LocalDateTime lastActivityDate;
     }
 
+    /**
+     * Gets the most recent course progress activity for a user
+     * @param userId id of the user
+     * @return optional containing the latest activity DTO
+     */
     public Optional<LatestActivityDto> getLatestActivity(Long userId) {
         return userCourseProgressRepository.findLatestProgressByUserId(userId)
             .map(progress -> {
@@ -46,6 +51,15 @@ public class UserCourseProgressService {
             });
     }
 
+    /**
+     * Updates or creates progress for a user in a specific course
+     * @param userId id of the user
+     * @param courseId id of the course
+     * @param newCompletedLessons number of lessons completed
+     * @return updated user course progress
+     * @throws IllegalArgumentException if userId or courseId is null
+     * @throws RuntimeException if user or course is not found
+     */
     public UserCourseProgress updateProgress(Long userId, Long courseId, int newCompletedLessons) {
         if (userId == null || courseId == null) {
             throw new IllegalArgumentException("Wystąpił błąd, prosimy spróbować później.");
@@ -83,6 +97,13 @@ public class UserCourseProgressService {
         return userCourseProgressRepository.save(progress);
     }
 
+    /**
+     * Gets progress information for all users enrolled in a specific course
+     * @param courseId id of the course
+     * @return list of course progress details for users
+     * @throws IllegalArgumentException if courseId is null
+     * @throws RuntimeException if course is not found
+     */
     public List<CourseProgressByUserDetailsDto> getCourseProgressForAllUsers(Long courseId) {
         if (courseId == null) {
             throw new IllegalArgumentException();
@@ -110,6 +131,9 @@ public class UserCourseProgressService {
     /**
      * Retrieves the number of completed lessons for a specific user and course.
      * Returns 0 if no progress record is found (user has not started the course).
+     * @param userId id of the user
+     * @param courseId id of the course
+     * @return number of completed lessons
      */
     public int getCompletedLevelsForCourse(Long userId, Long courseId) {
         return userCourseProgressRepository.findByUserIdAndCourseId(userId, courseId)

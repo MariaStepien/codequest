@@ -40,7 +40,16 @@ public class LessonService {
     private final ObjectMapper objectMapper; 
     private final String UPLOAD_DIR = "uploads/backgrounds";
 
+    /**
+     * Gets lesson with its tasks by lesson id
+     * @param lessonId id of the lesson
+     * @return optional containing lesson DTO with tasks
+     * @throws IllegalArgumentException if no lessonId was given
+     */
     public Optional<LessonDto> getLessonWithTasks(Long lessonId) {
+        if (lessonId == null) {
+            throw new IllegalArgumentException("Coś poszło nie tak. Spróbuj ponownie później.");
+        }
         Optional<Lesson> lessonOptional = lessonRepository.findById(lessonId);
 
         if (lessonOptional.isEmpty()) {
@@ -50,6 +59,12 @@ public class LessonService {
         return lessonOptional.map(this::mapToDtoWithTasks);
     }
     
+    /**
+     * Finds lesson with tasks by course id and its order index
+     * @param courseId id of the course
+     * @param orderIndex number of the lesson in the course
+     * @return optional containing lesson DTO with tasks
+     */
     public Optional<LessonDto> getLessonWithTasksByCourseIdAndOrderIndex(Long courseId, Integer orderIndex) {
         Optional<Lesson> lessonOptional = lessonRepository.findByCourseIdAndOrderIndex(courseId, orderIndex);
 
@@ -60,17 +75,31 @@ public class LessonService {
         return lessonOptional.map(this::mapToDtoWithTasks);
     }
 
+    /**
+     * Determines the next available order index for a lesson within a course
+     * @param courseId id of the course
+     * @return next order index
+     */
     public Integer getNextOrderIndex(Long courseId) {
         return lessonRepository.findTopByCourseIdOrderByOrderIndexDesc(courseId)
                 .map(lesson -> lesson.getOrderIndex() + 1)
                 .orElse(1);
     }
 
+    /**
+     * Creates a new lesson
+     * @param creationDto data for creating the lesson
+     * @param file background image file
+     * @return created lesson DTO
+     * @throws IOException if file saving fails
+     * @throws RuntimeException if course or enemy is not found
+     * @throws IllegalArgumentException if JSON tasks structure is invalid
+     */
     public LessonDto createLesson(LessonCreationDto creationDto, MultipartFile file) throws IOException {
         Lesson lesson = new Lesson();
-        
+
         Course course = courseRepository.findById(creationDto.getCourseId())
-                .orElseThrow(() -> new RuntimeException("Course not found with ID: " + creationDto.getCourseId()));
+                .orElseThrow(() -> new RuntimeException("Nie znaleziono kursu z ID: " + creationDto.getCourseId()));
         lesson.setCourse(course);
 
         lesson.setTitle(creationDto.getTitle());
@@ -79,7 +108,7 @@ public class LessonService {
         
         if (creationDto.isHasEnemy() && creationDto.getEnemyId() != null) {
             Enemy enemy = enemyRepository.findById(creationDto.getEnemyId())
-                    .orElseThrow(() -> new RuntimeException("Enemy not found with ID: " + creationDto.getEnemyId()));
+                    .orElseThrow(() -> new RuntimeException("Nie znaleziono wroga z ID: " + creationDto.getEnemyId()));
             lesson.setEnemy(enemy);
         }
         
@@ -107,6 +136,11 @@ public class LessonService {
         return mapToDtoWithTasks(savedLesson); 
     }
 
+    /**
+     * Gets all lessons belonging to a specific course
+     * @param courseId id of the course
+     * @return list of simple lesson DTOs
+     */
     public List<LessonDto> getLessonsByCourseId(Long courseId) {
         List<Lesson> lessons = lessonRepository.findByCourseIdOrderByOrderIndex(courseId);
 
@@ -115,20 +149,41 @@ public class LessonService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Deletes a lesson and its progress records
+     * @param lessonId id of the lesson to be deleted
+     * @throws IllegalArgumentException if no lessonId was given
+     * @throws RuntimeException if lesson was not found
+     */
     @Transactional
     public void deleteLesson(Long lessonId) {
         userLessonProgressRepository.deleteByLessonId(lessonId);
-        
+        if (lessonId == null) {
+            throw new IllegalArgumentException("Brak ID lekcji.");
+        }
         Lesson lesson = lessonRepository.findById(lessonId)
-                .orElseThrow(() -> new RuntimeException("Lesson not found with ID: " + lessonId));
+                .orElseThrow(() -> new RuntimeException("Nie znaleziono lekcji z ID: " + lessonId));
         
         lessonRepository.delete(lesson);
     }
 
+    /**
+     * Updates an existing lesson
+     * @param lessonId id of lesson to be updated
+     * @param updateDto updated lesson data
+     * @param file new background image file
+     * @return updated lesson DTO
+     * @throws IOException if file saving fails
+     * @throws IllegalArgumentException if no lessonId was given or JSON is invalid
+     * @throws RuntimeException if lesson, enemy, or course was not found
+     */
     @Transactional
     public LessonDto updateLesson(Long lessonId, LessonCreationDto updateDto, MultipartFile file) throws IOException{
+        if (lessonId == null) {
+            throw new IllegalArgumentException("Brak ID lekcji.");
+        }
         Lesson lesson = lessonRepository.findById(lessonId)
-            .orElseThrow(() -> new RuntimeException("Lesson not found with ID: " + lessonId));
+            .orElseThrow(() -> new RuntimeException("Nie znaleziono lekcji z ID: " + lessonId));
 
         Integer oldOrderIndex = lesson.getOrderIndex();
         Integer newOrderIndex = updateDto.getOrderIndex();
@@ -150,7 +205,7 @@ public class LessonService {
         
         if (updateDto.isHasEnemy() && updateDto.getEnemyId() != null) {
             Enemy enemy = enemyRepository.findById(updateDto.getEnemyId())
-                    .orElseThrow(() -> new RuntimeException("Enemy not found with ID: " + updateDto.getEnemyId()));
+                    .orElseThrow(() -> new RuntimeException("Nie znaleziono przeciwnika z ID: " + updateDto.getEnemyId()));
             lesson.setEnemy(enemy);
         } else {
             lesson.setEnemy(null);
@@ -158,7 +213,7 @@ public class LessonService {
         
         if (updateDto.getCourseId() != null) {
              Course course = courseRepository.findById(updateDto.getCourseId())
-                     .orElseThrow(() -> new RuntimeException("Course not found"));
+                     .orElseThrow(() -> new RuntimeException("Nie znaleziono kursu."));
              lesson.setCourse(course);
         }
 
@@ -171,7 +226,7 @@ public class LessonService {
             if (!rootNode.has("tasks") || !rootNode.get("tasks").isArray()) {
                  throw new IllegalArgumentException("Invalid tasks JSON structure: 'tasks' array missing or malformed.");
             }
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid tasks JSON: " + e.getMessage());
         }
         
@@ -182,6 +237,11 @@ public class LessonService {
         return mapToDtoWithTasks(savedLesson); 
     }
 
+    /**
+     * Maps lesson entity to a simple DTO without tasks
+     * @param lesson lesson entity
+     * @return simple lesson DTO
+     */
     private LessonDto mapToSimpleDto(Lesson lesson) {
         LessonDto lessonDto = new LessonDto();
         lessonDto.setId(lesson.getId());
@@ -198,7 +258,11 @@ public class LessonService {
         return lessonDto;
     }
 
-
+    /**
+     * Maps lesson entity to a DTO including parsed tasks from JSON
+     * @param lesson lesson entity
+     * @return lesson DTO with tasks
+     */
     private LessonDto mapToDtoWithTasks(Lesson lesson) {
         LessonDto lessonDto = new LessonDto();
         lessonDto.setId(lesson.getId());
@@ -224,13 +288,19 @@ public class LessonService {
                 lessonDto.setTasks(List.of()); 
             }
             
-        } catch (Exception e) {
+        } catch (IOException e) {
             lessonDto.setTasks(List.of());
         }
 
         return lessonDto;
     }
 
+    /**
+     * Saves an uploaded file to the local storage
+     * @param file multipart file to be saved
+     * @return path to the saved file
+     * @throws IOException if file creation or copying fails
+     */
     private String saveFile(MultipartFile file) throws IOException {
         Path uploadPath = Paths.get(UPLOAD_DIR).toAbsolutePath().normalize();
         if (!Files.exists(uploadPath)) Files.createDirectories(uploadPath);

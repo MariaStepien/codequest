@@ -11,6 +11,7 @@ Aplikacja dostępna jest pod url localhost:5173
     Wśród testowych danych dodawanych do bazy z init.sql znajduje się testowy administrator umożliwiający pełne wypróbowanie aplikacji.
 
     login: admin
+    
     hasło: password
 
     Aby utworzyć nowe konto admina, należy utworzyć najpierw zwykłe konto użytkownika po czym w bazie danych zamienić rolę "USER" na "ADMIN"
