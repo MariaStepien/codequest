@@ -144,7 +144,7 @@ export default function FillInTheBlank({ sentence, correctAnswers, onTaskComplet
       <div className="space-y-3">
         {hasSucceeded && (
           <p className="text-sm text-green-600 font-bold mt-2 text-center">
-            Poprawnie rozwiązano zadanie! 🎉 (Próba {attempts})
+            Poprawnie rozwiązano zadanie! (Próba {attempts})
           </p>
         )}
         

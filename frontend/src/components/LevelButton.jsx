@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types';
-import { useNavigate } from 'react-router-dom';
 
 /**
  * Reusable component for a single level button.
@@ -8,20 +7,15 @@ import { useNavigate } from 'react-router-dom';
  * @param {boolean} props.isUnlocked If true, the button is clickable.
  */
 export default function LevelButton({ levelNumber, isUnlocked = true }) {
-
-    const colorMap = {
-        1: 'bg-red-300 border-red-400 hover:bg-red-400',
-        4: 'bg-red-300 border-red-400 hover:bg-red-400',
-        8: 'bg-red-300 border-red-400 hover:bg-red-400',
-        2: 'bg-yellow-300 border-yellow-400 hover:bg-yellow-400',
-        5: 'bg-yellow-300 border-yellow-400 hover:bg-yellow-400',
-        3: 'bg-green-300 border-green-400 hover:bg-green-400',
-        7: 'bg-blue-300 border-blue-400 hover:bg-blue-400',
-    };
-
+    const colorMap = [
+        'bg-red-300 border-red-400 hover:bg-red-400',
+        'bg-yellow-300 border-yellow-400 hover:bg-yellow-400',
+        'bg-green-300 border-green-400 hover:bg-green-400',
+        'bg-blue-300 border-blue-400 hover:bg-blue-400'
+    ];
+    const unlockedColorClass = colorMap[(levelNumber - 1) % colorMap.length];
     const lockedClasses = 'bg-gray-200 border-gray-300 text-gray-500 cursor-not-allowed shadow-inner';
     
-    const unlockedColorClass = colorMap[levelNumber] || 'bg-blue-300 border-blue-400 hover:bg-blue-400';
     const unlockedClasses = `${unlockedColorClass} text-white hover:scale-105 active:scale-100`;
 
     return (

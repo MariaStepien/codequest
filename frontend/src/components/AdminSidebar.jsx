@@ -16,6 +16,10 @@ const navLinks = [
   { id: 'reports', name: 'Zgłoszenia', icon: AlertCircle, href: '/admin/reports'}
 ];
 
+/**
+ * Reusable component for admin navigation panel.
+ * @param {object} currentPage
+ */
 export default function AdminSidebar({ currentPage }) { 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [fullUser, setFullUser] = useState(null);

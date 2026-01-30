@@ -12,6 +12,11 @@ export default function TrophiesPage() {
   const jwtToken = localStorage.getItem('token');
   const IMAGE_BASE_URL = '/api/uploads';
 
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = courses.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(courses.length / itemsPerPage);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -40,11 +45,6 @@ export default function TrophiesPage() {
 
     fetchData();
   }, [jwtToken]);
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = courses.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(courses.length / itemsPerPage);
 
   if (isLoading) {
     return (
@@ -90,7 +90,6 @@ export default function TrophiesPage() {
                         className="w-32 h-32 object-contain"
                         onError={(e) => {
                           e.target.onerror = null;
-                          e.target.src = 'https://via.placeholder.com/150?text=Trophy';
                         }}
                       />
                     ) : (

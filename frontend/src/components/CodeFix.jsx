@@ -110,7 +110,7 @@ export default function CodeFix({
             <div className="space-y-3 pt-4 border-t">
                 {hasSucceeded && (
                     <p className="text-sm text-green-600 font-bold mt-2 text-center">
-                        Poprawnie naprawiono błąd! 🎉 (Próba {attempts})
+                        Poprawnie naprawiono błąd! (Próba {attempts})
                     </p>
                 )}
                 

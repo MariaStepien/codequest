@@ -1,14 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Zap, ArrowRight, Star, Coins, Award, Trophy } from 'lucide-react';
+import { ArrowRight, Coins, Award, Trophy } from 'lucide-react';
 import Header from '../components/Header';
-import CoursesPage from './CoursesPage';
 
 const initialUserData = {
   login: "...",
   progress: 0,
-  currentCourse: "N/A",
-  currentLesson: "N/A",
-  courses: [],
   points: 0,
   coins: 0,
   rank: 15,
@@ -163,11 +159,6 @@ export default function DashboardPage() {
             points: userDetails.points,
             coins: userDetails.coins,
             rank: userDetails.rank,
-            courses: [
-              { id: 1, title: "Python for Beginners", progress: 70, color: "blue", lessons: 20, hours: 15, status: 'In Progress' },
-              { id: 2, title: "Modern JavaScript", progress: 45, color: "yellow", lessons: 30, hours: 25, status: 'In Progress' },
-              { id: 4, title: "Introduction to HTML & CSS", progress: 100, color: "green", lessons: 10, hours: 5, status: 'Completed' },
-            ]
         }));
 
         await fetchLatestActivity();
@@ -191,14 +182,7 @@ export default function DashboardPage() {
     if (isLoading) return <div className="text-center py-10 text-xl font-medium">Ładowanie panelu użytkownika...</div>;
     if (error) return <div className="text-center py-10 text-xl font-medium text-red-600">Błąd: {error}</div>;
 
-    switch (currentPage) {
-      case 'dashboard':
-        return <DashboardContentArea userData={userData} />;
-      case 'courses':
-        return <CoursesPage courses={userData.courses} />; 
-      default:
-        return <DashboardContentArea userData={userData} />;
-    }
+    return <DashboardContentArea userData={userData} />;
   };
 
 

@@ -153,7 +153,7 @@ export default function MatchingPairs({ items, onTaskComplete }) {
                 {results && (
                     <div className={`p-4 rounded-lg text-center font-bold ${isSuccess ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
                         {isSuccess 
-                            ? 'Brawo! Wszystko poprawnie! 🎉' 
+                            ? 'Brawo! Wszystko poprawnie!' 
                             : `Wynik: ${Object.values(results).filter(v => v).length} / ${items.length} poprawnych.`}
                     </div>
                 )}
