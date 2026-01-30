@@ -238,7 +238,35 @@ export default function LevelTemplate({ isAdminPreview = false }) {
 
         const fetchLessonAndNextCheck = async () => {
             setIsLoading(true);
+            const token = localStorage.getItem('token');
+
             try {
+                const userRes = await fetch('/api/user/me', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const userData = await userRes.json();
+
+                if (!isAdminPreview) {
+                    if (userData.hearts <= 0) {
+                        triggerToast("Brak serc! Poczekaj na regenerację.", true);
+                        setIsLoading(false);
+                        setTimeout(() => navigate('/dashboard'), 2000);
+                        return;
+                    }
+
+                    const progressRes = await fetch(`/api/courses/completed-levels/${courseId}`, {
+                        headers: { 'Authorization': `Bearer ${token}` },
+                    });
+                    const lastCompletedLevel = await progressRes.json();
+
+                    if (orderIndex > lastCompletedLevel + 1) {
+                        triggerToast("Nie odblokowałeś jeszcze tej lekcji.", true);
+                        setIsLoading(false);
+                        setTimeout(() => navigate('/dashboard'), 2000);
+                        return;
+                    }
+                }
+
                 const response = await fetch(`/api/lessons/course/${courseId}/order/${orderIndex}`);
                 if (!response.ok) throw new Error("Nie udało się pobrać lekcji");
                 const data = await response.json();
