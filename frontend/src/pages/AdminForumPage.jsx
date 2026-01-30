@@ -36,7 +36,7 @@ export default function AdminForumPage() {
         message = 'Czy na pewno chcesz usunąć ten komentarz?';
         break;
         case 'user-block':
-        message = `Czy na pewno chcesz zmienić status blokady użytkownika?`;
+        message = `Czy na pewno chcesz zablokować użytkownika?`;
         break;
         default:
         message = 'Czy na pewno chcesz wykonać tę operację?';
@@ -244,7 +244,7 @@ export default function AdminForumPage() {
       if (type === 'post' || type === 'comment') {
         url = `/api/forum/${type}s/${id}?userId=${userData.id}&isAdmin=true`;
       } else if (type === 'user-block') {
-        url = `/api/user/${id}/toggle-block`;
+        url = `/api/user/${id}/block-user`;
         method = 'POST';
       }
       const res = await fetch(url, {
@@ -321,7 +321,7 @@ export default function AdminForumPage() {
             <button 
                 onClick={() => openModal('user-block', comment.author?.id, comment.author?.userLogin)} 
                 className="text-gray-400 hover:text-orange-500 p-1" 
-                title="Zablokuj/Odblokuj autora komentarza"
+                title="Zablokuj autora komentarza"
             >
                 {comment.author?.isBlocked ? <UserCheck className="w-4 h-4"/> : <UserX className="w-4 h-4"/>}
             </button>
@@ -387,7 +387,7 @@ export default function AdminForumPage() {
                             <button 
                                 onClick={() => openModal('user-block', selectedPost.author?.id, selectedPost.author?.userLogin)} 
                                 className="text-gray-400 hover:text-orange-500 p-2"
-                                title="Zablokuj/Odblokuj autora wpisu"
+                                title="Zablokuj autora wpisu"
                             >
                                 {selectedPost.author?.isBlocked ? <UserCheck className="w-5 h-5"/> : <UserX className="w-5 h-5"/>}
                             </button>
@@ -484,7 +484,13 @@ export default function AdminForumPage() {
                         <span className="flex items-center"><MessageSquare className="w-3 h-3 mr-1" /> {post.comments?.length || 0}</span>
                       </div>
                     </div>
-                    <button onClick={(e) => { e.stopPropagation(); setModal({ show: true, type: 'post', id: post.id }); }} className="text-red-400 hover:text-red-600 p-2"><Trash2 className="w-6 h-6" /></button>
+                    <button onClick={(e) => { 
+                      e.stopPropagation(); 
+                      openModal('post', post.id );
+                      }} 
+                      className="text-red-400 hover:text-red-600 p-2">
+                        <Trash2 className="w-6 h-6" />
+                    </button>
                   </div>
                 ))}
                 <div className="flex justify-center gap-2 mt-8">

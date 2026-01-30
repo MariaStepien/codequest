@@ -7,11 +7,10 @@ import './index.css'
 
 const rootElement = document.getElementById('root');
 
-// Create the root
 if (rootElement) {
   createRoot(rootElement).render(
     <StrictMode>
-      {/* BrowserRouter must wrap the App component to enable routing */}
+      {/* BrowserRouter wraps the App component to enable routing */}
       <BrowserRouter>
         <App />
       </BrowserRouter>

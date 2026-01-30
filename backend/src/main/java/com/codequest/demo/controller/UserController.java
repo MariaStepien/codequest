@@ -43,9 +43,9 @@ public class UserController {
 
     /**
      * Fetches a paginated list of all users.
-     * Maps to the /api/user endpoint.
+     * Maps to the /api/user/all endpoint.
      */
-    @GetMapping
+    @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<UserDto>> getAllUsersPage(@PageableDefault(size = 10, sort = "id", direction= Sort.Direction.ASC) Pageable pageable) {
         Page<UserDto> users = userService.getAllUsersPage(pageable);
@@ -59,6 +59,17 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> toggleBlockStatus(@PathVariable Long id) {
         userService.toggleBlockStatus(id);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Blocks user.
+     * Maps to the /api/user/{id}/block-user endpoint.
+     */
+    @PostMapping("/{id}/block-user")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> blockUser(@PathVariable Long id) {
+        userService.blockUser(id);
         return ResponseEntity.ok().build();
     }
 

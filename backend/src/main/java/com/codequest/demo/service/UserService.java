@@ -88,6 +88,17 @@ public class UserService {
         user.setBlocked(!user.isBlocked());
         userRepository.save(user);
     }
+
+    /**
+     * Allows to block user
+     * @param userId id of user who will be blocked
+     */
+    @Transactional
+    public void blockUser(Long userId) {
+        User user = findUserById(userId);
+        user.setBlocked(true);
+        userRepository.save(user);
+    }
     
     /**
      * Authenticates a user based on login and password.

@@ -99,6 +99,12 @@ public class SecurityConfig {
 
                 registry.requestMatchers("/api/reports/**").permitAll();
 
+                registry.requestMatchers("/api/user/all").hasRole("ADMIN");
+
+                registry.requestMatchers("/api/user/{id}/toggle-block").hasRole("ADMIN");
+
+                registry.requestMatchers("/api/user/{id}/block-user").hasRole("ADMIN");
+
                 // All other requests still require authentication
                 registry.anyRequest().authenticated();
             })

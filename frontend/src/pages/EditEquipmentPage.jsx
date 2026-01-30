@@ -211,16 +211,10 @@ export default function EditEquipmentPage() {
                                         name="itemNumber"
                                         value={formData.itemNumber}
                                         onChange={handleChange}
-                                        min="1"
-                                        max={maxAllowedNumber || ""}
+                                        readOnly
                                         className="text-black w-full p-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 transition"
                                         required
                                     />
-                                    {maxAllowedNumber && (
-                                        <p className="text-xs text-gray-500 mt-1">
-                                            Zmiana numeru nie zmienia nazwy pliku
-                                        </p>
-                                    )}
                                 </div>
                             </div>
 
