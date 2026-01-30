@@ -353,7 +353,7 @@ export default function LessonCreationPage() {
                                     <select
                                         value={selectedEnemyId}
                                         onChange={(e) => setSelectedEnemyId(e.target.value)}
-                                        className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                        className="text-black w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500"
                                     >
                                         <option value="">Wybierz przeciwnika...</option>
                                         {enemies.map(enemy => (
