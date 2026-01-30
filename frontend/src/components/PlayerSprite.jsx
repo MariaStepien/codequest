@@ -23,8 +23,8 @@ export default function PlayerSprite() {
         fetchPlayerStyle();
     }, []);
 
-    const spriteFilename = spriteInfo?.sprite_img_source || 'uploads/sprites/sprite_1_1_1_1_1.png';
-    const imageUrl = `/api/${spriteFilename}`;
+    const spriteFilename = spriteInfo?.spriteImgSource || 'sprite_1_1_1_1_1.png';
+    const imageUrl = `/api/uploads/sprites/${spriteFilename}`;
 
     return (
         <div className="flex flex-col items-center">
