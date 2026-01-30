@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -49,6 +50,7 @@ public class ReportController {
      * Maps to the /api/reports endpoint.
      */
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<Report>> getReports(
             @RequestParam(required = false, defaultValue = "ALL") String status,
             @RequestParam(required = false, defaultValue = "ALL") String targetType,
@@ -61,6 +63,7 @@ public class ReportController {
      * Maps to the /api/reports/{id}/status endpoint.
      */
     @PatchMapping("/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> updateStatus(
             @PathVariable Long id, 
             @RequestParam ReportStatus status) {
@@ -73,6 +76,7 @@ public class ReportController {
      * Maps to the /api/reports/{id}/content endpoint.
      */
     @GetMapping("/{id}/content")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getReportedContent(@PathVariable Long id) {
         Report report = reportService.getById(id);
         if ("POST".equals(report.getTargetType())) {
@@ -90,6 +94,7 @@ public class ReportController {
      * Maps to the /api/reports/stats/daily-count endpoint.
      */
     @GetMapping("/stats/daily-count")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Long> getDailyCount() {
         return ResponseEntity.ok(reportService.getDailyReportCount());
     }
@@ -99,6 +104,7 @@ public class ReportController {
      * Maps to the /api/reports/stats/pending-count endpoint.
      */
     @GetMapping("/stats/pending-count")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Long> getPendingCount() {
         return ResponseEntity.ok(reportService.getPendingReportCount());
     }

@@ -82,9 +82,9 @@ public class CourseController {
 
     /**
      * Updates course.
-     * Maps to the /api/courses/{id} endpoint.
+     * Maps to the /api/courses/{id}/edit-course endpoint.
      */
-    @PutMapping("/{id}")
+    @PutMapping("/{id}/edit-course")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> updateCourse(@PathVariable Long id, @RequestBody CourseDTO courseDTO) {
         courseDTO.setId(id);
@@ -100,9 +100,9 @@ public class CourseController {
 
     /**
      * Deletes course.
-     * Maps to the /api/courses/{id} endpoint.
+     * Maps to the /api/courses/{id}/delete-course endpoint.
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}/delete-course")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteCourse(@PathVariable Long id) {
         try {

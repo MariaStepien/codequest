@@ -44,10 +44,8 @@ public class UserLessonProgressService {
     public UserLessonProgressDto recordProgress(Long userId, UserLessonProgressCreationDto dto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Nie znaleziono użytkownika"));
-        Course course = courseRepository.findById(dto.getCourseId())
-                .orElseThrow(() -> new RuntimeException("Nie znaleziono kursu"));
-        Lesson lesson = lessonRepository.findById(dto.getLessonId())
-                .orElseThrow(() -> new RuntimeException("Nie znaleziono lekcji"));
+        Course course = courseRepository.getReferenceById(dto.getCourseId());
+        Lesson lesson = lessonRepository.getReferenceById(dto.getLessonId());
 
         UserLessonProgress progress = userLessonProgressRepository
                 .findByUserIdAndLessonId(userId, dto.getLessonId())
@@ -56,14 +54,17 @@ public class UserLessonProgressService {
                     newProgress.setUser(user);
                     newProgress.setCourse(course);
                     newProgress.setLesson(lesson);
+                    newProgress.setPointsEarned(0);
+                    newProgress.setStarsEarned(0);
                     newProgress.setStarsEarned(0); 
                     return newProgress;
                 });
 
-        updateProgressFields(progress, dto, user);
-
-        UserLessonProgress saved = userLessonProgressRepository.save(progress);
-        return mapToDto(saved);
+        updateStatsAndRewards(user, progress, dto);
+        
+        UserLessonProgress savedProgress = userLessonProgressRepository.save(progress);
+        
+        return mapToDto(savedProgress);
     }
 
     /**
@@ -72,8 +73,11 @@ public class UserLessonProgressService {
      * @param dto new progress data
      * @param user user entity to receive coins
      */
-    private void updateProgressFields(UserLessonProgress progress, UserLessonProgressCreationDto dto, User user) {
+    private void updateStatsAndRewards(User user, UserLessonProgress progress, UserLessonProgressCreationDto dto) {
+        
         if (dto.getPointsEarned() > progress.getPointsEarned()) {
+            int diff = dto.getPointsEarned() - progress.getPointsEarned();
+            user.setPoints(user.getPoints() + diff);
             progress.setPointsEarned(dto.getPointsEarned());
         }
 
@@ -123,6 +127,8 @@ public class UserLessonProgressService {
         dto.setStarsEarned(progress.getStarsEarned());
         dto.setTimeTakenSeconds(progress.getTimeTakenSeconds());
         dto.setPointsEarned(progress.getPointsEarned());
+        dto.setDateCreated(progress.getDateCreated());
+        dto.setLastUpdated(progress.getLastUpdated());
         return dto;
     }
 }

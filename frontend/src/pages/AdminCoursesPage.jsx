@@ -114,7 +114,7 @@ export default function AdminCoursesPage() {
     setModalConfig({ show: false, courseId: null, title: '' });
 
     try {
-      const response = await fetch(`/api/courses/${courseId}`, {
+      const response = await fetch(`/api/courses/${courseId}/delete-course`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${jwtToken}` }
       });

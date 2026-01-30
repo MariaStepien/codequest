@@ -99,7 +99,7 @@ export default function EditCoursePage() {
     setIsSaving(true);
     
     try {
-      const response = await fetch(`${API_BASE_URL}/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/${id}/edit-course`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

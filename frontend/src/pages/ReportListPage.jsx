@@ -69,8 +69,11 @@ export default function ReportListPage() {
 
   const fetchReports = async (page = 0) => {
       try {
+          const token = localStorage.getItem('token');
           const response = await fetch(
-              `/api/reports?status=${filterStatus}&targetType=${filterTargetType}&page=${page}&size=10&sort=createdAt,${sortDate}`
+              `/api/reports?status=${filterStatus}&targetType=${filterTargetType}&page=${page}&size=10&sort=createdAt,${sortDate}`, {
+                headers: {'Authorization': `Bearer ${token}`}
+              }  
           );
           const data = await response.json();
           
@@ -110,10 +113,12 @@ export default function ReportListPage() {
   };
 
   const handleUpdateStatus = async () => {
+    const token = localStorage.getItem('token');
     const { id, status } = confirmModal;
     try {
       const res = await fetch(`/api/reports/${id}/status?status=${status}`, {
-        method: 'PATCH'
+        method: 'PATCH',
+        headers: {'Authorization': `Bearer ${token}`}
       });
       if (res.ok) {
         triggerToast(`Zgłoszenie zostało zaktualizowane.`);
@@ -126,13 +131,15 @@ export default function ReportListPage() {
   };
 
   const handleDeleteContent = async () => {
+    const token = localStorage.getItem('token');
     const type = selectedReportContent.contentType === 'POST' ? 'posts' : 'comments';
     const id = selectedReportContent.id;
     const userId = adminData.id;
 
     try {
       const res = await fetch(`/api/forum/${type}/${id}?userId=${userId}&isAdmin=true`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: {'Authorization': `Bearer ${token}`}
       });
 
       if (res.ok) {
@@ -165,15 +172,20 @@ export default function ReportListPage() {
           throw new Error("Nie udało się pobrać danych lekcji");
         }
       }
-      const res = await fetch(`/api/reports/${report.id}/content`);
+      const res = await fetch(`/api/reports/${report.id}/content`, {headers: {'Authorization': `Bearer ${token}`}});
       if (res.ok) {
         const data = await res.json();
+        
         setSelectedReportContent({
           ...data,
           contentType: report.targetType,
           reportId: report.id
         });
-        setIsModalOpen(true);
+        if (data === null) {
+          triggerToast("Nie znaleziono zgłoszonej treści (mogła zostać już usunięta).", true);
+        } else {
+          setIsModalOpen(true);
+        }
       } else {
         triggerToast("Nie znaleziono zgłoszonej treści (mogła zostać już usunięta).", true);
       }

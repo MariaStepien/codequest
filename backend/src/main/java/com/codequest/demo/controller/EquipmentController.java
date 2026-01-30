@@ -78,6 +78,7 @@ public class EquipmentController {
      * Maps to the /api/equipment/admin/type/{type} endpoint.
      */
     @GetMapping("/admin/type/{type}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Equipment>> getAdminEquipmentByType(@PathVariable String type) {
         try {
             EquipmentType equipmentType = EquipmentType.valueOf(type.toUpperCase());
@@ -124,6 +125,7 @@ public class EquipmentController {
      * Maps to the /api/equipment endpoint.
      */
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Equipment>> getAllEquipment() {
         List<Equipment> allEquipment = equipmentService.getAllEquipment();
         return ResponseEntity.ok(allEquipment);
