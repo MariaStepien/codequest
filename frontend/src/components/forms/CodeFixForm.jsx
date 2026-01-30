@@ -1,6 +1,11 @@
 import { useMemo } from 'react';
 import { AlertCircle } from 'lucide-react';
 
+/**
+ * form component for the Code Fix task type
+ * @param {Object} task the task object containing code, line/char offsets, and explanation
+ * @param {Function} onUpdate callback function to update the task data in the parent state
+ */
 export default function CodeFixForm({ task, onUpdate }) {
     
     const handleInputChange = (e) => {

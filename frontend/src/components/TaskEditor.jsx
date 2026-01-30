@@ -94,7 +94,12 @@ function TaskFormWrapper({ task, onUpdate }) {
     );
 }
 
-
+/**
+ * Component for managing and ordering a list of lesson tasks
+ * @param {Array} tasks Array of task objects to be displayed and edited
+ * @param {Function} setTasks State setter function to update the list of tasks
+ * @param {boolean} disabled Flag to disable all editing actions (e.g., during saving)
+ */
 export default function TaskEditor({ tasks, onTasksChange, disabled }) {
 
     const handleAddTask = (type) => {

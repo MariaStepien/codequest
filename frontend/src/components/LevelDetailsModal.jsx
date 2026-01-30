@@ -9,7 +9,14 @@ const StarIcon = ({ isActive }) => (
         }`} 
     />
 );
-
+/**
+ * Component for showing modal with information on progress in level
+ * @param {Object} lessonDetails Object containing title, orderIndex, and enemy info
+ * @param {Object} progress Object containing user's previous performance (starsEarned, timeTakenSeconds)
+ * @param {Function} onClose Function to handle closing the modal
+ * @param {Long} courseId The ID of the current course
+ * @param {number} userHearts Current number of hearts the user has
+ */
 export default function LevelDetailsModal({ lessonDetails, progress, onClose, courseId, userHearts }) {
     const navigate = useNavigate();
 

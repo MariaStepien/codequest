@@ -3,11 +3,10 @@ import PropTypes from 'prop-types';
 
 /**
  * Component for a single-select multiple choice question.
- * @param {object} props
- * @param {string} props.question The question text.
- * @param {string[]} props.options An array of possible answer strings.
- * @param {string} props.correctAnswer The correct answer string (must match one of the options).
- * @param {function} props.onTaskComplete Callback to signal LevelTemplate (true for correct, false for incorrect/try again).
+ * @param {string} question The question text.
+ * @param {Array} options An array of possible answer strings.
+ * @param {string} correctAnswer The correct answer string (must match one of the options).
+ * @param {function} onTaskComplete Callback to signal LevelTemplate (true for correct, false for incorrect/try again).
  */
 export default function MultipleChoice({ question, options, correctAnswer, onTaskComplete }) {
     const [selectedOption, setSelectedOption] = useState(null);

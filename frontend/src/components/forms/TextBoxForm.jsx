@@ -1,3 +1,8 @@
+/**
+ * Form component for the TextBox information task type
+ * @param {Object} task the task object containing the sentence (text content), bgColor, and borderColor
+ * @param {Function} onUpdate callback function to update the task data in the parent state
+ */
 export default function TextBoxForm({ task, onUpdate }) {
     const colorOptions = [
         { name: 'Czerwony', bg: 'bg-red-100', border: 'border-red-500', text: 'text-red-700' },

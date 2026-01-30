@@ -1,5 +1,10 @@
 import { ChevronRight } from 'lucide-react';
 
+/**
+ * Form component for the Fill in the Blank task type
+ * @param {Object} task the task object containing the sentence with [BLANK] tags and correct answers
+ * @param {Function} onUpdate callback function to update the task data in the parent state
+ */
 export default function FillInTheBlankForm({ task, onUpdate }) {
 
     const handleSentenceChange = (e) => {

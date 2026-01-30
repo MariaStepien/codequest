@@ -19,6 +19,14 @@ const getTargetLabel = (type) => {
   }
 };
 
+/**
+ * Component for reporting inappropriate content or bugs within the application
+ * @param {boolean} show Controls whether the modal is visible
+ * @param {Function} onClose Callback function to close the modal
+ * @param {Function} onReport Callback function triggered when the form is submitted, receiving the report data object
+ * @param {string} targetType The type of content being reported ('POST', 'COMMENT', 'LESSON')
+ * @param {Long} targetId The unique identifier of the content being reported
+ */
 export default function ReportModal({ show, onClose, onReport, targetType, targetId }) {
   const [category, setCategory] = useState(CATEGORIES[0]);
   const [description, setDescription] = useState('');

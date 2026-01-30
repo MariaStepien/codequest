@@ -1,6 +1,15 @@
 import { useRef } from "react";
 import { X } from "lucide-react";
 
+/**
+ * Component for displaying the service terms and conditions with a scroll-to-read requirement
+ * @param {boolean} isOpen Controls whether the modal is visible
+ * @param {Function} onClose Callback function to close the modal
+ * @param {boolean} hasRead State indicating if the user has scrolled to the bottom
+ * @param {Function} setHasRead State setter to update the reading progress status
+ * @param {boolean} acceptedTerms State indicating if the checkbox is checked
+ * @param {Function} setAcceptedTerms State setter to update the checkbox status
+ */
 export default function TermsModal({ 
   isOpen, 
   onClose, 

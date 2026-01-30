@@ -49,6 +49,11 @@ const calculatePoints = (timeTakenSeconds) => {
     return Math.max(MIN_POINTS, calculatedPoints);
 };
 
+/**
+ * Component for showing lesson with tasks
+ * @param {boolean} isAdminPreview information whether to use admin preview
+
+ */
 export default function LevelTemplate({ isAdminPreview = false }) {
     const { courseId, levelNumber: routeLevelNumber } = useParams();
     const orderIndex = routeLevelNumber ? parseInt(routeLevelNumber, 10) : null;

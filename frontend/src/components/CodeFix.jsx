@@ -1,6 +1,16 @@
 import { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
+/**
+ * Component for a Code Fix task where users fill in a missing part of a code snippet
+ * @param {string} instructions text explaining what the user needs to fix
+ * @param {string} incorrectCode the full code snippet containing the intentional error or gap
+ * @param {string} correctGapText -the exact string expected in the input to solve the task
+ * @param {number} fixLineStart zero-based index of the line where the gap is located
+ * @param {number} fixCharStart starting character index on the line for the gap
+ * @param {number} fixCharEnd ending character index on the line for the gap
+ * @param {Function} onTaskComplete callback triggered with (isCorrect) when the user submits their answer
+ */
 export default function CodeFix({ 
     instructions, 
     incorrectCode, 

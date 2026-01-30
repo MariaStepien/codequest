@@ -11,6 +11,10 @@ const navLinks = [
   { id: 'forum', name: 'Forum', icon: MessageSquare, href: '/forum'}
 ];
 
+/**
+ * Reusable component for user navigation panel.
+ * @param {object} currentPage
+ */
 export default function Header({ currentPage }) { 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [fullUser, setFullUser] = useState(null);

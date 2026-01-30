@@ -1,5 +1,11 @@
 import { CheckCircle, XCircle } from 'lucide-react';
 
+/**
+ * Notification component for displaying brief success or error messages at the top of the screen
+ * @param {boolean} show Controls whether the toast is visible
+ * @param {string} message The text message to display
+ * @param {boolean} isError Determines the color scheme (red for error, green for success)
+ */
 export default function Toast({ show, message, isError }) {
     if (!show) return null;
 

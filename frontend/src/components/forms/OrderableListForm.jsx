@@ -1,5 +1,10 @@
 import { MinusCircle, PlusCircle, ChevronsUp, ChevronsDown } from 'lucide-react';
 
+/**
+ * Form component for the Orderable List task type
+ * @param {Object} task the task object containing the prompt and the correctOrder array of items
+ * @param {Function} onUpdate callback function to update the task data in the parent state
+ */
 const createNewItem = (index) => ({
     id: `item-${Date.now()}-${index}`, 
     text: `Nowy element ${index + 1}`

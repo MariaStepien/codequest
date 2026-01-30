@@ -16,9 +16,9 @@ const shuffleArray = (array) => {
 
 /**
  * A component allowing users to reorder a list of items using up/down buttons.
- * @param {Array<object>} props.initialItems The items to be ordered by the user.
- * @param {Array<object>} props.correctOrder The array of items in the correct order (must have same IDs as initialItems).
- * @param {function} props.onTaskComplete Callback to signal LevelTemplate (true for correct order, false otherwise).
+ * @param {Array<object>} initialItems The items to be ordered by the user.
+ * @param {Array<object>} correctOrder The array of items in the correct order (must have same IDs as initialItems).
+ * @param {function} onTaskComplete Callback to signal LevelTemplate (true for correct order, false otherwise).
  */
 export default function OrderableList({ initialItems, correctOrder, onTaskComplete }) {
     const [items, setItems] = useState(() => shuffleArray(initialItems));

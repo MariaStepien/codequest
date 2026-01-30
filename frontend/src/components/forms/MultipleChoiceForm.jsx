@@ -1,5 +1,10 @@
 import { MinusCircle } from 'lucide-react';
 
+/**
+ * Editor form component for the Multiple Choice task type
+ * @param {Object} task the task object containing the question, options array, and correctAnswer string
+ * @param {Function} onUpdate callback function to update the task data in the parent state
+ */
 export default function MultipleChoiceForm({ task, onUpdate }) {
 
     const handleInputChange = (e) => {

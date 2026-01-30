@@ -6,6 +6,11 @@ const createNewPair = () => ({
     right: 'Element B'
 });
 
+/**
+ * Form component for the Matching Pairs task type
+ * @param {Object} task the task object containing the prompt and an array of pairs (left/right)
+ * @param {Function} onUpdate callback function to update the task data in the parent state
+ */
 export default function MatchingPairsForm({ task, onUpdate }) {
     
     const handlePromptChange = (e) => {

@@ -1,6 +1,13 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import PropTypes from 'prop-types'; 
 
+/**
+ * Component for displaying static instructional text or information within a lesson
+ * @param {string} sentence The text content to be displayed
+ * @param {string} bgColor Tailwind CSS background color class
+ * @param {string} borderColor Tailwind CSS border color class
+ * @param {Function} onTaskComplete Callback function that automatically signals task completion on mount
+ */
 export default function TextBox({ 
   sentence, 
   bgColor = 'bg-slate-900', 

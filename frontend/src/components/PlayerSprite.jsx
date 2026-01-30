@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 
+/**
+ * Component that renders user sprite
+ */
 export default function PlayerSprite() {
     const [spriteInfo, setSpriteInfo] = useState(null);
 

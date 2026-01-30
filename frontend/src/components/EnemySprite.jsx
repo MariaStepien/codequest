@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react';
 
+/**
+ * Component that renders enemy sprite
+ * @param {Long} enemyId id of enemy to render
+ */
 export default function EnemySprite({ enemyId }) {
     const [enemy, setEnemy] = useState(null);
 

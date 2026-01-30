@@ -10,6 +10,12 @@ const shuffleArray = (array) => {
     return newArray;
 };
 
+/**
+ * Component that renders FillInTheBlank task in lesson.
+ * @param {String} sentence text that user has to fill in
+ * @param {Array} correctAnswers array of correctAnswers that fill the text
+ * @param {Function} onTaskComplete Callback function triggered with (isCorrect) when the user submits
+ */
 export default function FillInTheBlank({ sentence, correctAnswers, onTaskComplete }) {
   const safeSentence = sentence || ""; 
   const textSegments = safeSentence.split('[BLANK]');

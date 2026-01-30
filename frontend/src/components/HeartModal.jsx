@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Heart, Coins, X, Clock } from 'lucide-react';
 
+/**
+ * Component for heart panel for managing hearts
+ * @param user user object with information about current hearts
+ * @param onClose responsible for closing modal panel
+ * @param onUpdate refreshes user's data
+ */
 export default function HeartModal({ user, onClose, onUpdate }) {
     const [timeLeft, setTimeLeft] = useState("");
 

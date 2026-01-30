@@ -10,6 +10,11 @@ const availableTaskTypes = [
     { type: 'CodeFix', name: 'Poprawa Kodu' },
 ];
 
+/**
+ * UI component for choosing a task type and adding it to the lesson
+ * @param {Function} onAddTask Callback function triggered when the "Add" button is clicked, 
+ * receives the selected task type string as an argument
+ */
 export default function TaskFormSelector({ onAddTask }) {
     const [selectedType, setSelectedType] = useState(availableTaskTypes[0].type);
 

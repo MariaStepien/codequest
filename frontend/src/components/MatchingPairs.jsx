@@ -22,6 +22,11 @@ const PAIR_COLORS = [
     'bg-orange-100 border-orange-400 text-orange-900',
 ];
 
+/**
+ * Component for a Matching Pairs task where users connect related items from two columns
+ * @param {Array} items Array of objects, each containing { key, left, right } strings
+ * @param {Function} onTaskComplete Callback function triggered with (isCorrect) when the user submits
+ */
 export default function MatchingPairs({ items, onTaskComplete }) {
     const [selected, setSelected] = useState({ key: null, side: null });
     const [userPairs, setUserPairs] = useState({});

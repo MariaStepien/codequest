@@ -1,5 +1,15 @@
 import { AlertTriangle } from 'lucide-react';
 
+/**
+ * A reusable confirmation modal component for handling user approval or rejection of an action.
+ * @param {boolean} show controls the visibility of the modal.
+ * @param {string} title the header text displayed at the top of the modal.
+ * @param {string} message the descriptive text asking for user confirmation.
+ * @param {Function} onConfirm callback executed when the user clicks the confirmation button.
+ * @param {Function} onCancel callback executed when the user clicks the cancel/deny button.
+ * @param {string} confirmText text label for the confirmation button.
+ * @param {string} cancelText text label for the cancellation button.
+ */
 export default function ConfirmationModal({ 
     show, 
     title = "Potwierdzenie", 
