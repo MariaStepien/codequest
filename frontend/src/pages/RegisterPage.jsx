@@ -27,8 +27,8 @@ export default function RegisterPage() {
       return;
     }
 
-    if (password.length < 8) {
-      setError("Hasło musi zawierać conajmniej 8 znaków.");
+    if (password.length < 8 || password.length > 72) {
+      setError("Hasło musi zawierać conajmniej 8 znaków i maksymalnie 72.");
       return;
     }
 

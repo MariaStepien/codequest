@@ -121,7 +121,7 @@ public class LessonService {
             }
             objectMapper.readValue(tasksNode.traverse(), new TypeReference<List<TaskDto>>() {});
             
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid tasks JSON provided: " + e.getMessage());
         }
         
@@ -132,7 +132,12 @@ public class LessonService {
         }
         
         Lesson savedLesson = lessonRepository.save(lesson);
-        
+
+        if (course.getTotalLessons() < lesson.getOrderIndex()) {
+            course.setTotalLessons(course.getTotalLessons() + 1);
+            courseRepository.save(course);
+        }
+ 
         return mapToDtoWithTasks(savedLesson); 
     }
 

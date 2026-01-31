@@ -189,8 +189,8 @@ public class UserService {
             throw new RuntimeException("Nowe hasło musi być inne niż obecne.");
         }
 
-        if (newPassword.length() < 8) {
-            throw new RuntimeException("Nowe hasło musi zawierać co najmniej 8 znaków.");
+        if (newPassword.length() < 8 || newPassword.length() >= 72) {
+            throw new RuntimeException("Nowe hasło musi zawierać pomiędzy 8 a 72 znakami.");
         }
 
         user.setPassword(passwordEncoder.encode(newPassword));

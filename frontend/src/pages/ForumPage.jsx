@@ -288,6 +288,7 @@ export default function ForumPage() {
               <div className="mt-2 flex gap-2">
                 <input 
                   className="text-black flex-1 border rounded px-2 py-1 text-sm outline-none"
+                  maxLength={500}
                   value={editValue.content}
                   onChange={(e) => setEditValue({...editValue, content: e.target.value})}
                 />
@@ -312,6 +313,7 @@ export default function ForumPage() {
                 <input 
                   className="text-black flex-1 border rounded-lg px-3 py-1 text-sm focus:ring-1 focus:ring-indigo-500 outline-none"
                   placeholder="Napisz odpowiedź..."
+                  maxLength={500}
                   value={replyValue}
                   onChange={(e) => setReplyValue(e.target.value)}
                   autoFocus
@@ -380,12 +382,14 @@ export default function ForumPage() {
                   <input 
                     className="text-black w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none" 
                     value={editValue.title}
+                    maxLength={255}
                     onChange={(e) => setEditValue({...editValue, title: e.target.value})}
                     required
                   />
                   <textarea 
                     className="text-black w-full border rounded-lg px-4 py-2 h-32 focus:ring-2 focus:ring-indigo-500 outline-none" 
                     value={editValue.content}
+                    maxLength={2000}
                     onChange={(e) => setEditValue({...editValue, content: e.target.value})}
                     required
                   />
@@ -441,6 +445,7 @@ export default function ForumPage() {
                 <input 
                   className="text-black flex-1 border rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none"
                   placeholder="Napisz komentarz..."
+                  maxLength={500}
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   required
@@ -474,6 +479,7 @@ export default function ForumPage() {
                   <input 
                     className="text-black w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none" 
                     placeholder="Tytuł wpisu" 
+                    maxLength={255}
                     value={newPostTitle}
                     onChange={(e) => setNewPostTitle(e.target.value)}
                     required
@@ -481,6 +487,7 @@ export default function ForumPage() {
                   <textarea 
                     className="text-black w-full border rounded-lg px-4 py-2 h-32 focus:ring-2 focus:ring-indigo-500 outline-none" 
                     placeholder="Treść wpisu..." 
+                    maxLength={2000}
                     value={newPostContent}
                     onChange={(e) => setNewPostContent(e.target.value)}
                     required

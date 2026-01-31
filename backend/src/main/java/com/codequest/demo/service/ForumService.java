@@ -59,6 +59,15 @@ public class ForumService {
         if (authorId == null) {
             throw new IllegalArgumentException("Coś poszło nie tak. Spróbuj ponownie później.");
         }
+
+        if (post.getTitle().length() > 255) {
+            throw new IllegalArgumentException("Tytuł wpisu nie może być dłuższy niż 255 znaków.");
+        }
+
+        if (post.getContent().length() > 2000) {
+            throw new IllegalArgumentException("Treść wpisu nie nie może być dłuższa niż 2000 znaków.");
+        }
+
         User author = userRepository.findById(authorId)
                 .orElseThrow(() -> new RuntimeException("Nie znaleziono uzytkownika o id: " + authorId));
         post.setAuthor(author);
@@ -103,6 +112,9 @@ public class ForumService {
         }
         if (postId == null) {
             throw new IllegalArgumentException("Coś poszło nie tak. Spróbuj ponownie później.");
+        }
+        if (comment.getContent().length() > 500) {
+            throw new IllegalArgumentException("Treść wpisu nie może być dłuższa niż 500 znaków.");
         }
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Nie znaleziono wpisu."));
