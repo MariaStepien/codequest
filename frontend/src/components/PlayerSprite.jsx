@@ -20,7 +20,7 @@ export default function PlayerSprite() {
                     setSpriteInfo(data);
                 }
             } catch (err) {
-                console.error("Error fetching player sprite:", err);
+                console.error("Nieudało się pobrać wizerunku użytkownika:", err);
             }
         };
         fetchPlayerStyle();

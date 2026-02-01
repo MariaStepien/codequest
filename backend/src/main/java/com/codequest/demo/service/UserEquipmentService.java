@@ -51,6 +51,10 @@ public class UserEquipmentService {
      * @return user equipment DTO including sprite and owned items
      */
     public UserEquipmentDto getUserEquipment(Long userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("Wystąpił problem, prosimy spróbować później.");
+        }
+        
         UserEquipment userEquipment = userEquipmentRepository.findById(userId)
                 .orElseGet(() -> {
                     UserEquipment newEq = new UserEquipment();
