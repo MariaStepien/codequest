@@ -30,6 +30,7 @@ export default function TextBox({
         shadow-md 
         transition duration-300 
         hover:shadow-lg
+        text-left
       `}
     >
       <div className="text-sm md:text-base text-gray-900 font-mono whitespace-pre-wrap leading-relaxed">
