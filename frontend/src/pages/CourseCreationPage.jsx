@@ -93,6 +93,12 @@ export default function CourseCreationPage() {
     setIsLoading(true);
     setError(null);
     setSuccessMessage('');
+
+    if (!selectedFile) {
+      setError("Proszę wybrać zdjęcie trofeum.");
+      setIsLoading(false);
+      return;
+    }
     
     if (!jwtToken || localStorage.getItem('role') !== 'ADMIN') {
       showToast("Autoryzacja nieudana.", true);
@@ -227,7 +233,7 @@ export default function CourseCreationPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Ikona trofeum (opcjonalnie)</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Ikona trofeum</label>
                 <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-indigo-400 transition-colors">
                   <div className="space-y-1 text-center">
                     {previewUrl ? (
