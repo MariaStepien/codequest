@@ -227,6 +227,7 @@ export default function EditLessonPage() {
                                     onChange={handleLessonDataChange}
                                     required
                                     min="1"
+                                    max={courses.find(c => c.id === Number(lessonData.courseId))?.totalLessons || ""}
                                     className="text-black mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border"
                                     placeholder="1"
                                 />

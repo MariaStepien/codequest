@@ -34,6 +34,7 @@ export default function LessonCreationPage() {
     const storedRole = localStorage.getItem('role');
 
     const [toast, setToast] = useState({ show: false, message: '', type: '' });
+    const navigate = useNavigate();
 
     const fetchNextOrderIndex = async (courseId) => {
         if (!courseId) return;
@@ -181,21 +182,25 @@ export default function LessonCreationPage() {
             if (response.status === 403) {
                 throw new Error("Brak uprawnień. Tylko administrator może tworzyć lekcje.");
             }
-            if (!response.ok) {
+
+            const createdLesson = await response.json();
+            if (response.ok) {
+                setSuccessMessage(`Pomyślnie utworzono lekcję: ${createdLesson.title} (ID: ${createdLesson.id}).`);
+                setLessonData(initialLessonData);
+                setTasks([]);
+                setHasEnemy(false);
+                setSelectedEnemyId('');
+                setBgFile(null);
+                
+                setTimeout(() => {
+                    navigate('/admin/courses');
+                }, 1500);
+                return;
+            }
+            else {
                 const errorDetail = await response.text();
                 throw new Error(`Błąd tworzenia lekcji. Status: ${response.status}. Szczegóły: ${errorDetail.substring(0, 100)}...`);
             }
-
-            const createdLesson = await response.json();
-            setSuccessMessage(`Pomyślnie utworzono lekcję: ${createdLesson.title} (ID: ${createdLesson.id}).`);
-            
-            setLessonData(initialLessonData);
-            const defaultCourseId = courses[0]?.id || '';
-            setLessonData(prev => ({ ...prev, courseId: defaultCourseId }));
-            if (defaultCourseId) fetchNextOrderIndex(defaultCourseId);
-            setTasks([]);
-            setBgFile(null);
-
         } catch (err) {
             setError(err.message);
         } finally {
@@ -399,13 +404,10 @@ export default function LessonCreationPage() {
                             >
                                 {isLoading ? (
                                     <>
-                                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.13..."></path>
-                                      </svg>
-                                      Tworzenie lekcji...
+                                        <span className="mr-3 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                                        Tworzenie lekcji
                                     </>
-                                ) : (
+                                    ) : (
                                     'Utwórz Lekcję'
                                 )}
                             </button>
