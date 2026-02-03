@@ -52,7 +52,7 @@ export default function MatchingPairsForm({ task, onUpdate }) {
             <h4 className="font-semibold text-lg text-purple-700">Edytor: Łączenie w Pary</h4>
             
             <div>
-                <label htmlFor={`prompt-${task.id}`} className="block text-sm font-medium text-gray-700">Instrukcja (Prompt)</label>
+                <label htmlFor={`prompt-${task.id}`} className="block text-sm font-medium text-gray-700">Instrukcja</label>
                 <input
                     type="text"
                     id={`prompt-${task.id}`}
@@ -66,7 +66,7 @@ export default function MatchingPairsForm({ task, onUpdate }) {
             </div>
 
             <div className="space-y-3 pt-2 border-t border-purple-200">
-                <label className="block text-sm font-medium text-gray-700">Zdefiniowane Pary (Left - Right)</label>
+                <label className="block text-sm font-medium text-gray-700">Zdefiniowane Pary (Kolumna A - Kolumna B)</label>
                 {task.items.map((item, index) => (
                     <div key={item.key} className="flex items-center space-x-2 bg-white p-2 rounded-md shadow-sm border">
                         <span className="text-sm font-bold text-gray-500 w-8 text-center">{index + 1}.</span>

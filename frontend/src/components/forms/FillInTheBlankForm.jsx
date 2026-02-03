@@ -39,7 +39,7 @@ export default function FillInTheBlankForm({ task, onUpdate }) {
             
             <div>
                 <label htmlFor={`sentence-${task.id}`} className="block text-sm font-medium text-gray-700">
-                    Zdanie z Lukami (użyj **[BLANK]** dla każdej luki)
+                    Zdanie z Lukami (użyj [BLANK] dla każdej luki)
                 </label>
                 <textarea
                     id={`sentence-${task.id}`}
@@ -54,7 +54,7 @@ export default function FillInTheBlankForm({ task, onUpdate }) {
             </div>
             
             <p className="text-sm font-medium text-gray-600">
-                Wykryto **{numBlanks}** {numBlanks === 1 ? 'lukę' : (numBlanks % 10 >= 2 && numBlanks % 10 <= 4 && (numBlanks < 10 || numBlanks > 20) ? 'luki' : 'luk')}.
+                Wykryto {numBlanks} {numBlanks === 1 ? 'lukę' : (numBlanks % 10 >= 2 && numBlanks % 10 <= 4 && (numBlanks < 10 || numBlanks > 20) ? 'luki' : 'luk')}.
             </p>
 
             <div className="space-y-3 pt-2 border-t border-green-200">

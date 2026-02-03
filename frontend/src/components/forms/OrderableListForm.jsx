@@ -77,7 +77,7 @@ export default function OrderableListForm({ task, onUpdate }) {
             <h4 className="font-semibold text-lg text-yellow-800">Edytor: Uporządkowanie Listy</h4>
             
             <div>
-                <label htmlFor={`prompt-${task.id}`} className="block text-sm font-medium text-gray-700">Instrukcja (Prompt)</label>
+                <label htmlFor={`prompt-${task.id}`} className="block text-sm font-medium text-gray-700">Instrukcja</label>
                 <input
                     type="text"
                     id={`prompt-${task.id}`}
