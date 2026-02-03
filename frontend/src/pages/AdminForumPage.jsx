@@ -415,7 +415,7 @@ export default function AdminForumPage() {
               </div>
               
               <div className="space-y-4">
-                <h3 className="text-xl font-bold flex items-center"><MessageSquare className="w-5 h-4 mr-2" /> Komentarze</h3>
+                <h3 className="text-xl text-indigo-600 font-bold flex items-center"><MessageSquare className="w-5 h-4 mr-2" /> Komentarze</h3>
                 
                 <form onSubmit={handleAddComment} className="flex gap-2">
                   <input 

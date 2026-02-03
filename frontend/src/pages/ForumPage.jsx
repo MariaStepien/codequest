@@ -437,7 +437,7 @@ export default function ForumPage() {
             </div>
 
             <div className="space-y-4 text-left">
-              <h3 className="text-xl font-bold flex items-center">
+              <h3 className="text-xl text-indigo-600 font-bold flex items-center">
                 <MessageSquare className="w-5 h-4 mr-2" /> Komentarze
               </h3>
               
